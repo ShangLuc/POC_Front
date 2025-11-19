@@ -1,0 +1,106 @@
+<div class="container-fluid py-5">
+    <div class="row justify-content-center ">
+        <div class="col-lg-8 ">
+            <div class="card p-5">
+                <div class="card-header">
+                    <h5 class="card-title " *ngIf="!selectedProfile">Sélectionnez votre profil</h5>
+                    <h5 class="card-title" *ngIf="selectedProfile === 'eleve'">
+                        Authentification Élève
+                        <a class="cursor-pointer float-right"
+                            [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
+                            (click)="selectProfile('')">
+                            <i class="fa fa-arrow-left"></i> Retour
+                        </a>
+                    </h5>
+                    <h5 class="card-title" *ngIf="selectedProfile === 'admin'">
+                        Authentification Administrateur
+                        <a class="cursor-pointer float-right"
+                            [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
+                            (click)="selectProfile('')">
+                            <i class="fa fa-arrow-left"></i> Retour
+                        </a>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Profile Selection Buttons -->
+                    <div class="row mb-4 d-flex justify-content-center gap-3" *ngIf="!selectedProfile">
+                        <div class="col-md-6 ms-30 me-10">
+                            <button 
+                                type="button" 
+                                class="btn btn-ld w-100 "
+                                (click)="selectProfile('eleve')">
+                                <i class="fa fa-graduation-cap"></i> Élève
+                            </button>
+                        </div>
+                        <div class="col-md-6 ms-10 me-30">
+                            <button 
+                                type="button" 
+                                class="btn btn-md w-100 "
+                                (click)="selectProfile('admin')">
+                                <i class="fa fa-user-shield"></i>Administrateur
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Eleve Login Form -->
+                    <div *ngIf="selectedProfile === 'eleve'">
+                        <form>
+                            <div class="form-group">
+                                <label for="eleveIdentifiant">Identifiant</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="eleveIdentifiant"
+                                    placeholder="Entrez votre identifiant"
+                                    [(ngModel)]="eleveIdentifiant"
+                                    name="eleveIdentifiant">
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary w-50 mx-auto mt-3 mb-3"
+                                    (click)="authenticate()">
+                                    Authentification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Admin Login Form -->
+                    <div *ngIf="selectedProfile === 'admin'">
+                        <form>
+                            <div class="form-group">
+                                <label for="adminEmail">Email</label>
+                                <input 
+                                    type="email" 
+                                    class="form-control" 
+                                    id="adminEmail"
+                                    placeholder="Entrez votre email"
+                                    [(ngModel)]="adminEmail"
+                                    name="adminEmail">
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPassword">Mot de passe</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="adminPassword"
+                                    placeholder="Entrez votre mot de passe"
+                                    [(ngModel)]="adminPassword"
+                                    name="adminPassword">
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary w-50 mx-auto mt-3 mb-3"
+                                    (click)="authenticate()">
+                                    Authentification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
