@@ -15,6 +15,7 @@ import { SectionComponent }         from '../../pages/section/section.component'
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
+import { StudentListComponent } from 'app/pages/studentList/studentList.component';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { ActivityComponent } from 'app/pages/activity/activity.component';
     AcceuilComponent,
     UserComponent,
     ActivityComponent,
+    StudentListComponent,
     TableComponent,
     TypographyComponent,
     IconsComponent,

@@ -1,0 +1,113 @@
+<div class="container-fluid py-5">
+    <!-- Tableau des Étudiants -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-header">
+            <h5 class="card-title">Liste des élèves</h5>
+        </div>
+        <div class="card-body p-5">
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openModal()">
+                    <i class="fa fa-plus"></i> Ajouter un élève
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Identifiant National</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Établissement</th>
+                            <th>Demi-journée</th>
+                            <th>Confirmé le choix</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let student of students; let i = index">
+                            <td>{{ student.numero }}</td>
+                            <td>{{ student.identifiantNational }}</td>
+                            <td>{{ student.nom }}</td>
+                            <td>{{ student.prenom }}</td>
+                            <td>{{ student.etablissement }}</td>
+                            <td>{{ student.demijournee }}</td>
+                            <td>
+                                <span *ngIf="student.confirmeChoix === 'oui'" class="badge badge-success">Oui</span>
+                                <span *ngIf="student.confirmeChoix === 'non'" class="badge badge-danger">Non</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteStudent(i)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="students.length === 0">
+                            <td colspan="7" class="text-center text-muted">Aucun étudiant ajouté</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter un étudiant -->
+    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un Étudiant</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="identifiantInput">Identifiant National</label>
+                        <input type="text" class="form-control" id="identifiantInput" 
+                               [(ngModel)]="newStudent.identifiantNational" 
+                               placeholder="Entrez l'identifiant national">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="nomInput">Nom</label>
+                        <input type="text" class="form-control" id="nomInput" 
+                               [(ngModel)]="newStudent.nom" 
+                               placeholder="Entrez le nom">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="prenomInput">Prénom</label>
+                        <input type="text" class="form-control" id="prenomInput" 
+                               [(ngModel)]="newStudent.prenom" 
+                               placeholder="Entrez le prénom">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="etablissementInput">Établissement</label>
+                        <input type="text" class="form-control" id="etablissementInput" 
+                               [(ngModel)]="newStudent.etablissement" 
+                               placeholder="Entrez l'établissement">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="demijourneeInput">Demi-journée</label>
+                        <input type="text" class="form-control" id="demijourneeInput" 
+                               [(ngModel)]="newStudent.demijournee" 
+                               placeholder="Entrez la demi-journée de participation">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="confirmeChoixSelect">Confirmé le choix</label>
+                        <select class="form-control" id="confirmeChoixSelect" 
+                                [(ngModel)]="newStudent.confirmeChoix">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="addStudent()">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay pour modal -->
+    <div class="modal-backdrop fade" [ngClass]="{'show': showModal}" *ngIf="showModal"></div>
+
+</div>
