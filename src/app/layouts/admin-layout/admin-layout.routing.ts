@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
+import { AcceuilComponent } from '../../pages/acceuil/acceuil.component';
 import { UserComponent } from '../../pages/user/user.component';
 import { TableComponent } from '../../pages/table/table.component';
 import { TypographyComponent } from '../../pages/typography/typography.component';
@@ -8,7 +8,7 @@ import { IconsComponent } from '../../pages/icons/icons.component';
 import { SectionComponent } from '../../pages/section/section.component';
 
 export const AdminLayoutRoutes: Routes = [
-    { path: 'dashboard',      component: DashboardComponent },
+    { path: 'acceuil',        component: AcceuilComponent },
     { path: 'user',           component: UserComponent },
     { path: 'table',          component: TableComponent },
     { path: 'typography',     component: TypographyComponent },
