@@ -1,0 +1,168 @@
+<div class="container-fluid py-5">
+    <!-- Conférences Table -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-header">
+            <h5 class="card-title">Conférences</h5>
+        </div>
+        <div class="card-body p-5">
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openModal('conferences')">
+                    <i class="fa fa-plus"></i> Ajouter une conférence
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom</th>
+                            <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of conferences; let i = index">
+                            <td>{{ item.numero }}</td>
+                            <td>{{ item.nom }}</td>
+                            <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('conferences', i)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="conferences.length === 0">
+                            <td colspan="5" class="text-center text-muted">Aucune conférence ajoutée</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Rondes -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-header">
+            <h5 class="card-title">Tables Rondes</h5>
+        </div>
+        <div class="card-body p-5">
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openModal('tables_rondes')">
+                    <i class="fa fa-plus"></i> Ajouter une table ronde
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom</th>
+                            <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of tablesRondes; let i = index">
+                            <td>{{ item.numero }}</td>
+                            <td>{{ item.nom }}</td>
+                            <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('tables_rondes', i)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="tablesRondes.length === 0">
+                            <td colspan="5" class="text-center text-muted">Aucune table ronde ajoutée</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flashs Métiers -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-header">
+            <h5 class="card-title">Flashs Métiers</h5>
+        </div>
+        <div class="card-body p-5">
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openModal('flashs_metiers')">
+                    <i class="fa fa-plus"></i> Ajouter un flash métier
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom</th>
+                            <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of flashsMetiers; let i = index">
+                            <td>{{ item.numero }}</td>
+                            <td>{{ item.nom }}</td>
+                            <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('flashs_metiers', i)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="flashsMetiers.length === 0">
+                            <td colspan="5" class="text-center text-muted">Aucun flash métier ajouté</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter une activité -->
+    <div class="modal fade" [ngClass]="{'show': activeModal}" [ngStyle]="{'display': activeModal ? 'block' : 'none'}" id="activityModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span *ngIf="activeModal === 'conferences'">Ajouter une Conférence</span>
+                        <span *ngIf="activeModal === 'tables_rondes'">Ajouter une Table Ronde</span>
+                        <span *ngIf="activeModal === 'flashs_metiers'">Ajouter un Flash Métier</span>
+                    </h5>
+                    <button type="button" class="btn-close" (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="nomInput">Nom</label>
+                        <input type="text" class="form-control" id="nomInput" [(ngModel)]="newActivity.nom" placeholder="Entrez le nom">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="capaciteInput">Capacité Maximale</label>
+                        <input type="number" class="form-control" id="capaciteInput" [(ngModel)]="newActivity.capacite" placeholder="Entrez la capacité">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="nbRepetitionInput">Nombre de Répétition</label>
+                        <input type="number" class="form-control" id="nbRepetitionInput" [(ngModel)]="newActivity.nbRepetition" placeholder="Entrez le nombre de répétition">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="addActivity(activeModal)">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay pour modal -->
+    <div class="modal-backdrop fade" [ngClass]="{'show': activeModal}" *ngIf="activeModal"></div>
+
+</div>
