@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { AcceuilComponent } from '../../pages/acceuil/acceuil.component';
+import { FormComponent } from '../../pages/form/form.component';
 import { UserComponent } from '../../pages/user/user.component';
 import { TableComponent } from '../../pages/table/table.component';
 import { TypographyComponent } from '../../pages/typography/typography.component';
@@ -9,6 +10,7 @@ import { SectionComponent } from '../../pages/section/section.component';
 
 export const AdminLayoutRoutes: Routes = [
     { path: 'acceuil',        component: AcceuilComponent },
+    { path: 'form',           component: FormComponent },
     { path: 'user',           component: UserComponent },
     { path: 'table',          component: TableComponent },
     { path: 'typography',     component: TypographyComponent },

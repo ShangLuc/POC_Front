@@ -1,0 +1,216 @@
+<div class="row">
+  <div class="col justify-content-md-center">
+    <div class="card card-user">
+      <div class="card-header">
+        <h5 class="card-title">Inscription aux conférences - Forum de l'orientation</h5>
+      </div>
+      <div class="card-body">
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+  
+  <!-- Étape 1: Informations personnelles -->
+  <div *ngIf="currentStep === 1">
+    <h6 class="mb-3">Étape 1: Informations personnelles</h6>
+    
+    <div class="mb-3">
+      <label for="Prénom">Prénom : </label>
+      <input id="Prénom" type="text" formControlName="Prénom" class="form-control"/>
+      <div *ngIf="formGroup.get('Prénom')?.invalid && formGroup.get('Prénom')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('Prénom')?.errors?.['required']">Ce champ est obligatoire.</small>
+        <small *ngIf="formGroup.get('Prénom')?.errors?.['maxlength']">Le prénom doit contenir au max 15 caractères.</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="Nom">Nom de la famille : </label>
+      <input id="Nom" type="text" formControlName="Nom" class="form-control"/>
+      <div *ngIf="formGroup.get('Nom')?.invalid && formGroup.get('Nom')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('Nom')?.errors?.['required']">Ce champ est obligatoire.</small>
+        <small *ngIf="formGroup.get('Nom')?.errors?.['maxlength']">Le nom doit contenir au max 15 caractères.</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="id">Id National : </label>
+      <input id="id" type="text" formControlName="id" class="form-control"/>
+      <div *ngIf="formGroup.get('id')?.invalid && formGroup.get('id')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('id')?.errors?.['required']">Ce champ est obligatoire.</small>
+        <small *ngIf="formGroup.get('id')?.errors?.['maxlength']">L'ID doit contenir au max 15 caractères.</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="Etablissement">Etablissement : </label>
+      <input id="Etablissement" type="text" formControlName="Etablissement" class="form-control"/>
+      <div *ngIf="formGroup.get('Etablissement')?.invalid && formGroup.get('Etablissement')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('Etablissement')?.errors?.['required']">Ce champ est obligatoire.</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="Lib">Lib.Structure : </label>
+      <input id="Lib" type="text" formControlName="Lib" class="form-control" />
+      <div *ngIf="formGroup.get('Lib')?.invalid && formGroup.get('Lib')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('Lib')?.errors?.['required']">Ce champ est obligatoire.</small>
+        <small *ngIf="formGroup.get('Lib')?.errors?.['maxlength']">11 caractères au max.</small>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStep1Valid()">
+      Suivant
+    </button>
+  </div>
+
+  <!-- Étape 2: Choix des vœux -->
+  <div *ngIf="currentStep === 2">
+    <h6 class="mb-3">Étape 2: Sélection de vos vœux</h6>
+    
+    <!-- <div class="alert alert-info" role="alert">
+      <strong>Instructions :</strong>
+      <ul class="mb-0">
+        <li>Vœux 1 et 2 : Conférences obligatoires (attribution garantie)</li>
+        <li>Vœux 3, 4 et 5 : Au choix parmi conférences, tables rondes ou flashs métiers</li>
+        <li>Tous les vœux doivent être différents</li>
+      </ul>
+    </div> -->
+
+    <!-- Vœu 1 - Conférence obligatoire -->
+<div class="mb-3">
+  <label for="voeu1" class="form-label d-block">
+    <strong>Vœu 1 :</strong> Conférence (obligatoire) <span class="text-danger">*</span>
+  </label>
+  <select id="voeu1" formControlName="voeu1" class="form-select" (change)="onVoeuChange()" style="width: 50%;">
+    <option value="">-- Sélectionnez une conférence --</option>
+    <optgroup label="Conférences">
+      <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu1')">
+        {{ conf }}
+      </option>
+    </optgroup>
+  </select>
+  <div *ngIf="formGroup.get('voeu1')?.invalid && formGroup.get('voeu1')?.touched" class="text-danger">
+    <small *ngIf="formGroup.get('voeu1')?.errors?.['required']">Le vœu 1 est obligatoire.</small>
+  </div>
+</div>
+
+<!-- Vœu 2 - Conférence obligatoire -->
+<div class="mb-3">
+  <label for="voeu2" class="form-label d-block">
+    <strong>Vœu 2 :</strong> Conférence (obligatoire) <span class="text-danger">*</span>
+  </label>
+  <select id="voeu2" formControlName="voeu2" class="form-select" (change)="onVoeuChange()" style="width: 50%;">
+    <option value="">-- Sélectionnez une conférence --</option>
+    <optgroup label="Conférences">
+      <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu2')">
+        {{ conf }}
+      </option>
+    </optgroup>
+  </select>
+  <div *ngIf="formGroup.get('voeu2')?.invalid && formGroup.get('voeu2')?.touched" class="text-danger">
+    <small *ngIf="formGroup.get('voeu2')?.errors?.['required']">Le vœu 2 est obligatoire.</small>
+  </div>
+</div>
+
+   
+
+    <!-- <hr class="my-4"> -->
+
+    <!-- Vœu 3 - Au choix -->
+    <div class="mb-3">
+      <label for="voeu3" class="form-label d-block">
+        <strong>Vœu 3 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+      </label>
+      <select id="voeu3" formControlName="voeu3" class="form-select" (change)="onVoeuChange()" style="width: 50%;">
+        <option value="">-- Sélectionnez un vœu --</option>
+        <optgroup label="Conférences">
+          <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu3')">
+            {{ conf }}
+          </option>
+        </optgroup>
+        <optgroup label="Tables rondes">
+          <option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu3')">
+            {{ table }}
+          </option>
+        </optgroup>
+        <optgroup label="Flashs métiers">
+          <option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu3')">
+            {{ flash }}
+          </option>
+        </optgroup>
+      </select>
+      <div *ngIf="formGroup.get('voeu3')?.invalid && formGroup.get('voeu3')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('voeu3')?.errors?.['required']">Le vœu 3 est obligatoire.</small>
+      </div>
+    </div>
+
+    <!-- Vœu 4 - Au choix -->
+    <div class="mb-3">
+      <label for="voeu4" class="form-label d-block">
+        <strong>Vœu 4 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+      </label>
+      <select id="voeu4" formControlName="voeu4" class="form-select" (change)="onVoeuChange()" style="width: 50%;">
+        <option value="">-- Sélectionnez un vœu --</option>
+        <optgroup label="Conférences">
+          <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu4')">
+            {{ conf }}
+          </option>
+        </optgroup>
+        <optgroup label="Tables rondes">
+          <option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu4')">
+            {{ table }}
+          </option>
+        </optgroup>
+        <optgroup label="Flashs métiers">
+          <option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu4')">
+            {{ flash }}
+          </option>
+        </optgroup>
+      </select>
+      <div *ngIf="formGroup.get('voeu4')?.invalid && formGroup.get('voeu4')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('voeu4')?.errors?.['required']">Le vœu 4 est obligatoire.</small>
+      </div>
+    </div>
+
+    <!-- Vœu 5 - Au choix -->
+    <div class="mb-3">
+      <label for="voeu5" class="form-label d-block">
+        <strong>Vœu 5 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+      </label>
+      <select id="voeu5" formControlName="voeu5" class="form-select" (change)="onVoeuChange()" style="width: 50%;">
+        <option value="">-- Sélectionnez un vœu --</option>
+        <optgroup label="Conférences">
+          <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">
+            {{ conf }}
+          </option>
+        </optgroup>
+        <optgroup label="Tables rondes">
+          <option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu5')">
+            {{ table }}
+          </option>
+        </optgroup>
+        <optgroup label="Flashs métiers">
+          <option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu5')">
+            {{ flash }}
+          </option>
+        </optgroup>
+      </select>
+      <div *ngIf="formGroup.get('voeu5')?.invalid && formGroup.get('voeu5')?.touched" class="text-danger">
+        <small *ngIf="formGroup.get('voeu5')?.errors?.['required']">Le vœu 5 est obligatoire.</small>
+      </div>
+    </div>
+
+    <!-- Messages de validation personnalisés -->
+    <div *ngIf="validationMessage" class="alert alert-danger mt-3" role="alert">
+      {{ validationMessage }}
+    </div>
+
+    <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">
+      Précédent
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">
+      Enregistrer
+    </button>
+  </div>
+</form>
+      </div>
+    </div>
+  </div>
+</div>
