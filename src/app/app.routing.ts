@@ -1,13 +1,19 @@
 import { Routes } from '@angular/router';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+import { AuthComponent } from './pages/auth/auth.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: '/auth',
     pathMatch: 'full',
-  }, {
+  }, 
+  {
+    path: 'auth',
+    component: AuthComponent
+  },
+  {
     path: '',
     component: AdminLayoutComponent,
     children: [
