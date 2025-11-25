@@ -23,6 +23,6 @@ export const AppRoutes: Routes = [
   }]},
   {
     path: '**',
-    redirectTo: 'acceuil'
+    redirectTo: 'accueil'
   }
 ]

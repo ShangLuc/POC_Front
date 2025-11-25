@@ -21,7 +21,6 @@ export class AuthComponent implements OnInit{
 
     selectProfile(profile: string) {
         this.selectedProfile = profile;
-        // Reset form values when switching profiles
         this.eleveIdentifiant = '';
         this.adminEmail = '';
         this.adminPassword = '';

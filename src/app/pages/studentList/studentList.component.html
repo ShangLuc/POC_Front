@@ -5,10 +5,14 @@
             <h5 class="card-title">Liste des élèves</h5>
         </div>
         <div class="card-body p-5">
-            <div class="mb-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="openModal()">
+            <div class="mb-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
                 </button>
+                <label for="excel-upload" class="btn btn-outline-success btn-sm">
+                    <i class="fa fa-file-excel"></i> Importer un fichier Excel
+                </label>
+                <input id="excel-upload" type="file" (change)="onFileChange($event)" style="display: none;" accept=".xlsx, .xls">
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -19,7 +23,7 @@
                             <th>Nom</th>
                             <th>Prénom</th>
                             <th>Établissement</th>
-                            <th>Demi-journée</th>
+                            <th>Lib. Structure</th>
                             <th>Confirmé le choix</th>
                             <th>Action</th>
                         </tr>
@@ -31,7 +35,7 @@
                             <td>{{ student.nom }}</td>
                             <td>{{ student.prenom }}</td>
                             <td>{{ student.etablissement }}</td>
-                            <td>{{ student.demijournee }}</td>
+                            <td>{{ student.libStructure }}</td>
                             <td>
                                 <span *ngIf="student.confirmeChoix === 'oui'" class="badge badge-success">Oui</span>
                                 <span *ngIf="student.confirmeChoix === 'non'" class="badge badge-danger">Non</span>
@@ -43,7 +47,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="students.length === 0">
-                            <td colspan="7" class="text-center text-muted">Aucun étudiant ajouté</td>
+                            <td colspan="8" class="text-center text-muted">Aucun étudiant ajouté</td>
                         </tr>
                     </tbody>
                 </table>
@@ -83,12 +87,6 @@
                         <input type="text" class="form-control" id="etablissementInput" 
                                [(ngModel)]="newStudent.etablissement" 
                                placeholder="Entrez l'établissement">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="demijourneeInput">Demi-journée</label>
-                        <input type="text" class="form-control" id="demijourneeInput" 
-                               [(ngModel)]="newStudent.demijournee" 
-                               placeholder="Entrez la demi-journée de participation">
                     </div>
                     <div class="form-group mb-3">
                         <label for="confirmeChoixSelect">Confirmé le choix</label>

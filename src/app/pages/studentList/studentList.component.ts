@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as XLSX from 'xlsx';
 
 
 @Component({
@@ -19,7 +20,6 @@ export class StudentListComponent implements OnInit{
         nom: '',
         prenom: '',
         etablissement: '',
-        demijournee: '',
         confirmeChoix: 'non'
     };
 
@@ -44,7 +44,6 @@ export class StudentListComponent implements OnInit{
             nom: '',
             prenom: '',
             etablissement: '',
-            demijournee: '',
             confirmeChoix: 'non'
         };
     }
@@ -63,7 +62,6 @@ export class StudentListComponent implements OnInit{
             nom: this.newStudent.nom,
             prenom: this.newStudent.prenom,
             etablissement: this.newStudent.etablissement,
-            demijournee: this.newStudent.demijournee,
             confirmeChoix: this.newStudent.confirmeChoix
         };
 
@@ -82,5 +80,39 @@ export class StudentListComponent implements OnInit{
         this.students.forEach((student, index) => {
             student.numero = index + 1;
         });
+    }
+
+    // Importer un fichier Excel
+    onFileChange(event: any) {
+        const target: DataTransfer = <DataTransfer>(event.target);
+        if (target.files.length !== 1) {
+            throw new Error('Cannot use multiple files');
+        }
+        const reader: FileReader = new FileReader();
+        reader.onload = (e: any) => {
+            const bstr: string = e.target.result;
+            const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+            const wsname: string = wb.SheetNames[0];
+            const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+            const data = <any[]>(XLSX.utils.sheet_to_json(ws, { header: 1 }));
+            
+            // Supprimer la première ligne (en-têtes)
+            data.shift();
+
+            data.forEach(row => {
+                const newStudent = {
+                    numero: this.students.length + 1,
+                    etablissement: row[0],
+                    nom: row[1],
+                    prenom: row[2],
+                    identifiantNational: row[3],
+                    libStructure: row[4],
+                    confirmeChoix: 'non' // Valeur par défaut
+                };
+                this.students.push(newStudent);
+            });
+            this.updateNumbers();
+        };
+        reader.readAsBinaryString(target.files[0]);
     }
 }

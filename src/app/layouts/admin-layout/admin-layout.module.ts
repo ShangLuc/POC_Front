@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminLayoutRoutes } from './admin-layout.routing';
 
 import { AuthComponent }            from 'app/pages/auth/auth.component';
-import { AcceuilComponent }         from '../../pages/acceuil/acceuil.component';
+import { AccueilComponent }         from '../../pages/accueil/accueil.component';
 import { FormComponent }            from '../../pages/form/form.component';
 import { UserComponent }            from '../../pages/user/user.component';
 import { TableComponent }           from '../../pages/table/table.component';
@@ -28,7 +28,7 @@ import { StudentListComponent } from 'app/pages/studentList/studentList.componen
   ],
   declarations: [
     AuthComponent,
-    AcceuilComponent,
+    AccueilComponent,
     UserComponent,
     ActivityComponent,
     StudentListComponent,

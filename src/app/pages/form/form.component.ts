@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,9 +9,9 @@ import { CommonModule } from '@angular/common';
     imports: [ReactiveFormsModule, CommonModule]
 })
 
-export class FormComponent {
-    currentStep = 1;
+export class FormComponent implements OnInit {
     validationMessage = '';
+    isConfirmed = false;
 
     // Liste des 19 conférences
     conferences = [
@@ -55,54 +55,42 @@ export class FormComponent {
         'Flash métier: design / architecture (animation par des professionnels)'
     ];
 
-    formGroup = new FormGroup({
-        // Étape 1
-        Prénom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
-        Nom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
-        id: new FormControl('', [Validators.required, Validators.maxLength(15)]),
-        Etablissement: new FormControl('', Validators.required),
-        Lib: new FormControl('', [Validators.required, Validators.maxLength(11)]),
-        
-        // Étape 2 - Vœux
-        voeu1: new FormControl('', Validators.required),
-        voeu2: new FormControl('', Validators.required),
-        voeu3: new FormControl('', Validators.required),
-        voeu4: new FormControl('', Validators.required),
-        voeu5: new FormControl('', Validators.required)
-    });
+    formGroup: FormGroup;
 
-    isStep1Valid(): boolean {
-        const prenom = this.formGroup.get('Prénom');
-        const nom = this.formGroup.get('Nom');
-        const id = this.formGroup.get('id');
-        const Etablissement = this.formGroup.get('Etablissement');
-        const Lib = this.formGroup.get('Lib');
-        
-        return !!(prenom?.valid && nom?.valid && id?.valid && Etablissement?.valid && Lib?.valid);
+    constructor() {
+        this.formGroup = new FormGroup({
+            Prénom: new FormControl({ value: '', disabled: true }),
+            Nom: new FormControl({ value: '', disabled: true }),
+            id: new FormControl({ value: '', disabled: true }),
+            Etablissement: new FormControl({ value: '', disabled: true }),
+            Lib: new FormControl({ value: '', disabled: true }),
+            voeu1: new FormControl('', Validators.required),
+            voeu2: new FormControl('', Validators.required),
+            voeu3: new FormControl('', Validators.required),
+            voeu4: new FormControl('', Validators.required),
+            voeu5: new FormControl('', Validators.required)
+        });
     }
 
-    nextStep(): void {
-        if (this.isStep1Valid()) {
-            this.currentStep = 2;
-        } else {
-            this.formGroup.get('Prénom')?.markAsTouched();
-            this.formGroup.get('Nom')?.markAsTouched();
-            this.formGroup.get('id')?.markAsTouched();
-            this.formGroup.get('Etablissement')?.markAsTouched();
-            this.formGroup.get('Lib')?.markAsTouched();
-        }
-    }
+    ngOnInit() {
+        // Simuler la récupération des informations de l'utilisateur
+        // Dans une application réelle, ces données viendraient d'un service d'authentification
+        const userInfo = {
+            Prénom: 'Jean',
+            Nom: 'Dupont',
+            id: '123456789',
+            Etablissement: 'Lycée Victor Hugo',
+            Lib: 'Structure A'
+        };
 
-    previousStep(): void {
-        this.currentStep = 1;
+        // Mettre à jour les valeurs du formulaire avec les données de l'utilisateur
+        this.formGroup.patchValue(userInfo);
     }
 
     onVoeuChange(): void {
-        // Réinitialiser le message de validation
         this.validationMessage = '';
     }
 
-    // Vérifie si un vœu est déjà sélectionné dans un autre champ
     isVoeuSelected(voeu: string, currentField: string): boolean {
         const voeux = ['voeu1', 'voeu2', 'voeu3', 'voeu4', 'voeu5'];
         
@@ -114,70 +102,58 @@ export class FormComponent {
         return false;
     }
 
-    // Validation complète des vœux
     validateVoeux(): string {
-        const voeu1 = this.formGroup.get('voeu1')?.value;
-        const voeu2 = this.formGroup.get('voeu2')?.value;
-        const voeu3 = this.formGroup.get('voeu3')?.value;
-        const voeu4 = this.formGroup.get('voeu4')?.value;
-        const voeu5 = this.formGroup.get('voeu5')?.value;
+        const voeuxValues = this.formGroup.getRawValue();
+        const voeux = [voeuxValues.voeu1, voeuxValues.voeu2, voeuxValues.voeu3, voeuxValues.voeu4, voeuxValues.voeu5];
 
-        const voeux = [voeu1, voeu2, voeu3, voeu4, voeu5];
-
-        // Vérifier que tous les vœux sont différents
         const uniqueVoeux = new Set(voeux);
         if (uniqueVoeux.size !== 5) {
             return 'Tous les vœux doivent être différents.';
         }
 
-        // Vérifier que les vœux 1 et 2 sont des conférences
-        if (!this.conferences.includes(voeu1)) {
+        if (!this.conferences.includes(voeuxValues.voeu1)) {
             return 'Le vœu 1 doit être une conférence.';
         }
-        if (!this.conferences.includes(voeu2)) {
+        if (!this.conferences.includes(voeuxValues.voeu2)) {
             return 'Le vœu 2 doit être une conférence.';
-        }
-
-        // Vérifier que les vœux 3, 4, 5 ne sont pas les mêmes que 1 et 2 s'ils sont des conférences
-        const voeux12 = [voeu1, voeu2];
-        if (this.conferences.includes(voeu3) && voeux12.includes(voeu3)) {
-            return 'Le vœu 3 ne peut pas être identique aux vœux 1 ou 2.';
-        }
-        if (this.conferences.includes(voeu4) && voeux12.includes(voeu4)) {
-            return 'Le vœu 4 ne peut pas être identique aux vœux 1 ou 2.';
-        }
-        if (this.conferences.includes(voeu5) && voeux12.includes(voeu5)) {
-            return 'Le vœu 5 ne peut pas être identique aux vœux 1 ou 2.';
         }
 
         return '';
     }
 
-    onSubmit(): void {
+    onSave(): void {
         if (this.formGroup.valid) {
-            // Validation des règles métier
             const validationError = this.validateVoeux();
             if (validationError) {
                 this.validationMessage = validationError;
                 return;
             }
-
-            console.log('Formulaire valide:', this.formGroup.value);
-            
-            // Afficher un résumé de la sélection
-            console.log('=== Résumé de vos vœux ===');
-            console.log('Vœu 1 (Conférence):', this.formGroup.get('voeu1')?.value);
-            console.log('Vœu 2 (Conférence):', this.formGroup.get('voeu2')?.value);
-            console.log('Vœu 3:', this.formGroup.get('voeu3')?.value);
-            console.log('Vœu 4:', this.formGroup.get('voeu4')?.value);
-            console.log('Vœu 5:', this.formGroup.get('voeu5')?.value);
-            
-            // Envoyer au backend
-            alert('Inscription enregistrée avec succès !');
+            console.log('Formulaire enregistré:', this.formGroup.getRawValue());
+            alert('Vos choix ont été enregistrés. Vous pouvez encore les modifier.');
         } else {
-            Object.keys(this.formGroup.controls).forEach(key => {
-                this.formGroup.get(key)?.markAsTouched();
-            });
+            this.markAllAsTouched();
         }
+    }
+
+    onConfirm(): void {
+        if (this.formGroup.valid) {
+            const validationError = this.validateVoeux();
+            if (validationError) {
+                this.validationMessage = validationError;
+                return;
+            }
+            this.isConfirmed = true;
+            this.formGroup.disable(); // Désactiver le formulaire après confirmation
+            console.log('Formulaire confirmé:', this.formGroup.getRawValue());
+            alert('Vos choix ont été confirmés et ne peuvent plus être modifiés.');
+        } else {
+            this.markAllAsTouched();
+        }
+    }
+
+    markAllAsTouched() {
+        Object.keys(this.formGroup.controls).forEach(key => {
+            this.formGroup.get(key)?.markAsTouched();
+        });
     }
 }
