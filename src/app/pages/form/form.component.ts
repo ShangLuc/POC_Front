@@ -13,7 +13,7 @@ export class FormComponent {
     currentStep = 1;
     validationMessage = '';
 
-    // Liste des 19 conférences
+    
     conferences = [
         'Etudes et métiers des arts, de la culture et du design',
         'Etudes et métiers du commerce',
@@ -36,7 +36,7 @@ export class FormComponent {
         'Etre étudiant _ Parcoursup'
     ];
 
-    // Liste des 5 tables rondes
+   
     tablesRondes = [
         'Table ronde: Etre étudiant en BTS (animation par des étudiants)',
         'Table ronde: Etre étudiant en BUT (animation par des étudiants)',
@@ -45,7 +45,7 @@ export class FormComponent {
         'Table ronde: Etre étudiant en Licences (animation par des étudiants)'
     ];
 
-    // Liste des 5 flashs métiers
+    
     flashsMetiers = [
         'Flash métier: ingénieur (animation par des professionnels)',
         'Flash métier: social (animation par des professionnels)',
@@ -57,8 +57,8 @@ export class FormComponent {
 
     formGroup = new FormGroup({
         // Étape 1
-        Prénom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
-        Nom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
+        // Prénom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
+        // Nom: new FormControl('', [Validators.required, Validators.maxLength(15)]),
         id: new FormControl('', [Validators.required, Validators.maxLength(15)]),
         Etablissement: new FormControl('', Validators.required),
         Lib: new FormControl('', [Validators.required, Validators.maxLength(11)]),
@@ -72,21 +72,22 @@ export class FormComponent {
     });
 
     isStep1Valid(): boolean {
-        const prenom = this.formGroup.get('Prénom');
-        const nom = this.formGroup.get('Nom');
+        // const prenom = this.formGroup.get('Prénom');
+        // const nom = this.formGroup.get('Nom');
         const id = this.formGroup.get('id');
         const Etablissement = this.formGroup.get('Etablissement');
         const Lib = this.formGroup.get('Lib');
         
-        return !!(prenom?.valid && nom?.valid && id?.valid && Etablissement?.valid && Lib?.valid);
+        // return !!(prenom?.valid && nom?.valid && id?.valid && Etablissement?.valid && Lib?.valid);
+        return !!(id?.valid && Etablissement?.valid && Lib?.valid);
     }
 
     nextStep(): void {
         if (this.isStep1Valid()) {
             this.currentStep = 2;
         } else {
-            this.formGroup.get('Prénom')?.markAsTouched();
-            this.formGroup.get('Nom')?.markAsTouched();
+            // this.formGroup.get('Prénom')?.markAsTouched();
+            // this.formGroup.get('Nom')?.markAsTouched();
             this.formGroup.get('id')?.markAsTouched();
             this.formGroup.get('Etablissement')?.markAsTouched();
             this.formGroup.get('Lib')?.markAsTouched();

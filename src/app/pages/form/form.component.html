@@ -11,23 +11,23 @@
   <div *ngIf="currentStep === 1">
     <h6 class="mb-3">Étape 1: Informations personnelles</h6>
     
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <label for="Prénom">Prénom : </label>
       <input id="Prénom" type="text" formControlName="Prénom" class="form-control"/>
       <div *ngIf="formGroup.get('Prénom')?.invalid && formGroup.get('Prénom')?.touched" class="text-danger">
         <small *ngIf="formGroup.get('Prénom')?.errors?.['required']">Ce champ est obligatoire.</small>
         <small *ngIf="formGroup.get('Prénom')?.errors?.['maxlength']">Le prénom doit contenir au max 15 caractères.</small>
       </div>
-    </div>
+    </div> -->
 
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <label for="Nom">Nom de la famille : </label>
       <input id="Nom" type="text" formControlName="Nom" class="form-control"/>
       <div *ngIf="formGroup.get('Nom')?.invalid && formGroup.get('Nom')?.touched" class="text-danger">
         <small *ngIf="formGroup.get('Nom')?.errors?.['required']">Ce champ est obligatoire.</small>
         <small *ngIf="formGroup.get('Nom')?.errors?.['maxlength']">Le nom doit contenir au max 15 caractères.</small>
       </div>
-    </div>
+    </div> -->
 
     <div class="mb-3">
       <label for="id">Id National : </label>
