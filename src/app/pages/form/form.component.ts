@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { jsPDF } from 'jspdf';
 
 @Component({
     selector: 'user-cmp',
@@ -12,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class FormComponent {
     currentStep = 1;
     validationMessage = '';
+    showDownloadButton = false;
 
     
     conferences = [
@@ -175,10 +177,52 @@ export class FormComponent {
             
             // Envoyer au backend
             alert('Inscription enregistrée avec succès !');
+            this.showDownloadButton = true;
+            this.downloadTicket();
         } else {
             Object.keys(this.formGroup.controls).forEach(key => {
                 this.formGroup.get(key)?.markAsTouched();
             });
         }
+    }
+
+    downloadTicket(): void {
+        const doc = new jsPDF();
+
+        const prenom = this.formGroup.get('Prénom')?.value || 'Non renseigné';
+        const nom = this.formGroup.get('Nom')?.value || 'Non renseigné';
+        const voeu1 = this.formGroup.get('voeu1')?.value || 'Non renseigné';
+        const voeu2 = this.formGroup.get('voeu2')?.value || 'Non renseigné';
+        const voeu3 = this.formGroup.get('voeu3')?.value || 'Non renseigné';
+        const voeu4 = this.formGroup.get('voeu4')?.value || 'Non renseigné';
+        const voeu5 = this.formGroup.get('voeu5')?.value || 'Non renseigné';
+
+        //ajouter un titre avec style
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Ticket de Vœux', 10, 10);
+
+        doc.setDrawColor(0,0,0);
+        doc.setLineWidth(0.5);
+        doc.rect(10, 30, 190, 100);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(60, 60, 60);
+        doc.text(`Prénom : ${prenom}`, 10, 20);
+        doc.text(`Nom : ${nom}`, 10, 30);
+        doc.text(`Vœu 1 : ${voeu1}`, 10, 40);
+        doc.text(`Vœu 2 : ${voeu2}`, 10, 50);
+        doc.text(`Vœu 3 : ${voeu3}`, 10, 60);
+        doc.text(`Vœu 4 : ${voeu4}`, 10, 70);
+        doc.text(`Vœu 5 : ${voeu5}`, 10, 80);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Merci de votre participation !', 105, 130, { align: 'center' });
+
+        doc.save('Votre choix.pdf');
     }
 }

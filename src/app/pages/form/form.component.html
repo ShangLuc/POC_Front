@@ -208,6 +208,11 @@
     <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">
       Enregistrer
     </button>
+
+    <!-- Bouton de téléchargement du ticket -->
+    <button *ngIf="showDownloadButton" type="button" class="btn btn-success mt-3" (click)="downloadTicket()">
+      Télécharger le ticket
+    </button>
   </div>
 </form>
       </div>
