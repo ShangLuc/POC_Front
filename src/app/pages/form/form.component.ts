@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { jsPDF } from 'jspdf';
 
 @Component({
@@ -72,6 +73,7 @@ export class FormComponent {
         voeu4: new FormControl('', Validators.required),
         voeu5: new FormControl('', Validators.required)
     });
+    constructor(private http: HttpClient) {}
 
     isStep1Valid(): boolean {
         // const prenom = this.formGroup.get('Prénom');
@@ -157,33 +159,43 @@ export class FormComponent {
     }
 
     onSubmit(): void {
-        if (this.formGroup.valid) {
-            // Validation des règles métier
-            const validationError = this.validateVoeux();
-            if (validationError) {
-                this.validationMessage = validationError;
-                return;
-            }
+        if (!this.formGroup.valid) {
+    Object.keys(this.formGroup.controls).forEach(key => {
+      this.formGroup.get(key)?.markAsTouched();
+    });
+    return;
+  }
 
-            console.log('Formulaire valide:', this.formGroup.value);
-            
-            // Afficher un résumé de la sélection
-            console.log('=== Résumé de vos vœux ===');
-            console.log('Vœu 1 (Conférence):', this.formGroup.get('voeu1')?.value);
-            console.log('Vœu 2 (Conférence):', this.formGroup.get('voeu2')?.value);
-            console.log('Vœu 3:', this.formGroup.get('voeu3')?.value);
-            console.log('Vœu 4:', this.formGroup.get('voeu4')?.value);
-            console.log('Vœu 5:', this.formGroup.get('voeu5')?.value);
-            
-            // Envoyer au backend
-            alert('Inscription enregistrée avec succès !');
-            this.showDownloadButton = true;
-            this.downloadTicket();
-        } else {
-            Object.keys(this.formGroup.controls).forEach(key => {
-                this.formGroup.get(key)?.markAsTouched();
-            });
-        }
+  // Validation des règles métier
+  const validationError = this.validateVoeux();
+  if (validationError) {
+    this.validationMessage = validationError;
+    return;
+  }
+
+  const id = this.formGroup.get('id')?.value;
+
+  const body = {
+    voeux: [
+      this.formGroup.value.voeu1,
+      this.formGroup.value.voeu2,
+      this.formGroup.value.voeu3,
+      this.formGroup.value.voeu4,
+      this.formGroup.value.voeu5
+    ],
+    etablissement: this.formGroup.value.Etablissement,
+    lib: this.formGroup.value.Lib
+  };
+
+  this.http.post(`http://localhost:8080/api/eleves/${id}/voeux`, body)
+    .subscribe({
+      next: () => {
+        alert('Inscription enregistrée avec succès !');
+        this.showDownloadButton = true;
+        this.downloadTicket();
+      },
+      error: (err) => alert("Erreur lors de l'enregistrement : " + err.message)
+    });
     }
 
     downloadTicket(): void {
