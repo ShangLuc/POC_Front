@@ -9,11 +9,17 @@ export interface RouteInfo {
 }
 
 export const ROUTES: RouteInfo[] = [
+<<<<<<< HEAD
     { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
     { path: '/form',          title: 'formulaire',        icon:'nc-bank',       class: '' },
     { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
+=======
+    { path: '/acceuil',       title: 'Acceuil',                icon:'nc-bank',       class: '' },
+    { path: '/form',          title: 'formulaire',        icon:'nc-paper',       class: '' },
+    { path: '/activity',      title: 'Les activités',          icon:'nc-time-alarm',  class: '' },
+>>>>>>> 7b565674017c66247567a58f85597658bc2fbf27
     { path: '/user',          title: "Profil d'utilisateur",   icon:'nc-single-02',  class: '' },
-    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-single-02',  class: '' },
+    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
     { path: '/table',         title: 'Table List',             icon:'nc-tile-56',    class: '' },
     { path: '/section',       title: 'Section',                icon:'nc-pin-3',      class: '' },
     { path: '/icons',         title: 'Icons',                  icon:'nc-diamond',    class: '' },
