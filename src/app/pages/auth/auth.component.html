@@ -20,6 +20,14 @@
                             <i class="fa fa-arrow-left"></i> Retour
                         </a>
                     </h5>
+                    <h5 class="card-title" *ngIf="selectedProfile === 'referent'">
+                        Authentification Référent
+                        <a class="cursor-pointer float-right"
+                            [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
+                            (click)="selectProfile('')">
+                            <i class="fa fa-arrow-left"></i> Retour
+                        </a>
+                    </h5>
                 </div>
                 <div class="card-body">
                     <!-- Profile Selection Buttons -->
@@ -38,6 +46,14 @@
                                 class="btn btn-md w-100 "
                                 (click)="selectProfile('admin')">
                                 <i class="fa fa-user"></i> Administrateur
+                            </button>
+                        </div>
+                        <div class="col-md-6 ms-10 me-30">
+                            <button 
+                                type="button" 
+                                class="btn btn-md w-100 "
+                                (click)="selectProfile('referent')">
+                                <i class="fa fa-user"></i> Référent
                             </button>
                         </div>
                     </div>
@@ -89,6 +105,30 @@
                                     [(ngModel)]="adminPassword"
                                     name="adminPassword">
                             </div>
+                            <div class="d-flex justify-content-center">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary w-50 mx-auto mt-3 mb-3"
+                                    (click)="authenticate()">
+                                    Authentification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Admin Référent Form-->
+                    <div *ngIf="selectedProfile === 'referent'">
+                        <form>
+                            <div class="form-group">
+                                <label for="referentEmail">Nom d'utilisateur</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="referentUsername"
+                                    placeholder="Entrez votre nom d'utilisateur"
+                                    [(ngModel)]="referentUsername"
+                                    name="referentUsername">
+                            </div>
+                            
                             <div class="d-flex justify-content-center">
                                 <button 
                                     type="button" 
