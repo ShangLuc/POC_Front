@@ -1,18 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { EleveService } from '../eleve.service';
 
 
 @Component({
     selector: 'user-cmp',
     standalone: true,
     templateUrl: 'form.component.html',
-    imports: [ReactiveFormsModule, CommonModule]
+    imports: [ReactiveFormsModule, CommonModule],
+    providers: [EleveService]
 })
 
 export class FormComponent implements OnInit {
     validationMessage = '';
     isConfirmed = false;
+
+    messageSucces = '';
+    messageErreur = '';
 
     
     conferences = [
@@ -56,9 +61,46 @@ export class FormComponent implements OnInit {
         'Flash métier: design / architecture (animation par des professionnels)'
     ];
 
+    // Mapping simple titre -> id_event en base
+    private titreToId: { [titre: string]: number } = {
+        'Etudes et métiers des arts, de la culture et du design':1,
+        'Etudes et métiers du commerce':2,
+        'Les études médicales':3,
+        'Management économie gestion Licences CPGE':4,
+        'Sciences et innovations technologiques BTS BUT':5,
+        'Sociologie, sciences de l\'éducation, histoire géographie Licences CPGE':6,
+        'Etudes et métiers de l\'informatique et du numérique':7,
+        'Etudes et métiers du droit - Science Po':8,
+        'Etudes et métiers du soin et de la santé':9,
+        'Etudes et métiers du tourisme et de l\'hôtellerie BTS':10,
+        'Etudes et métiers de l\'habitat et de la construction':11,
+        'Sciences et techniques Licence CPGE':12,
+        'Etudes et métiers de l\'ingénieur':13,
+        'Etudes et métiers du management, économie, gestion (BTS/BUT)':14,
+        'Etudes et métiers du secteur social':15,
+        'Etudes et métiers du sport':16,
+        'Lettres et langues Licences CPGE':17,
+        'Sciences de la vie, de l\'environnement et de l\'agronomie BTS BUT':18,
+        'Etre étudiant _ Parcoursup':19,
+        // TABLE RONDES
+        'Table ronde: Etre étudiant en BTS (animation par des étudiants)': 20,
+        'Table ronde: Etre étudiant en BUT (animation par des étudiants)':21,
+        'Table ronde: Etre étudiant en prépa CPI ou CPGE (animation par des étudiants)':22,
+        'Table ronde: Etre alternant dans l\'enseignement supérieur (animation par des étudiants)':23,
+        'Table ronde: Etre étudiant en Licences (animation par des étudiants)':24,
+        // FLASH METIERS
+        'Flash métier: ingénieur (animation par des professionnels)':25,
+        'Flash métier: social (animation par des professionnels)':26,
+        'Flash métier: commerce (animation par des professionnels)':27,
+        'Flash métier: sport (animation par des professionnels)':28,
+        'Flash métier: paramédical (animation par des professionnels)':29,
+        'Flash métier: design / architecture (animation par des professionnels)':30
+
+    };
+
     formGroup: FormGroup;
 
-    constructor() {
+    constructor(private eleveService: EleveService) {
         this.formGroup = new FormGroup({
             Prénom: new FormControl({ value: '', disabled: true }),
             Nom: new FormControl({ value: '', disabled: true }),
@@ -76,20 +118,26 @@ export class FormComponent implements OnInit {
     ngOnInit() {
         // Simuler la récupération des informations de l'utilisateur
         // Dans une application réelle, ces données viendraient d'un service d'authentification
-        const userInfo = {
-            Prénom: 'Jean',
-            Nom: 'Dupont',
-            id: '123456789',
-            Etablissement: 'Lycée Victor Hugo',
-            Lib: 'Structure A'
-        };
+        // const userInfo = {
+        //     Prénom: 'Jean',
+        //     Nom: 'Dupont',
+        //     id: '123456789',
+        //     Etablissement: 'Lycée Victor Hugo',
+        //     Lib: 'Structure A'
+        // };
 
         // Mettre à jour les valeurs du formulaire avec les données de l'utilisateur
-        this.formGroup.patchValue(userInfo);
+        // this.formGroup.patchValue(userInfo);
+        const eleveId = localStorage.getItem('eleveId');
+        if(eleveId){
+            this.formGroup.patchValue({ id: eleveId });
+        }
     }
 
     onVoeuChange(): void {
         this.validationMessage = '';
+        this.messageErreur = '';
+        this.messageSucces = '';
     }
 
     isVoeuSelected(voeu: string, currentField: string): boolean {
@@ -123,33 +171,66 @@ export class FormComponent implements OnInit {
     }
 
     onSave(): void {
-        if (this.formGroup.valid) {
-            const validationError = this.validateVoeux();
-            if (validationError) {
-                this.validationMessage = validationError;
-                return;
-            }
-            console.log('Formulaire enregistré:', this.formGroup.getRawValue());
-            alert('Vos choix ont été enregistrés. Vous pouvez encore les modifier.');
-        } else {
+        this.messageErreur = '';
+        this.messageSucces = '';
+
+        if (!this.formGroup.valid) {
             this.markAllAsTouched();
+            return;
         }
+
+        const validationError = this.validateVoeux();
+        if (validationError) {
+            this.validationMessage = validationError;
+            return;
+        }
+
+        const raw = this.formGroup.getRawValue();
+const eleveId = raw.id;
+
+const voeuxTitres = [raw.voeu1, raw.voeu2, raw.voeu3, raw.voeu4, raw.voeu5];
+const eventIds: number[] = voeuxTitres.map(titre => this.titreToId[titre]);
+
+this.eleveService.saveVoeux(eleveId, eventIds).subscribe({
+            next: (msg: string) => {
+                this.messageSucces = msg || 'Vos choix ont été enregistrés. Vous pouvez encore les modifier.';
+            },
+            error: (err) => {
+                this.messageErreur = err?.error || 'Erreur lors de l\'enregistrement des vœux.';
+                console.error(err);
+            }
+        });
     }
 
     onConfirm(): void {
-        if (this.formGroup.valid) {
-            const validationError = this.validateVoeux();
-            if (validationError) {
-                this.validationMessage = validationError;
-                return;
-            }
-            this.isConfirmed = true;
-            this.formGroup.disable(); // Désactiver le formulaire après confirmation
-            console.log('Formulaire confirmé:', this.formGroup.getRawValue());
-            alert('Vos choix ont été confirmés et ne peuvent plus être modifiés.');
-        } else {
+        this.messageErreur = '';
+        this.messageSucces = '';
+
+        if (!this.formGroup.valid) {
             this.markAllAsTouched();
+            return;
         }
+
+        const validationError = this.validateVoeux();
+        if (validationError) {
+            this.validationMessage = validationError;
+            return;
+        }
+
+        const raw = this.formGroup.getRawValue();
+        const eleveId = raw.id;
+
+        this.eleveService.confirmerVoeux(eleveId).subscribe({
+            next: (msg: string) => {
+                this.isConfirmed = true;
+                this.formGroup.disable();
+                this.messageSucces = msg || 'Vos choix ont été confirmés et ne peuvent plus être modifiés.';
+            },
+            error: (err) => {
+                this.messageErreur = err?.error || 'Erreur lors de la confirmation des vœux.';
+                console.error(err);
+            }
+        });
     }
 
     markAllAsTouched() {
