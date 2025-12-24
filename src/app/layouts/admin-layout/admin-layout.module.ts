@@ -17,6 +17,7 @@ import { SectionComponent }         from '../../pages/section/section.component'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { StudentListComponent } from 'app/pages/studentList/studentList.componen
     CommonModule,
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
-    NgbModule
+    NgbModule,
+    NgSelectModule
   ],
   declarations: [
     AuthComponent,

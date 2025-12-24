@@ -28,6 +28,7 @@
     "@angular/router": "^14.2.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
     "@ng-bootstrap/ng-bootstrap": "^13.1.1",
+    "@ng-select/ng-select": "^9.1.0",
     "@ngui/map": "0.30.3",
     "@popperjs/core": "^2.11.4",
     "@types/googlemaps": "3.39.14",
