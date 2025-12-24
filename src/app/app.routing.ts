@@ -2,16 +2,18 @@ import { Routes } from '@angular/router';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { AuthComponent } from './pages/auth/auth.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const AppRoutes: Routes = [
   {
     path: '',
-    redirectTo: '/auth',
+    redirectTo: '/accueil',
     pathMatch: 'full',
   }, 
   {
     path: 'auth',
-    component: AuthComponent
+    component: AuthComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: '',

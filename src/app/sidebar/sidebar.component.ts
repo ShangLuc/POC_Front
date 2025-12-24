@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../pages/auth.service';
 
 
 export interface RouteInfo {
@@ -7,6 +8,17 @@ export interface RouteInfo {
     icon: string;
     class: string;
 }
+
+export const ADMIN_ROUTES: RouteInfo[] = [
+    { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
+    { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
+    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
+    { path: '/user',          title: "Profil", icon:'nc-single-02',  class: '' },
+];
+
+export const STUDENT_ROUTES: RouteInfo[] = [
+    { path: '/form',          title: 'formulaire',        icon:'nc-bank',       class: '' },
+];
 
 export const ROUTES: RouteInfo[] = [
     { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
@@ -28,7 +40,17 @@ export const ROUTES: RouteInfo[] = [
 
 export class SidebarComponent implements OnInit {
     public menuItems: any[];
+    
+    constructor(private authService: AuthService) {}
+
     ngOnInit() {
-        this.menuItems = ROUTES.filter(menuItem => menuItem);
+        // Show admin menu for admins, student menu for students
+        if (this.authService.isAdmin()) {
+            this.menuItems = ADMIN_ROUTES.filter(menuItem => menuItem);
+        } else if (this.authService.isEleve()) {
+            this.menuItems = STUDENT_ROUTES.filter(menuItem => menuItem);
+        } else {
+            this.menuItems = ROUTES.filter(menuItem => menuItem);
+        }
     }
 }

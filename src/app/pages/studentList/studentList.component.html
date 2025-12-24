@@ -5,6 +5,21 @@
             <h5 class="card-title">Liste des élèves</h5>
         </div>
         <div class="card-body p-5">
+            <!-- Messages de succès et d'erreur -->
+            <div *ngIf="successMessage" class="alert alert-success alert-with-icon mb-3" role="alert">
+                <span data-notify="icon" class="nc-icon nc-check-2"></span>
+                <span data-notify="message">{{ successMessage }}</span>
+            </div>
+            <div *ngIf="errorMessage" class="alert alert-danger alert-with-icon mb-3" role="alert">
+                <span data-notify="icon" class="nc-icon nc-alert-circle-i"></span>
+                <span data-notify="message">{{ errorMessage }}</span>
+            </div>
+
+            <!-- Messages de chargement -->
+            <div *ngIf="loadingEleves" class="alert alert-info mb-3">
+                <i class="fa fa-spinner fa-spin"></i> Chargement des élèves...
+            </div>
+
             <div class="mb-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
@@ -24,21 +39,21 @@
                             <th>Prénom</th>
                             <th>Établissement</th>
                             <th>Lib. Structure</th>
-                            <th>Confirmé le choix</th>
+                            <th>Inscrit</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let student of students; let i = index">
-                            <td>{{ student.numero }}</td>
-                            <td>{{ student.identifiantNational }}</td>
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ student.identifiantNational || student.id || '-' }}</td>
                             <td>{{ student.nom }}</td>
                             <td>{{ student.prenom }}</td>
                             <td>{{ student.etablissement }}</td>
-                            <td>{{ student.libStructure }}</td>
+                            <td>{{ student.libStructure || '-' }}</td>
                             <td>
-                                <span *ngIf="student.confirmeChoix === 'oui'" class="badge badge-success">Oui</span>
-                                <span *ngIf="student.confirmeChoix === 'non'" class="badge badge-danger">Non</span>
+                                <span *ngIf="student.inscrit === true || student.inscrit === 'true' || student.inscrit === 'oui'" class="badge badge-success">Oui</span>
+                                <span *ngIf="student.inscrit === false || student.inscrit === 'false' || student.inscrit === 'non'" class="badge badge-danger">Non</span>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" (click)="deleteStudent(i)">
@@ -46,8 +61,8 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr *ngIf="students.length === 0">
-                            <td colspan="8" class="text-center text-muted">Aucun étudiant ajouté</td>
+                        <tr *ngIf="!loadingEleves && students.length === 0">
+                            <td colspan="8" class="text-center text-muted">Aucun étudiant trouvé</td>
                         </tr>
                     </tbody>
                 </table>
@@ -65,41 +80,56 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group mb-3">
-                        <label for="identifiantInput">Identifiant National</label>
+                        <label for="identifiantInput">Identifiant National *</label>
                         <input type="text" class="form-control" id="identifiantInput" 
-                               [(ngModel)]="newStudent.identifiantNational" 
+                               [(ngModel)]="newStudent.id" 
+                               name="id"
                                placeholder="Entrez l'identifiant national">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="nomInput">Nom</label>
+                        <label for="nomInput">Nom *</label>
                         <input type="text" class="form-control" id="nomInput" 
                                [(ngModel)]="newStudent.nom" 
+                               name="nom"
                                placeholder="Entrez le nom">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="prenomInput">Prénom</label>
+                        <label for="prenomInput">Prénom *</label>
                         <input type="text" class="form-control" id="prenomInput" 
                                [(ngModel)]="newStudent.prenom" 
+                               name="prenom"
                                placeholder="Entrez le prénom">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="etablissementInput">Établissement</label>
+                        <label for="etablissementInput">Établissement *</label>
                         <input type="text" class="form-control" id="etablissementInput" 
                                [(ngModel)]="newStudent.etablissement" 
+                               name="etablissement"
                                placeholder="Entrez l'établissement">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="confirmeChoixSelect">Confirmé le choix</label>
-                        <select class="form-control" id="confirmeChoixSelect" 
-                                [(ngModel)]="newStudent.confirmeChoix">
+                        <label for="libStructureInput">Lib. Structure</label>
+                        <input type="text" class="form-control" id="libStructureInput" 
+                               [(ngModel)]="newStudent.libStructure" 
+                               name="libStructure"
+                               placeholder="Entrez la lib. structure (optionnel)">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="inscritSelect">Inscrit</label>
+                        <select class="form-control" id="inscritSelect" 
+                                [(ngModel)]="newStudent.inscrit"
+                                name="inscrit">
                             <option value="non">Non</option>
                             <option value="oui">Oui</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
-                    <button type="button" class="btn btn-primary" (click)="addStudent()">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="addingStudent">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="addStudent()" [disabled]="addingStudent">
+                        <span *ngIf="!addingStudent">Ajouter</span>
+                        <span *ngIf="addingStudent"><i class="fa fa-spinner fa-spin"></i> Ajout en cours...</span>
+                    </button>
                 </div>
             </div>
         </div>

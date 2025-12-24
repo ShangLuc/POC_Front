@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
 export class AuthComponent implements OnInit {
   selectedProfile: string = '';
   eleveIdentifiant: string = '';
-  adminEmail: string = '';
+  adminUsername: string = '';
   adminPassword: string = '';
 
   // Paramètres réglables pour le bouton retour
@@ -30,7 +30,7 @@ export class AuthComponent implements OnInit {
   selectProfile(profile: string) {
     this.selectedProfile = profile;
     this.eleveIdentifiant = '';
-    this.adminEmail = '';
+    this.adminUsername = '';
     this.adminPassword = '';
     this.errorMessage = '';
   }
@@ -56,18 +56,25 @@ export class AuthComponent implements OnInit {
       });
 
     } else if (this.selectedProfile === 'admin') {
-      if (!this.adminEmail || !this.adminPassword) {
-        this.errorMessage = 'Merci de saisir email et mot de passe.';
+      if (!this.adminUsername || !this.adminPassword) {
+        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur et votre mot de passe.';
         return;
       }
 
-      this.authService.loginAdmin(this.adminEmail, this.adminPassword).subscribe({
+      this.authService.loginAdmin(this.adminUsername, this.adminPassword).subscribe({
         next: () => {
-          this.router.navigate(['/admin']); // adapte cette route à ton écran admin
+          this.router.navigate(['/accueil']); // adapte cette route à ton écran admin
         },
         error: (err) => {
           console.error(err);
-          this.errorMessage = err?.error || 'Identifiants administrateur invalides.';
+          // Display the error message from the API if available
+          if (err?.error && typeof err.error === 'string') {
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Identifiants administrateur invalides.';
+          }
         }
       });
 

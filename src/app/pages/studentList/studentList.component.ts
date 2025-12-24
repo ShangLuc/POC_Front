@@ -1,5 +1,8 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import * as XLSX from 'xlsx';
+import { AuthService } from '../auth.service';
 
 
 @Component({
@@ -10,20 +13,46 @@ import * as XLSX from 'xlsx';
 
 export class StudentListComponent implements OnInit{   
     
+    constructor(
+    private http: HttpClient,
+    private authService: AuthService
+    ) {}
+
+    // Get authorization headers with Bearer token
+    private getAuthHeaders(): HttpHeaders {
+        const token = this.authService.getAuthToken();
+        if (token) {
+          return new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          });
+        }
+        return new HttpHeaders({
+          'Content-Type': 'application/json'
+        });
+      }
+
     students: any[] = [];
     studentCounter: number = 0;
+    loadingEleves: boolean = false;
+    errorMessage: string = '';
+    successMessage: string = '';
     
     // Modal state
     showModal: boolean = false;
+    addingStudent: boolean = false;
     newStudent = {
-        identifiantNational: '',
+        id: '',
         nom: '',
         prenom: '',
         etablissement: '',
-        confirmeChoix: 'non'
+        libStructure: '',
+        inscrit: 'non'
     };
 
-    ngOnInit(){}
+    ngOnInit(){
+        this.loadEleves();
+    }
 
     // Ouvrir la modal
     openModal() {
@@ -40,33 +69,101 @@ export class StudentListComponent implements OnInit{
     // Réinitialiser le formulaire
     resetForm() {
         this.newStudent = {
-            identifiantNational: '',
+            id: '',
             nom: '',
             prenom: '',
             etablissement: '',
-            confirmeChoix: 'non'
+            libStructure: '',
+            inscrit: 'non'
         };
+        this.errorMessage = '';
+        this.successMessage = '';
     }
 
     // Ajouter un étudiant
     addStudent() {
-        if (!this.newStudent.identifiantNational || !this.newStudent.nom || 
+        if (!this.newStudent.id || !this.newStudent.nom || 
             !this.newStudent.prenom || !this.newStudent.etablissement) {
-            alert('Veuillez remplir tous les champs');
+            this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+            return;
+        }
+
+        this.addingStudent = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        // Vérifier la présence du token avant l'appel
+        const headers = this.getAuthHeaders();
+        if (!headers.get('Authorization')) {
+            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
+            this.addingStudent = false;
             return;
         }
 
         const student = {
-            numero: this.students.length + 1,
-            identifiantNational: this.newStudent.identifiantNational,
+            id: this.newStudent.id,
             nom: this.newStudent.nom,
             prenom: this.newStudent.prenom,
             etablissement: this.newStudent.etablissement,
-            confirmeChoix: this.newStudent.confirmeChoix
+            // Valeur par défaut vide si non fournie
+            libStructure: this.newStudent.libStructure || '',
+            inscrit: this.newStudent.inscrit === 'oui' ? true : false
         };
 
-        this.students.push(student);
-        this.closeModal();
+        this.http.post<string>('http://localhost:8080/api/admin/eleves',
+            student,
+            { 
+                headers: headers,
+                responseType: 'text' as 'json'  // Handle text response
+            }
+        ).subscribe({
+            next: (response) => {
+                this.successMessage = 'Étudiant ajouté avec succès.';
+                // Add the student to the list locally
+                this.students.push({
+                    ...student,
+                    id: this.newStudent.id
+                });
+                this.closeModal();
+                // Clear success message after 3 seconds
+                setTimeout(() => {
+                    this.successMessage = '';
+                }, 3000);
+            },
+            error: (err) => {
+                console.error('Erreur lors de l\'ajout de l\'étudiant:', err);
+                this.errorMessage = err?.error?.message || 'Erreur lors de l\'ajout de l\'étudiant.';
+                this.addingStudent = false;
+            },
+            complete: () => {
+                this.addingStudent = false;
+            }
+        });
+    }
+
+    loadEleves() {
+        this.loadingEleves = true;
+        this.errorMessage = '';
+        this.getAllEleves().subscribe({
+            next: (response) => {
+                this.students = response;
+                this.loadingEleves = false;
+            },
+            error: (err) => {
+                console.error('Error loading Eleves:', err);
+                this.errorMessage = 'Erreur lors du chargement des élèves.';
+                this.loadingEleves = false;
+            }
+        });
+    }
+
+
+
+    getAllEleves(): Observable<any[]> {
+        return this.http.get<any[]>(
+            'http://localhost:8080/api/admin/eleves',
+            { headers: this.getAuthHeaders() }
+        );
     }
 
     // Supprimer un étudiant
@@ -105,9 +202,9 @@ export class StudentListComponent implements OnInit{
                     etablissement: row[0],
                     nom: row[1],
                     prenom: row[2],
-                    identifiantNational: row[3],
+                    id: row[3],
                     libStructure: row[4],
-                    confirmeChoix: 'non' // Valeur par défaut
+                    inscrit: 'non' // Valeur par défaut
                 };
                 this.students.push(newStudent);
             });
