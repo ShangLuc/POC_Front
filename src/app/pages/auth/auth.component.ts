@@ -45,9 +45,10 @@ export class AuthComponent implements OnInit {
       }
 
       this.authService.loginEleve(this.eleveIdentifiant).subscribe({
-        next: () => {
-          this.authService.setCurrentEleveId(this.eleveIdentifiant);
-          this.router.navigate(['/form']); // route vers le formulaire de vœux
+        next: (response) => {
+          const storedId = response?.id || this.eleveIdentifiant;
+          this.authService.setCurrentEleveId(storedId);
+          this.router.navigate(['/accueil']); // accès accueil + profil + formulaire
         },
         error: (err) => {
           console.error(err);

@@ -12,14 +12,17 @@ import { StudentListComponent } from 'app/pages/studentList/studentList.componen
 import { AdminGuard } from '../../guards/admin.guard';
 
 export const AdminLayoutRoutes: Routes = [
-    { path: 'accueil',        component: AccueilComponent, canActivate: [AdminGuard] },
+    // Accessible to authenticated users (élève or admin)
+    { path: 'accueil',        component: AccueilComponent },
     { path: 'form',           component: FormComponent },
+    { path: 'user',           component: UserComponent },
+
+    // Admin-only screens
     { path: 'activity',       component: ActivityComponent, canActivate: [AdminGuard] },
     { path: 'studentList',    component: StudentListComponent, canActivate: [AdminGuard] },
-    { path: 'user',           component: UserComponent },
-    { path: 'section',        component: ActivityComponent },
-    { path: 'table',          component: TableComponent },
-    { path: 'typography',     component: TypographyComponent },
-    { path: 'icons',          component: IconsComponent },
-    { path: 'section',        component: SectionComponent }
+    { path: 'section',        component: ActivityComponent, canActivate: [AdminGuard] },
+    { path: 'table',          component: TableComponent, canActivate: [AdminGuard] },
+    { path: 'typography',     component: TypographyComponent, canActivate: [AdminGuard] },
+    { path: 'icons',          component: IconsComponent, canActivate: [AdminGuard] },
+    { path: 'section',        component: SectionComponent, canActivate: [AdminGuard] }
 ];

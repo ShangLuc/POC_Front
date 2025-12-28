@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { AdminManagementService } from '../admin-management.service';
+import { EleveService } from '../eleve.service';
+import { Eleve } from '../../models/eleve.model';
 
 @Component({
     selector: 'user-cmp',
@@ -14,6 +17,10 @@ export class UserComponent implements OnInit {
     isSuperAdmin: boolean = false;
     adminUsername: string = '';
     adminData: any = null;
+
+    student?: Eleve;
+    isStudentLoading = false;
+    profileErrorMessage = '';
     
     // Admin management properties
     admins: any[] = [];
@@ -26,7 +33,8 @@ export class UserComponent implements OnInit {
 
     constructor(
         private authService: AuthService,
-        private adminManagementService: AdminManagementService
+        private adminManagementService: AdminManagementService,
+        private eleveService: EleveService
     ) {}
 
     ngOnInit() {
@@ -39,10 +47,41 @@ export class UserComponent implements OnInit {
             this.adminData = this.authService.getAdminData();
         }
 
+        if (this.isEleve) {
+            this.loadStudentProfile();
+        }
+
         // Load admins if superadmin
         if (this.isSuperAdmin) {
             this.loadAdmins();
         }
+    }
+
+    private loadStudentProfile(): void {
+        this.profileErrorMessage = '';
+        const eleveId = this.authService.getCurrentEleveId();
+
+        if (!eleveId) {
+            this.profileErrorMessage = 'Aucun identifiant élève n\'a été trouvé. Merci de te reconnecter.';
+            return;
+        }
+
+        this.isStudentLoading = true;
+        this.eleveService.getEleveById(eleveId).subscribe({
+            next: (eleve) => {
+                this.student = eleve;
+                this.isStudentLoading = false;
+            },
+            error: (err: HttpErrorResponse) => {
+                console.error('Erreur lors du chargement du profil élève', err);
+                if (err.status === 403) {
+                    this.profileErrorMessage = 'L\'accès aux données du profil est restreint. Merci de te reconnecter.';
+                } else {
+                    this.profileErrorMessage = 'Impossible de charger le profil élève pour le moment.';
+                }
+                this.isStudentLoading = false;
+            }
+        });
     }
 
     // Load all admins

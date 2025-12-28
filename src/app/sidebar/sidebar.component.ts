@@ -17,7 +17,9 @@ export const ADMIN_ROUTES: RouteInfo[] = [
 ];
 
 export const STUDENT_ROUTES: RouteInfo[] = [
-    { path: '/form',          title: 'formulaire',        icon:'nc-bank',       class: '' },
+    { path: '/accueil',       title: 'Accueil',           icon:'nc-bank',        class: '' },
+    { path: '/form',          title: 'Formulaire',        icon:'nc-bank',        class: '' },
+    { path: '/user',          title: 'Profil',            icon:'nc-single-02',   class: '' },
 ];
 
 export const ROUTES: RouteInfo[] = [

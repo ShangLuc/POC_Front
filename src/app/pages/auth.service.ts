@@ -1,34 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api'; // idéalement depuis environment
+  private baseUrl = 'http://localhost:8080/api'; // keep host consistent with frontend to share cookies
+  private readonly eleveIdKey = 'eleveId';
   private currentUserRole: string = '';
 
   constructor(private http: HttpClient) {
     this.currentUserRole = localStorage.getItem('userRole') || '';
   }
 
- loginEleve(id: string) {
-  return this.http.post<any>('http://localhost:8080/api/auth/eleve/login', { id }).pipe(
-    tap(() => {
-      localStorage.setItem('userRole', 'eleve');
-      this.currentUserRole = 'eleve';
-    })
-  );
-}
+  loginEleve(id: string) {
+    return this.http.post<any>(`${this.baseUrl}/auth/eleve/login`, { id }, { withCredentials: true }).pipe(
+      tap((response) => {
+        const storedId = response?.id || id;
+        this.setCurrentEleveId(storedId);
+        if (response?.token) {
+          this.setAuthToken(response.token);
+        }
+        localStorage.setItem('userRole', 'eleve');
+        this.currentUserRole = 'eleve';
+      })
+    );
+  }
 
   loginAdmin(username: string, password: string): Observable<any> {
     if (!username || !password) {
       throw new Error('Username and password are required');
     } else {
       if (username == 'superadmin') {
-        return this.http.post<any>('http://localhost:8080/api/auth/superadmin/login', { username, password }).pipe(
+        return this.http.post<any>(`${this.baseUrl}/auth/superadmin/login`, { username, password }).pipe(
           tap((response) => {
             localStorage.setItem('userRole', 'superadmin');
             localStorage.setItem('adminUsername', username);
@@ -38,7 +44,7 @@ export class AuthService {
           })
         );
       } else {
-        return this.http.post<any>('http://localhost:8080/api/auth/admin/login', { username, password }).pipe(
+        return this.http.post<any>(`${this.baseUrl}/auth/admin/login`, { username, password }).pipe(
           tap((response) => {
             localStorage.setItem('userRole', 'admin');
             localStorage.setItem('adminUsername', username);
@@ -54,11 +60,11 @@ export class AuthService {
 
   // simple stockage local pour l’ID élève
   setCurrentEleveId(id: string): void {
-    localStorage.setItem('eleveId', id);
+    localStorage.setItem(this.eleveIdKey, id);
   }
 
   getCurrentEleveId(): string | null {
-    return localStorage.getItem('eleveId');
+    return localStorage.getItem(this.eleveIdKey);
   }
 
   isAdmin(): boolean {
@@ -90,30 +96,18 @@ export class AuthService {
     return localStorage.getItem('authToken');
   }
 
-  logout(): Observable<any> {
-    const username = this.getAdminUsername();
-    const role = this.getCurrentRole();
+  setAuthToken(token: string): void {
+    localStorage.setItem('authToken', token);
+  }
 
-    // Determine which endpoint to use based on role
-    let logoutUrl: string;
-    if (role === 'superadmin') {
-      logoutUrl = 'http://localhost:8080/api/auth/superadmin/logout';
-    } else if (role === 'admin') {
-      logoutUrl = 'http://localhost:8080/api/auth/admin/logout';
-    } else {
-      // For eleve or any other role
-      logoutUrl = 'http://localhost:8080/api/auth/logout';
-    }
-
-    return this.http.post<any>(logoutUrl, {}).pipe(
-      tap(() => {
-        this.clear();
-      })
-    );
+  logout(): Observable<void> {
+    // Frontend-only logout: remove local credentials and resolve
+    this.clear();
+    return of(void 0);
   }
 
   clear(): void {
-    localStorage.removeItem('eleveId');
+    localStorage.removeItem(this.eleveIdKey);
     localStorage.removeItem('userRole');
     localStorage.removeItem('adminUsername');
     localStorage.removeItem('adminData');
