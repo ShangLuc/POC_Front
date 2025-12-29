@@ -5,6 +5,21 @@
             <h5 class="card-title">Liste des élèves</h5>
         </div>
         <div class="card-body p-5">
+            <!-- Messages de succès et d'erreur -->
+            <div *ngIf="successMessage" class="alert alert-success alert-with-icon mb-3" role="alert">
+                <span data-notify="icon" class="nc-icon nc-check-2"></span>
+                <span data-notify="message">{{ successMessage }}</span>
+            </div>
+            <div *ngIf="errorMessage" class="alert alert-danger alert-with-icon mb-3" role="alert">
+                <span data-notify="icon" class="nc-icon nc-alert-circle-i"></span>
+                <span data-notify="message">{{ errorMessage }}</span>
+            </div>
+
+            <!-- Messages de chargement -->
+            <div *ngIf="loadingEleves" class="alert alert-info mb-3">
+                <i class="fa fa-spinner fa-spin"></i> Chargement des élèves...
+            </div>
+
             <div class="mb-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
@@ -13,6 +28,56 @@
                     <i class="fa fa-file-excel"></i> Importer un fichier Excel
                 </label>
                 <input id="excel-upload" type="file" (change)="onFileChange($event)" style="display: none;" accept=".xlsx, .xls">
+            </div>
+
+            <!-- Barre de recherche et filtres -->
+            <div class="mb-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Recherche</label>
+                        <input type="text" class="form-control form-control-sm filter-input" [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()" placeholder="Entrez votre recherche" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Établissement</label>
+                        <ng-select
+                            [items]="etablissements"
+                            [(ngModel)]="filterEtablissement"
+                            [placeholder]="filterEtablissement ? '' : 'Tous'"
+                            class="ng-select-sm"
+                            (change)="onFilterChange()">
+                        </ng-select>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <label class="form-label">Lib. Structure</label>
+                        <ng-select
+                            [items]="libStructures"
+                            [(ngModel)]="filterLibStructure"
+                            [placeholder]="filterLibStructure ? '' : 'Toutes'"
+                            class="ng-select-sm"
+                            (change)="onFilterChange()">
+                        </ng-select>
+                    </div>
+
+  
+                    <div class="col-md-2">
+                        <label class="form-label">Inscrit</label>
+                        <ng-select
+                            [(ngModel)]="filterInscrit"
+                            class="ng-select-sm"
+                            (change)="onFilterChange()"
+                            [clearable]="false">
+
+                            <ng-option value="tous">Tous</ng-option>
+                            <ng-option value="oui">Oui</ng-option>
+                            <ng-option value="non">Non</ng-option>
+
+                        </ng-select>
+                    </div>
+
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -24,33 +89,57 @@
                             <th>Prénom</th>
                             <th>Établissement</th>
                             <th>Lib. Structure</th>
-                            <th>Confirmé le choix</th>
+                            <th>Inscrit</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let student of students; let i = index">
+                        <tr *ngFor="let student of displayedStudents; let i = index">
                             <td>{{ student.numero }}</td>
-                            <td>{{ student.identifiantNational }}</td>
+                            <td>{{ student.identifiantNational || student.id || '-' }}</td>
                             <td>{{ student.nom }}</td>
                             <td>{{ student.prenom }}</td>
                             <td>{{ student.etablissement }}</td>
-                            <td>{{ student.libStructure }}</td>
+                            <td>{{ student.libStructure || '-' }}</td>
                             <td>
-                                <span *ngIf="student.confirmeChoix === 'oui'" class="badge badge-success">Oui</span>
-                                <span *ngIf="student.confirmeChoix === 'non'" class="badge badge-danger">Non</span>
+                                <span *ngIf="student.inscrit === true || student.inscrit === 'true' || student.inscrit === 'oui'" class="badge badge-success">Oui</span>
+                                <span *ngIf="student.inscrit === false || student.inscrit === 'false' || student.inscrit === 'non'" class="badge badge-danger">Non</span>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteStudent(i)">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(i + (currentPage - 1) * pageSize)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </td>
                         </tr>
-                        <tr *ngIf="students.length === 0">
-                            <td colspan="8" class="text-center text-muted">Aucun étudiant ajouté</td>
+                        <tr *ngIf="!loadingEleves && displayedStudents.length === 0">
+                            <td colspan="8" class="text-center text-muted">Aucun étudiant trouvé</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalPages > 1">
+                <div class="text-muted">
+                    Page {{ currentPage }} / {{ totalPages }}
+                    · Affiche {{ displayedStudents.length }} sur {{ students.length }} élèves
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="currentPage === 1">
+                            <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">Précédent</button>
+                        </li>
+                        <li class="page-item" *ngFor="let p of [].constructor(totalPages); let idx = index" [class.active]="(idx+1) === currentPage">
+                            <button class="page-link" (click)="setPage(idx+1)">{{ idx+1 }}</button>
+                        </li>
+                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Suivant</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="mb-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-danger btn-sm"  (click)="confirmDeleteAllStudents()" > Supprimer tous les élèves </button>
             </div>
         </div>
     </div>
@@ -65,41 +154,56 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group mb-3">
-                        <label for="identifiantInput">Identifiant National</label>
+                        <label for="identifiantInput">Identifiant National *</label>
                         <input type="text" class="form-control" id="identifiantInput" 
-                               [(ngModel)]="newStudent.identifiantNational" 
+                               [(ngModel)]="newStudent.id" 
+                               name="id"
                                placeholder="Entrez l'identifiant national">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="nomInput">Nom</label>
+                        <label for="nomInput">Nom *</label>
                         <input type="text" class="form-control" id="nomInput" 
                                [(ngModel)]="newStudent.nom" 
+                               name="nom"
                                placeholder="Entrez le nom">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="prenomInput">Prénom</label>
+                        <label for="prenomInput">Prénom *</label>
                         <input type="text" class="form-control" id="prenomInput" 
                                [(ngModel)]="newStudent.prenom" 
+                               name="prenom"
                                placeholder="Entrez le prénom">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="etablissementInput">Établissement</label>
+                        <label for="etablissementInput">Établissement *</label>
                         <input type="text" class="form-control" id="etablissementInput" 
                                [(ngModel)]="newStudent.etablissement" 
+                               name="etablissement"
                                placeholder="Entrez l'établissement">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="confirmeChoixSelect">Confirmé le choix</label>
-                        <select class="form-control" id="confirmeChoixSelect" 
-                                [(ngModel)]="newStudent.confirmeChoix">
+                        <label for="libStructureInput">Lib. Structure</label>
+                        <input type="text" class="form-control" id="libStructureInput" 
+                               [(ngModel)]="newStudent.libStructure" 
+                               name="libStructure"
+                               placeholder="Entrez la lib. structure (optionnel)">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="inscritSelect">Inscrit</label>
+                        <select class="form-control" id="inscritSelect" 
+                                [(ngModel)]="newStudent.inscrit"
+                                name="inscrit">
                             <option value="non">Non</option>
                             <option value="oui">Oui</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
-                    <button type="button" class="btn btn-primary" (click)="addStudent()">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="addingStudent">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="addStudent()" [disabled]="addingStudent">
+                        <span *ngIf="!addingStudent">Ajouter</span>
+                        <span *ngIf="addingStudent"><i class="fa fa-spinner fa-spin"></i> Ajout en cours...</span>
+                    </button>
                 </div>
             </div>
         </div>
