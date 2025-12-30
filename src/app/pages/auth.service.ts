@@ -9,6 +9,7 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private baseUrl = 'http://localhost:8080/api'; // keep host consistent with frontend to share cookies
   private readonly eleveIdKey = 'eleveId';
+  private readonly viewerUsernameKey = 'viewerUsername';
   private currentUserRole: string = '';
 
   constructor(private http: HttpClient) {
@@ -58,6 +59,32 @@ export class AuthService {
     }
   }
 
+  /**
+   * Authentification viewer
+   * Version simple : on vérifie que le viewer existe via l'API backend
+   * GET /api/viewers/by-username/{username}
+   */
+  loginViewer(username: string): Observable<any> {
+    if (!username) {
+      throw new Error('Username viewer is required');
+    }
+
+    return this.http.get<any>(`${this.baseUrl}/viewers/by-username/${encodeURIComponent(username)}`).pipe(
+      tap((response) => {
+        localStorage.setItem('userRole', 'viewer');
+        localStorage.setItem(this.viewerUsernameKey, username);
+
+        if (response?.token) {
+          this.setAuthToken(response.token);
+        }
+
+        this.currentUserRole = 'viewer';
+      })
+    );
+  }
+
+  
+
   // simple stockage local pour l’ID élève
   setCurrentEleveId(id: string): void {
     localStorage.setItem(this.eleveIdKey, id);
@@ -65,6 +92,14 @@ export class AuthService {
 
   getCurrentEleveId(): string | null {
     return localStorage.getItem(this.eleveIdKey);
+  }
+
+  setCurrentViewerUsername(username: string): void {
+    localStorage.setItem(this.viewerUsernameKey, username);
+  }
+
+  getCurrentViewerUsername(): string | null {
+    return localStorage.getItem(this.viewerUsernameKey);
   }
 
   isAdmin(): boolean {
@@ -75,12 +110,16 @@ export class AuthService {
     return this.currentUserRole === 'eleve';
   }
 
+  isViewer(): boolean {
+    return this.currentUserRole === 'viewer';
+  }
+
   getCurrentRole(): string {
     return this.currentUserRole;
   }
 
   isAuthenticated(): boolean {
-    return this.currentUserRole !== '' && (this.isAdmin() || this.isEleve());
+    return this.currentUserRole !== '' && (this.isAdmin() || this.isEleve() || this.isViewer());
   }
 
   getAdminUsername(): string | null {
@@ -112,6 +151,7 @@ export class AuthService {
     localStorage.removeItem('adminUsername');
     localStorage.removeItem('adminData');
     localStorage.removeItem('authToken');
+    localStorage.removeItem(this.viewerUsernameKey);
     this.currentUserRole = '';
   }
 }

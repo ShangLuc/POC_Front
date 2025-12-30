@@ -19,6 +19,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dashboard.component';
 
 
 @NgModule({
@@ -39,7 +40,11 @@ import { NgSelectModule } from '@ng-select/ng-select';
     TypographyComponent,
     IconsComponent,
     SectionComponent,
+<<<<<<< HEAD
     DashboardComponent,
+=======
+    ViewerDashboardComponent,
+>>>>>>> 3ea1c488e19b459f24b6f81c064dcf4799d5a4aa
   ]
 })
 

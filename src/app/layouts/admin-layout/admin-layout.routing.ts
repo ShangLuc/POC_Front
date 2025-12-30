@@ -11,12 +11,16 @@ import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
 import { DashboardComponent } from 'app/pages/dashboard/dashboard.component';
 import { AdminGuard } from '../../guards/admin.guard';
+import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dashboard.component';
 
 export const AdminLayoutRoutes: Routes = [
     // Accessible to authenticated users (élève or admin)
     { path: 'accueil',        component: AccueilComponent },
     { path: 'form',           component: FormComponent },
     { path: 'user',           component: UserComponent },
+
+    // Dashboard viewer (référent) - accessible aux viewers
+    { path: 'viewer-dashboard', component: ViewerDashboardComponent },
 
     // Admin-only screens
     { path: 'dashboard',      component: DashboardComponent, canActivate: [AdminGuard] },
