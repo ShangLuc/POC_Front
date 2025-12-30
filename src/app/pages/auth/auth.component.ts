@@ -12,6 +12,7 @@ export class AuthComponent implements OnInit {
   eleveIdentifiant: string = '';
   adminUsername: string = '';
   adminPassword: string = '';
+  viewerUsername: string = '';
 
   // Paramètres réglables pour le bouton retour
   backButtonColor: string = '#999999';
@@ -32,6 +33,7 @@ export class AuthComponent implements OnInit {
     this.eleveIdentifiant = '';
     this.adminUsername = '';
     this.adminPassword = '';
+    this.viewerUsername = '';
     this.errorMessage = '';
   }
 
@@ -79,8 +81,29 @@ export class AuthComponent implements OnInit {
         }
       });
 
-    } else {
-      this.errorMessage = 'Merci de choisir un profil (élève ou admin).';
+    } else if (this.selectedProfile === 'viewer' ){
+      if(!this.viewerUsername){
+        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur.';
+        return;
+      }
+      this.authService.loginViewer(this.viewerUsername).subscribe({
+        next: () => {
+          this.router.navigate(['/accueil']); // adapte cette route à ton écran viewer
+        },
+        error: (err) => {
+          console.error(err);
+          if (err?.error && typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else if (err?.error?.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Identifiant viewer invalide.';
+        }
+    }
+      });
+
+    }else {
+      this.errorMessage = 'Merci de choisir un profil (élève ou admin ou viewer).';
     }
   }
 }

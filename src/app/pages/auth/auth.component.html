@@ -20,7 +20,7 @@
                             <i class="fa fa-arrow-left"></i> Retour
                         </a>
                     </h5>
-                    <h5 class="card-title" *ngIf="selectedProfile === 'referent'">
+                    <h5 class="card-title" *ngIf="selectedProfile === 'viewer'">
                         Authentification Référent
                         <a class="cursor-pointer float-right"
                             [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
@@ -52,7 +52,7 @@
                             <button 
                                 type="button" 
                                 class="btn btn-md w-100 "
-                                (click)="selectProfile('referent')">
+                                (click)="selectProfile('viewer')">
                                 <i class="fa fa-user"></i> Référent
                             </button>
                         </div>
@@ -119,17 +119,17 @@
                         </form>
                     </div>
                     <!-- Admin Référent Form-->
-                    <div *ngIf="selectedProfile === 'referent'">
+                    <div *ngIf="selectedProfile === 'viewer'">
                         <form>
                             <div class="form-group">
-                                <label for="referentEmail">Nom d'utilisateur</label>
+                                <label for="viewerUsername">Nom d'utilisateur</label>
                                 <input 
                                     type="text" 
                                     class="form-control" 
-                                    id="referentUsername"
+                                    id="viewerUsername"
                                     placeholder="Entrez votre nom d'utilisateur"
-                                    [(ngModel)]="referentUsername"
-                                    name="referentUsername">
+                                    [(ngModel)]="viewerUsername"
+                                    name="viewerUsername">
                             </div>
                             
                             <div class="d-flex justify-content-center">

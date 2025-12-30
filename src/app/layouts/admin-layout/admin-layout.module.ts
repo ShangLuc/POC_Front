@@ -18,6 +18,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dashboard.component';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     TypographyComponent,
     IconsComponent,
     SectionComponent,
+    ViewerDashboardComponent,
   ]
 })
 
