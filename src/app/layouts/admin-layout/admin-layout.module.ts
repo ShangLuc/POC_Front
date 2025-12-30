@@ -13,6 +13,7 @@ import { TableComponent }           from '../../pages/table/table.component';
 import { TypographyComponent }      from '../../pages/typography/typography.component';
 import { IconsComponent }           from '../../pages/icons/icons.component';
 import { SectionComponent }         from '../../pages/section/section.component';
+import { DashboardComponent }       from '../../pages/dashboard/dashboard.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
@@ -38,6 +39,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     TypographyComponent,
     IconsComponent,
     SectionComponent,
+    DashboardComponent,
   ]
 })
 

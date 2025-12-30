@@ -31,6 +31,24 @@ export class UserComponent implements OnInit {
     successMessage: string = '';
     errorMessage: string = '';
 
+    // Viewer (Référant) management properties
+    viewers: any[] = [];
+    newViewerLycee: string = '';
+    newViewerPassword: string = '';
+    showAddViewerForm: boolean = false;
+    loadingViewers: boolean = false;
+    viewerSuccessMessage: string = '';
+    viewerErrorMessage: string = '';
+
+    // Password change properties
+    currentPassword: string = '';
+    newPassword: string = '';
+    confirmNewPassword: string = '';
+    showPasswordForm: boolean = false;
+    passwordSuccessMessage: string = '';
+    passwordErrorMessage: string = '';
+    isChangingPassword: boolean = false;
+
     constructor(
         private authService: AuthService,
         private adminManagementService: AdminManagementService,
@@ -51,9 +69,10 @@ export class UserComponent implements OnInit {
             this.loadStudentProfile();
         }
 
-        // Load admins if superadmin
+        // Load admins and viewers if superadmin
         if (this.isSuperAdmin) {
             this.loadAdmins();
+            this.loadViewers();
         }
     }
 
@@ -155,6 +174,130 @@ export class UserComponent implements OnInit {
         this.newAdminUsername = '';
         this.newAdminPassword = '';
         this.errorMessage = '';
+    }
+
+    // Load all viewers
+    loadViewers() {
+        this.loadingViewers = true;
+        this.viewerErrorMessage = '';
+        this.adminManagementService.getAllViewers().subscribe({
+            next: (response) => {
+                this.viewers = response;
+                this.loadingViewers = false;
+            },
+            error: (err) => {
+                console.error('Error loading viewers:', err);
+                this.viewerErrorMessage = 'Erreur lors du chargement des référants.';
+                this.loadingViewers = false;
+            }
+        });
+    }
+
+    // Add new viewer
+    addViewer() {
+        if ( !this.newViewerLycee || !this.newViewerPassword) {
+            this.viewerErrorMessage = 'Veuillez remplir tous les champs.';
+            return;
+        }
+
+        this.viewerErrorMessage = '';
+        this.viewerSuccessMessage = '';
+
+        this.adminManagementService.addViewer(this.newViewerLycee, this.newViewerPassword).subscribe({
+            next: (response) => {
+                this.viewerSuccessMessage = 'Référant ajouté avec succès.';
+                this.newViewerLycee = '';
+                this.newViewerPassword = '';
+                this.showAddViewerForm = false;
+                this.loadViewers(); // Reload the list
+            },
+            error: (err) => {
+                console.error('Error adding viewer:', err);
+                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de l\'ajout du référant.';
+            }
+        });
+    }
+
+    // Delete viewer with confirmation
+    deleteViewer(viewer: any) {
+        const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référant "${viewer.nom}"?`);
+        
+        if (!confirmDelete) {
+            return;
+        }
+
+        this.viewerErrorMessage = '';
+        this.viewerSuccessMessage = '';
+
+        this.adminManagementService.deleteViewer(viewer.id).subscribe({
+            next: () => {
+                this.viewerSuccessMessage = `Référant "${viewer.nom}" supprimé avec succès.`;
+                this.loadViewers(); // Reload the list
+            },
+            error: (err) => {
+                console.error('Error deleting viewer:', err);
+                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de la suppression du référant.';
+            }
+        });
+    }
+
+    // Cancel adding viewer
+    cancelAddViewer() {
+        this.showAddViewerForm = false;
+        this.newViewerLycee = '';
+        this.newViewerPassword = '';
+        this.viewerErrorMessage = '';
+    }
+
+    // Change password
+    changePassword() {
+        // Reset messages
+        this.passwordErrorMessage = '';
+        this.passwordSuccessMessage = '';
+
+        // Validation
+        if (!this.currentPassword || !this.newPassword || !this.confirmNewPassword) {
+            this.passwordErrorMessage = 'Veuillez remplir tous les champs.';
+            return;
+        }
+
+        if (this.newPassword !== this.confirmNewPassword) {
+            this.passwordErrorMessage = 'Les nouveaux mots de passe ne correspondent pas.';
+            return;
+        }
+
+        if (this.newPassword.length < 6) {
+            this.passwordErrorMessage = 'Le nouveau mot de passe doit contenir au moins 6 caractères.';
+            return;
+        }
+
+        this.isChangingPassword = true;
+
+        this.adminManagementService.changePassword(this.currentPassword, this.newPassword, this.isSuperAdmin).subscribe({
+            next: (response) => {
+                this.passwordSuccessMessage = 'Mot de passe modifié avec succès.';
+                this.currentPassword = '';
+                this.newPassword = '';
+                this.confirmNewPassword = '';
+                this.showPasswordForm = false;
+                this.isChangingPassword = false;
+            },
+            error: (err) => {
+                console.error('Error changing password:', err);
+                this.passwordErrorMessage = err?.error?.message || err?.error || 'Erreur lors du changement de mot de passe.';
+                this.isChangingPassword = false;
+            }
+        });
+    }
+
+    // Cancel password change
+    cancelPasswordChange() {
+        this.showPasswordForm = false;
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmNewPassword = '';
+        this.passwordErrorMessage = '';
+        this.passwordSuccessMessage = '';
     }
 }
 

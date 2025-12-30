@@ -10,7 +10,7 @@ export interface RouteInfo {
 }
 
 export const ADMIN_ROUTES: RouteInfo[] = [
-    { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
+    { path: '/dashboard',     title: 'Tableau de bord',        icon:'nc-chart-pie-36', class: '' },
     { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
     { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
     { path: '/user',          title: "Profil", icon:'nc-single-02',  class: '' },

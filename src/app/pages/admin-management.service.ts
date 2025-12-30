@@ -59,6 +59,51 @@ export class AdminManagementService {
     );
   }
 
+  // Get all viewers (référants)
+  getAllViewers(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/viewers`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
 
+  // Add a new viewer (référant)
+  addViewer( lycee: string, password: string): Observable<string> {
+    return this.http.post<string>(
+      `${this.baseUrl}/create-viewer`,
+      { lycee, password },
+      { 
+        headers: this.getAuthHeaders(),
+        responseType: 'text' as 'json'
+      }
+    );
+  }
+
+  // Delete a viewer by ID
+  deleteViewer(viewerId: string): Observable<string> {
+    return this.http.delete<string>(
+      `${this.baseUrl}/viewer/${viewerId}`,
+      { 
+        headers: this.getAuthHeaders(),
+        responseType: 'text' as 'json'
+      }
+    );
+  }
+
+  // Change password for admin or superadmin
+  changePassword(currentPassword: string, newPassword: string, isSuperAdmin: boolean): Observable<string> {
+    const endpoint = isSuperAdmin 
+      ? 'http://localhost:8080/api/auth/superadmin/change-password'
+      : 'http://localhost:8080/api/auth/admin/change-password';
+    
+    return this.http.post<string>(
+      endpoint,
+      { currentPassword, newPassword },
+      { 
+        headers: this.getAuthHeaders(),
+        responseType: 'text' as 'json'
+      }
+    );
+  }
 
 }

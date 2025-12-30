@@ -1,0 +1,264 @@
+<div class="content">
+  <div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Tableau de bord</h4>
+            <p class="card-category">Statistiques des inscriptions et activités</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Filtres</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Lycée</label>
+                  <select class="form-control" [(ngModel)]="selectedLycee" (change)="onLyceeChange()">
+                    <option value="">Tous les lycées</option>
+                    <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Classe</label>
+                  <select class="form-control" [(ngModel)]="selectedClasse" (change)="onClasseChange()">
+                    <option value="">Toutes les classes</option>
+                    <option *ngFor="let classe of classes" [value]="classe">{{ classe }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-secondary" (click)="resetFilters()">
+                  <i class="nc-icon nc-refresh-69"></i> Réinitialiser
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="row" *ngIf="errorMessage">
+      <div class="col-md-12">
+        <div class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="row" *ngIf="isLoading">
+      <div class="col-md-12">
+        <div class="alert alert-info">
+          <i class="nc-icon nc-refresh-69 spin"></i> Chargement des statistiques...
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-single-02 text-primary"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Total élèves</p>
+                  <p class="card-title">{{ totalEleves }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-check-2 text-success"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Élèves inscrits</p>
+                  <p class="card-title">{{ elevesInscrits }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-simple-remove text-danger"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Élèves non inscrits</p>
+                  <p class="card-title">{{ elevesNonInscrits }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-chart-pie-36 text-info"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Taux d'inscription</p>
+                  <p class="card-title">{{ tauxInscription }}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Taux d'inscription</h5>
+            <p class="card-category">Répartition des élèves inscrits / non inscrits</p>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 300px;">
+              <canvas #inscriptionChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Activités choisies</h5>
+            <p class="card-category">Répartition globale par type d'activité</p>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 300px;">
+              <canvas #activitiesChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row" *ngIf="!isLoading && activitiesByLycee.length > 0">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Activités par lycée</h5>
+            <p class="card-category">Répartition des activités choisies par établissement</p>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 400px;">
+              <canvas #activitiesByLyceeChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities Statistics Table -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Détail des activités choisies</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                  <div class="card-body text-center">
+                    <h3>{{ totalConferences }}</h3>
+                    <p class="mb-0">Conférences</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-info text-white">
+                  <div class="card-body text-center">
+                    <h3>{{ totalTablesRondes }}</h3>
+                    <p class="mb-0">Tables Rondes</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-warning text-dark">
+                  <div class="card-body text-center">
+                    <h3>{{ totalFlashsMetiers }}</h3>
+                    <p class="mb-0">Flash Métiers</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities by Lycee Table -->
+    <div class="row" *ngIf="!isLoading && (activitiesByLycee | keyvalue).length > 0">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Statistiques par lycée</h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Lycée</th>
+                  <th class="text-center">Nombre d'activités choisies</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of activitiesByLycee | keyvalue">
+                  <td>{{ item.key || 'Non spécifié' }}</td>
+                  <td class="text-center"><strong>{{ item.value }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

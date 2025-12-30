@@ -9,6 +9,7 @@ import { IconsComponent } from '../../pages/icons/icons.component';
 import { SectionComponent } from '../../pages/section/section.component';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
+import { DashboardComponent } from 'app/pages/dashboard/dashboard.component';
 import { AdminGuard } from '../../guards/admin.guard';
 
 export const AdminLayoutRoutes: Routes = [
@@ -18,6 +19,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'user',           component: UserComponent },
 
     // Admin-only screens
+    { path: 'dashboard',      component: DashboardComponent, canActivate: [AdminGuard] },
     { path: 'activity',       component: ActivityComponent, canActivate: [AdminGuard] },
     { path: 'studentList',    component: StudentListComponent, canActivate: [AdminGuard] },
     { path: 'section',        component: ActivityComponent, canActivate: [AdminGuard] },
