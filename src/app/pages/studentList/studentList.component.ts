@@ -72,7 +72,35 @@ export class StudentListComponent implements OnInit{
         prenom: '',
         etablissement: '',
         libStructure: '',
-        inscrit: 'non'
+        inscrit: 'non',
+        day: new Date().getDate(),
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        hour: new Date().getHours(),
+        minute: new Date().getMinutes()
+    };
+
+    // Import modal state
+    showImportModal: boolean = false;
+    importingFile: boolean = false;
+    selectedFile: File | null = null;
+    selectedFileName: string = '';
+    importErrorMessage: string = '';
+    
+    // Date/time selection arrays
+    days: number[] = Array.from({length: 31}, (_, i) => i + 1);
+    months: string[] = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    years: number[] = Array.from({length: 10}, (_, i) => new Date().getFullYear() - 5 + i);
+    hours: number[] = Array.from({length: 24}, (_, i) => i);
+    minutes: number[] = Array.from({length: 60}, (_, i) => i);
+    
+    // Import date object
+    importDate = {
+        day: new Date().getDate(),
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        hour: new Date().getHours(),
+        minute: new Date().getMinutes()
     };
 
     ngOnInit(){
@@ -93,13 +121,19 @@ export class StudentListComponent implements OnInit{
 
     // Réinitialiser le formulaire
     resetForm() {
+        const now = new Date();
         this.newStudent = {
             id: '',
             nom: '',
             prenom: '',
             etablissement: '',
             libStructure: '',
-            inscrit: 'non'
+            inscrit: 'non',
+            day: now.getDate(),
+            month: now.getMonth() + 1,
+            year: now.getFullYear(),
+            hour: now.getHours(),
+            minute: now.getMinutes()
         };
         this.errorMessage = '';
         this.successMessage = '';
@@ -132,6 +166,7 @@ export class StudentListComponent implements OnInit{
             etablissement: this.newStudent.etablissement,
             // Valeur par défaut vide si non fournie
             libStructure: this.newStudent.libStructure || '',
+            demiJournee: this.formatStudentDate(),
             inscrit: this.newStudent.inscrit === 'oui' ? true : false
         };
 
@@ -384,46 +419,98 @@ export class StudentListComponent implements OnInit{
         });
     }
 
-    // Importer un fichier Excel
-    onFileChange(event: any) {
+    // Ouvrir la modal d'import
+    openImportModal() {
+        this.showImportModal = true;
+        this.resetImportForm();
+    }
+
+    // Fermer la modal d'import
+    closeImportModal() {
+        this.showImportModal = false;
+        this.resetImportForm();
+    }
+
+    // Réinitialiser le formulaire d'import
+    resetImportForm() {
+        this.selectedFile = null;
+        this.selectedFileName = '';
+        this.importErrorMessage = '';
+        this.importingFile = false;
+        // Reset date to current
+        const now = new Date();
+        this.importDate = {
+            day: now.getDate(),
+            month: now.getMonth() + 1,
+            year: now.getFullYear(),
+            hour: now.getHours(),
+            minute: now.getMinutes()
+        };
+    }
+
+    // Sélection du fichier
+    onImportFileSelect(event: any) {
         const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length !== 1) {
-            this.errorMessage = 'Veuillez sélectionner un seul fichier Excel (.xlsx ou .xls).';
+        if (input.files && input.files.length === 1) {
+            this.selectedFile = input.files[0];
+            this.selectedFileName = this.selectedFile.name;
+            this.importErrorMessage = '';
+        } else {
+            this.selectedFile = null;
+            this.selectedFileName = '';
+        }
+    }
+
+    // Soumettre l'import avec la date
+    submitImport() {
+        if (!this.selectedFile) {
+            this.importErrorMessage = 'Veuillez sélectionner un fichier Excel.';
             return;
         }
-
-        const file: File = input.files[0];
 
         // Authorization header only (no Content-Type)
         const headers = this.getAuthHeadersForUpload();
         if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
+            this.importErrorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
             return;
         }
 
+        // Format the date string
+        const formattedDate = this.formatImportDate();
+
         const formData = new FormData();
-        // Assumes backend expects the field name 'file'
-        formData.append('file', file, file.name);
+        formData.append('file', this.selectedFile, this.selectedFile.name);
+        formData.append('demiJournee', formattedDate);
 
         // Indicate loading and clear messages
-        this.loadingEleves = true;
+        this.importingFile = true;
+        this.importErrorMessage = '';
         this.errorMessage = '';
         this.successMessage = '';
 
         this.http.post<string>('http://localhost:8080/api/admin/eleves/import', formData, { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
-                // Le backend renvoie du texte (plain text), on l'affiche directement
                 this.successMessage = response || 'Import réussi. Rafraîchissement de la liste…';
-                // clear file input
-                input.value = '';
-                // reload list from backend
+                this.closeImportModal();
                 this.loadEleves();
             },
             error: (err) => {
                 console.error('Erreur lors de l\'import du fichier Excel:', err);
-                this.errorMessage = (typeof err?.error === 'string' && err.error) || 'Erreur lors de l\'import du fichier.';
-                this.loadingEleves = false;
+                this.importErrorMessage = (typeof err?.error === 'string' && err.error) || 'Erreur lors de l\'import du fichier.';
+                this.importingFile = false;
             }
         });
+    }
+
+    // Formater la date pour l'envoi (import)
+    formatImportDate(): string {
+        const pad = (n: number) => n < 10 ? '0' + n : String(n);
+        return `${pad(this.importDate.day)}/${pad(this.importDate.month)}/${this.importDate.year} ${pad(this.importDate.hour)}:${pad(this.importDate.minute)}`;
+    }
+
+    // Formater la date pour l'ajout d'étudiant
+    formatStudentDate(): string {
+        const pad = (n: number) => n < 10 ? '0' + n : String(n);
+        return `${pad(this.newStudent.day)}/${pad(this.newStudent.month)}/${this.newStudent.year} ${pad(this.newStudent.hour)}:${pad(this.newStudent.minute)}`;
     }
 }

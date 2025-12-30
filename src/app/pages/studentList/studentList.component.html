@@ -24,10 +24,9 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
                 </button>
-                <label for="excel-upload" class="btn btn-outline-success btn-sm">
+                <button type="button" class="btn btn-outline-success btn-sm" (click)="openImportModal()">
                     <i class="fa fa-file-excel"></i> Importer un fichier Excel
-                </label>
-                <input id="excel-upload" type="file" (change)="onFileChange($event)" style="display: none;" accept=".xlsx, .xls">
+                </button>
             </div>
 
             <!-- Barre de recherche et filtres -->
@@ -90,6 +89,7 @@
                             <th>Établissement</th>
                             <th>Lib. Structure</th>
                             <th>Inscrit</th>
+                            <th>Demi journée</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -105,6 +105,7 @@
                                 <span *ngIf="student.inscrit === true || student.inscrit === 'true' || student.inscrit === 'oui'" class="badge badge-success">Oui</span>
                                 <span *ngIf="student.inscrit === false || student.inscrit === 'false' || student.inscrit === 'non'" class="badge badge-danger">Non</span>
                             </td>
+                            <td>{{ student.demiJournee || '-' }}</td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(i + (currentPage - 1) * pageSize)">
                                     <i class="fa fa-times"></i>
@@ -112,7 +113,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="!loadingEleves && displayedStudents.length === 0">
-                            <td colspan="8" class="text-center text-muted">Aucun étudiant trouvé</td>
+                            <td colspan="9" class="text-center text-muted">Aucun étudiant trouvé</td>
                         </tr>
                     </tbody>
                 </table>
@@ -145,6 +146,14 @@
     </div>
 
     <!-- Modal pour ajouter un étudiant -->
+    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un Étudiant</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
     <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -186,7 +195,49 @@
                         <input type="text" class="form-control" id="libStructureInput" 
                                [(ngModel)]="newStudent.libStructure" 
                                name="libStructure"
-                               placeholder="Entrez la lib. structure (optionnel)">
+                               placeholder="Entrez la lib. structure" >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Date de la demi-journée</label>
+                        <div class="row mt-2">
+                            <div class="col-4">
+                                <label for="day">Jour</label>
+                                <select class="form-control" id="day" [(ngModel)]="newStudent.day" name="day">
+                                    <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label for="month">Mois</label>
+                                <select class="form-control" id="month" [(ngModel)]="newStudent.month" name="month">
+                                    <option *ngFor="let m of months; let i = index" [value]="i + 1">{{ m }}</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label for="year">Année</label>
+                                <select class="form-control" id="year" [(ngModel)]="newStudent.year" name="year">
+                                    <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sélection de l'heure -->
+                    <div class="form-group mb-3">
+                        <label><strong>Heure</strong></label>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <label for="hour">Heure</label>
+                                <select class="form-control" id="hour" [(ngModel)]="newStudent.hour" name="hour">
+                                    <option *ngFor="let h of hours" [value]="h">{{ h < 10 ? '0' + h : h }}</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="minute">Minute</label>
+                                <select class="form-control" id="minute" [(ngModel)]="newStudent.minute" name="minute">
+                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min }}</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="inscritSelect">Inscrit</label>
@@ -211,5 +262,94 @@
 
     <!-- Overlay pour modal -->
     <div class="modal-backdrop fade" [ngClass]="{'show': showModal}" *ngIf="showModal"></div>
+
+    <!-- Modal pour importer un fichier Excel -->
+    <div class="modal fade" [ngClass]="{'show': showImportModal}" [ngStyle]="{'display': showImportModal ? 'block' : 'none'}" id="importModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Importer un fichier Excel</h5>
+                    <button type="button" class="btn-close" (click)="closeImportModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Sélection de la date -->
+                    <div class="form-group mb-3">
+                        <label><strong>Date de la demi-journée</strong></label>
+                        <div class="row mt-2">
+                            <div class="col-4">
+                                <label for="importDay">Jour</label>
+                                <select class="form-control" id="importDay" [(ngModel)]="importDate.day" name="importDay">
+                                    <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label for="importMonth">Mois</label>
+                                <select class="form-control" id="importMonth" [(ngModel)]="importDate.month" name="importMonth">
+                                    <option *ngFor="let m of months; let i = index" [value]="i + 1">{{ m }}</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label for="importYear">Année</label>
+                                <select class="form-control" id="importYear" [(ngModel)]="importDate.year" name="importYear">
+                                    <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sélection de l'heure -->
+                    <div class="form-group mb-3">
+                        <label><strong>Heure</strong></label>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <label for="importHour">Heure</label>
+                                <select class="form-control" id="importHour" [(ngModel)]="importDate.hour" name="importHour">
+                                    <option *ngFor="let h of hours" [value]="h">{{ h < 10 ? '0' + h : h }}</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="importMinute">Minute</label>
+                                <select class="form-control" id="importMinute" [(ngModel)]="importDate.minute" name="importMinute">
+                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sélection du fichier -->
+                    <div class="form-group mb-3">
+                        <label for="excelFile"><strong>Fichier Excel</strong></label>
+                        <div class="mt-2">
+                            <label for="excelFile" class="btn btn-outline-primary btn-sm d-block text-center py-3 cursor-pointer border-dashed">
+                                <i class="fa fa-upload"></i> Cliquez pour sélectionner un fichier Excel
+                            </label>
+                            <input type="file" class="form-control d-none" id="excelFile" 
+                                   (change)="onImportFileSelect($event)" 
+                                   accept=".xlsx, .xls"
+                                   #fileInput>
+                        </div>
+                        <div *ngIf="selectedFileName" class="mt-2">
+                            <p class="text-success fw-bold"><i class="fa fa-check-circle"></i> Fichier sélectionné: {{ selectedFileName }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Message d'erreur -->
+                    <div *ngIf="importErrorMessage" class="alert alert-danger mt-3" role="alert">
+                        {{ importErrorMessage }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeImportModal()" [disabled]="importingFile">Annuler</button>
+                    <button type="button" class="btn btn-success" (click)="submitImport()" [disabled]="importingFile || !selectedFile">
+                        <span *ngIf="!importingFile"><i class="fa fa-check"></i> Valider l'import</span>
+                        <span *ngIf="importingFile"><i class="fa fa-spinner fa-spin"></i> Import en cours...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay pour modal import -->
+    <div class="modal-backdrop fade" [ngClass]="{'show': showImportModal}" *ngIf="showImportModal"></div>
 
 </div>
