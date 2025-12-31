@@ -6,5 +6,6 @@
 3. Go to your file project
 4. Run in terminal: ```npm install -g @angular/cli```
 5. Then: ```npm install```
-6. And: ```ng serve```
-7. Navigate to: [http://localhost:4200/](http://localhost:4200/)
+6. Then: ```npm install @ng-select/ng-select```
+7. And: ```ng serve```
+8. Navigate to: [http://localhost:4200/](http://localhost:4200/)
