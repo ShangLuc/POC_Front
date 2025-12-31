@@ -170,6 +170,38 @@ export class FormComponent implements OnInit {
         return '';
     }
 
+    onSave(): void {
+        this.messageErreur = '';
+        this.messageSucces = '';
+
+        if (!this.formGroup.valid) {
+            this.markAllAsTouched();
+            return;
+        }
+
+        const validationError = this.validateVoeux();
+        if (validationError) {
+            this.validationMessage = validationError;
+            return;
+        }
+
+        const raw = this.formGroup.getRawValue();
+const eleveId = raw.id;
+
+const voeuxTitres = [raw.voeu1, raw.voeu2, raw.voeu3, raw.voeu4, raw.voeu5];
+const eventIds: number[] = voeuxTitres.map(titre => this.titreToId[titre]);
+
+this.eleveService.saveVoeux(eleveId, eventIds).subscribe({
+            next: (msg: string) => {
+                this.messageSucces = msg || 'Vos choix ont été enregistrés. Vous pouvez encore les modifier.';
+            },
+            error: (err) => {
+                this.messageErreur = err?.error || 'Erreur lors de l\'enregistrement des vœux.';
+                console.error(err);
+            }
+        });
+    }
+
     onConfirm(): void {
         this.messageErreur = '';
         this.messageSucces = '';
