@@ -18,6 +18,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'form',           component: FormComponent },
     { path: 'user',           component: UserComponent },
 
+
     // Dashboard viewer (référent) - accessible aux viewers
     { path: 'viewer-dashboard', component: ViewerDashboardComponent },
 

@@ -88,7 +88,7 @@ export class AuthComponent implements OnInit {
       }
       this.authService.loginViewer(this.viewerUsername).subscribe({
         next: () => {
-          this.router.navigate(['/accueil']); // adapte cette route à ton écran viewer
+          this.router.navigate(['/viewer-dashboard']); // adapte cette route à ton écran viewer
         },
         error: (err) => {
           console.error(err);
