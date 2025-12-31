@@ -2,7 +2,6 @@ import { Component, OnInit, Renderer2, ViewChild, ElementRef } from '@angular/co
 import { ROUTES } from '../../sidebar/sidebar.component';
 import { Router } from '@angular/router';
 import { Location} from '@angular/common';
-import { AuthService } from '../../pages/auth.service';
 
 @Component({
     moduleId: module.id,
@@ -20,7 +19,7 @@ export class NavbarComponent implements OnInit{
     public isCollapsed = true;
     @ViewChild("navbar-cmp", {static: false}) button;
 
-    constructor(location:Location, private renderer : Renderer2, private element : ElementRef, private router: Router, private authService: AuthService) {
+    constructor(location:Location, private renderer : Renderer2, private element : ElementRef, private router: Router) {
         this.location = location;
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
@@ -91,21 +90,6 @@ export class NavbarComponent implements OnInit{
           navbar.classList.remove('bg-white');
         }
 
-      }
-
-      logout() {
-        this.authService.logout().subscribe({
-          next: () => {
-            // Redirect to auth page after successful logout
-            this.router.navigate(['/auth']);
-          },
-          error: (err) => {
-            console.error('Logout error:', err);
-            // Clear local data and redirect anyway
-            this.authService.clear();
-            this.router.navigate(['/auth']);
-          }
-        });
       }
 
 }

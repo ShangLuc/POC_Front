@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../pages/auth.service';
 
 
 export interface RouteInfo {
@@ -49,23 +48,7 @@ export const ROUTES: RouteInfo[] = [
 
 export class SidebarComponent implements OnInit {
     public menuItems: any[];
-    
-    constructor(private authService: AuthService) {}
-
     ngOnInit() {
-        // Afficher un menu différent selon le rôle courant
-        if (this.authService.isAdmin()) {
-            // Admin + superadmin
-            this.menuItems = ADMIN_ROUTES.filter(menuItem => menuItem);
-        } else if (this.authService.isEleve()) {
-            // Élève
-            this.menuItems = STUDENT_ROUTES.filter(menuItem => menuItem);
-        } else if (this.authService.isViewer && this.authService.isViewer()) {
-            // Viewer / référent
-            this.menuItems = VIEWER_ROUTES.filter(menuItem => menuItem);
-        } else {
-            // Fallback générique
-            this.menuItems = ROUTES.filter(menuItem => menuItem);
-        }
+        this.menuItems = ROUTES.filter(menuItem => menuItem);
     }
 }

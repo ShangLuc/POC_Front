@@ -4,7 +4,7 @@ import { DashboardService, DashboardGlobal, DashboardParEtablissement } from '..
 @Component({
   selector: 'app-viewer-dashboard',
   templateUrl: './viewer-dashboard.component.html',
-  styleUrls: ['./viewer-dashboard.component.css']
+  styleUrls: []
 })
 export class ViewerDashboardComponent implements OnInit {
   // Statistiques globales du lycée

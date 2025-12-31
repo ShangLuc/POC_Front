@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../auth.service';
 
 
 @Component({
@@ -11,25 +9,6 @@ import { AuthService } from '../auth.service';
 
 export class ActivityComponent implements OnInit{
     
-    constructor(
-        private http: HttpClient,
-        private authService: AuthService
-    ) {}
-
-    // Get authorization headers with Bearer token
-    private getAuthHeaders(): HttpHeaders {
-        const token = this.authService.getAuthToken();
-        if (token) {
-            return new HttpHeaders({
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            });
-        }
-        return new HttpHeaders({
-            'Content-Type': 'application/json'
-        });
-    }
-
     // Données pour les trois types d'activités
     conferences: any[] = [];
     tablesRondes: any[] = [];
@@ -42,71 +21,13 @@ export class ActivityComponent implements OnInit{
     
     // Modal state
     activeModal: string = '';
-    addingActivity: boolean = false;
-    isEditMode: boolean = false;
-    editActivityId: string = '';
-    errorMessage: string = '';
-    successMessage: string = '';
     newActivity = {
         nom: '',
-        description: '',
-        capacite: ''
+        capacite: '',
+        nbRepetition: ''
     };
 
-    ngOnInit(){
-        this.loadActivities();
-    }
-
-    // Charger les activités depuis le backend
-    loadActivities() {
-        const headers = this.getAuthHeaders();
-        if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
-            return;
-        }
-
-        this.http.get<any[]>('http://localhost:8080/api/admin/events', { headers })
-            .subscribe({
-                next: (activities) => {
-                    // Reset arrays
-                    this.conferences = [];
-                    this.tablesRondes = [];
-                    this.flashsMetiers = [];
-                    this.conferenceCounter = 0;
-                    this.tableRondeCounter = 0;
-                    this.flashMetierCounter = 0;
-
-                    // Sort activities by type
-                    activities.forEach(activity => {
-                        const localActivity = {
-                            id: activity.id,
-                            numero: 0,
-                            nom: activity.nom,
-                            description: activity.description,
-                            capacite: activity.capacite
-                        };
-
-                        if (activity.type === 'CONFERENCE') {
-                            this.conferenceCounter++;
-                            localActivity.numero = this.conferenceCounter;
-                            this.conferences.push(localActivity);
-                        } else if (activity.type === 'TABLE_RONDE') {
-                            this.tableRondeCounter++;
-                            localActivity.numero = this.tableRondeCounter;
-                            this.tablesRondes.push(localActivity);
-                        } else if (activity.type === 'FLASH_METIER') {
-                            this.flashMetierCounter++;
-                            localActivity.numero = this.flashMetierCounter;
-                            this.flashsMetiers.push(localActivity);
-                        }
-                    });
-                },
-                error: (err) => {
-                    console.error('Erreur lors du chargement des activités:', err);
-                    this.errorMessage = 'Erreur lors du chargement des activités.';
-                }
-            });
-    }
+    ngOnInit(){}
 
     // Ouvrir une modal
     openModal(type: string) {
@@ -117,8 +38,6 @@ export class ActivityComponent implements OnInit{
     // Fermer la modal
     closeModal() {
         this.activeModal = '';
-        this.isEditMode = false;
-        this.editActivityId = '';
         this.resetForm();
     }
 
@@ -126,198 +45,54 @@ export class ActivityComponent implements OnInit{
     resetForm() {
         this.newActivity = {
             nom: '',
-            description: '',
-            capacite: ''
+            capacite: '',
+            nbRepetition: ''
         };
     }
 
     // Ajouter une activité
     addActivity(type: string) {
-        if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.description) {
-            this.errorMessage = 'Veuillez remplir tous les champs';
+        if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.nbRepetition) {
+            alert('Veuillez remplir tous les champs');
             return;
         }
 
-        // Vérifier la présence du token avant l'appel
-        const headers = this.getAuthHeaders();
-        if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
-            return;
-        }
+        const activity = {
+            numero: 0,
+            nom: this.newActivity.nom,
+            capacite: this.newActivity.capacite,
+            nbRepetition: this.newActivity.nbRepetition
+        };
 
-        this.addingActivity = true;
-        this.errorMessage = '';
-        this.successMessage = '';
-
-        // Map type to TypeEvent enum
-        let typeEvent: string;
         if (type === 'conferences') {
-            typeEvent = 'CONFERENCE';
+            this.conferenceCounter++;
+            activity.numero = this.conferenceCounter;
+            this.conferences.push(activity);
         } else if (type === 'tables_rondes') {
-            typeEvent = 'TABLE_RONDE';
+            this.tableRondeCounter++;
+            activity.numero = this.tableRondeCounter;
+            this.tablesRondes.push(activity);
         } else if (type === 'flashs_metiers') {
-            typeEvent = 'FLASH_METIER';
-        } else {
-            this.errorMessage = 'Type d\'activité invalide.';
-            this.addingActivity = false;
-            return;
+            this.flashMetierCounter++;
+            activity.numero = this.flashMetierCounter;
+            this.flashsMetiers.push(activity);
         }
 
-        const activity = {
-            type: typeEvent,
-            nom: this.newActivity.nom,
-            description: this.newActivity.description,
-            capacite: this.newActivity.capacite
-        };
-
-        this.http.post<string>('http://localhost:8080/api/admin/events',
-            activity,
-            { 
-                headers: headers,
-                responseType: 'text' as 'json'
-            }
-        ).subscribe({
-            next: (response) => {
-                this.successMessage = 'Activité ajoutée avec succès.';
-                
-                // Add the activity to the local list
-                const localActivity = {
-                    numero: 0,
-                    nom: this.newActivity.nom,
-                    description: this.newActivity.description,
-                    capacite: this.newActivity.capacite
-                };
-
-                if (type === 'conferences') {
-                    this.conferenceCounter++;
-                    localActivity.numero = this.conferenceCounter;
-                    this.conferences.push(localActivity);
-                } else if (type === 'tables_rondes') {
-                    this.tableRondeCounter++;
-                    localActivity.numero = this.tableRondeCounter;
-                    this.tablesRondes.push(localActivity);
-                } else if (type === 'flashs_metiers') {
-                    this.flashMetierCounter++;
-                    localActivity.numero = this.flashMetierCounter;
-                    this.flashsMetiers.push(localActivity);
-                }
-                
-                this.closeModal();
-                setTimeout(() => { this.successMessage = ''; }, 3000);
-            },
-            error: (err) => {
-                console.error('Erreur lors de l\'ajout de l\'activité:', err);
-                this.errorMessage = err?.error?.message || 'Erreur lors de l\'ajout de l\'activité.';
-                this.addingActivity = false;
-            },
-            complete: () => {
-                this.addingActivity = false;
-            }
-        });
-    }
-
-    // Ouvrir la modal en mode édition
-    openEditModal(type: string, activity: any) {
-        this.activeModal = type;
-        this.isEditMode = true;
-        this.editActivityId = activity.id;
-        this.newActivity = {
-            nom: activity.nom,
-            description: activity.description,
-            capacite: activity.capacite
-        };
-        this.errorMessage = '';
-    }
-
-    // Modifier une activité
-    updateActivity() {
-        if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.description) {
-            this.errorMessage = 'Veuillez remplir tous les champs';
-            return;
-        }
-
-        const headers = this.getAuthHeaders();
-        if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
-            return;
-        }
-
-        this.addingActivity = true;
-        this.errorMessage = '';
-
-        // Map type to TypeEvent enum
-        let typeEvent: string;
-        if (this.activeModal === 'conferences') {
-            typeEvent = 'CONFERENCE';
-        } else if (this.activeModal === 'tables_rondes') {
-            typeEvent = 'TABLE_RONDE';
-        } else if (this.activeModal === 'flashs_metiers') {
-            typeEvent = 'FLASH_METIER';
-        } else {
-            this.errorMessage = 'Type d\'activité invalide.';
-            this.addingActivity = false;
-            return;
-        }
-
-        const activity = {
-            type: typeEvent,
-            nom: this.newActivity.nom,
-            description: this.newActivity.description,
-            capacite: this.newActivity.capacite
-        };
-
-        this.http.put<string>(`http://localhost:8080/api/admin/events/${this.editActivityId}`,
-            activity,
-            { 
-                headers: headers,
-                responseType: 'text' as 'json'
-            }
-        ).subscribe({
-            next: (response) => {
-                this.successMessage = 'Activité modifiée avec succès.';
-                this.closeModal();
-                this.loadActivities();
-                setTimeout(() => { this.successMessage = ''; }, 3000);
-            },
-            error: (err) => {
-                console.error('Erreur lors de la modification de l\'activité:', err);
-                this.errorMessage = err?.error?.message || 'Erreur lors de la modification de l\'activité.';
-                this.addingActivity = false;
-            },
-            complete: () => {
-                this.addingActivity = false;
-            }
-        });
+        this.closeModal();
     }
 
     // Supprimer une activité
-    deleteActivity(type: string, id: string) {
-        if (!confirm('Voulez-vous vraiment supprimer cette activité ?')) {
-            return;
+    deleteActivity(type: string, index: number) {
+        if (type === 'conferences') {
+            this.conferences.splice(index, 1);
+            this.updateNumbers('conferences');
+        } else if (type === 'tables_rondes') {
+            this.tablesRondes.splice(index, 1);
+            this.updateNumbers('tables_rondes');
+        } else if (type === 'flashs_metiers') {
+            this.flashsMetiers.splice(index, 1);
+            this.updateNumbers('flashs_metiers');
         }
-
-        const headers = this.getAuthHeaders();
-        if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
-            return;
-        }
-
-        this.http.delete<string>(`http://localhost:8080/api/admin/events/${id}`,
-            { 
-                headers: headers,
-                responseType: 'text' as 'json'
-            }
-        ).subscribe({
-            next: (response) => {
-                this.successMessage = 'Activité supprimée avec succès.';
-                this.loadActivities();
-                setTimeout(() => { this.successMessage = ''; }, 3000);
-            },
-            error: (err) => {
-                console.error('Erreur lors de la suppression de l\'activité:', err);
-                this.errorMessage = err?.error?.message || 'Erreur lors de la suppression de l\'activité.';
-            }
-        });
     }
 
     // Mettre à jour les numéros après suppression

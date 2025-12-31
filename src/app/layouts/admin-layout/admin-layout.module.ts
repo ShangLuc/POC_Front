@@ -17,8 +17,6 @@ import { SectionComponent }         from '../../pages/section/section.component'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dashboard.component';
 
 
 @NgModule({
@@ -26,8 +24,7 @@ import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dash
     CommonModule,
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
-    NgbModule,
-    NgSelectModule
+    NgbModule
   ],
   declarations: [
     AuthComponent,
@@ -39,7 +36,6 @@ import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dash
     TypographyComponent,
     IconsComponent,
     SectionComponent,
-    ViewerDashboardComponent,
   ]
 })
 

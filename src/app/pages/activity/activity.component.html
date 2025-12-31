@@ -16,8 +16,8 @@
                         <tr>
                             <th>Numéro</th>
                             <th>Nom</th>
-                            <th>Description</th>
                             <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -25,13 +25,10 @@
                         <tr *ngFor="let item of conferences; let i = index">
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
-                            <td>{{ item.description }}</td>
                             <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
                             <td>
-                                <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('conferences', item)">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('conferences', item.id)">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('conferences', i)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </td>
@@ -62,8 +59,8 @@
                         <tr>
                             <th>Numéro</th>
                             <th>Nom</th>
-                            <th>Description</th>
                             <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -71,13 +68,10 @@
                         <tr *ngFor="let item of tablesRondes; let i = index">
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
-                            <td>{{ item.description }}</td>
                             <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
                             <td>
-                                <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('tables_rondes', item)">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('tables_rondes', item.id)">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('tables_rondes', i)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </td>
@@ -108,8 +102,8 @@
                         <tr>
                             <th>Numéro</th>
                             <th>Nom</th>
-                            <th>Description</th>
                             <th>Capacité Maximale</th>
+                            <th>Nombre de Répétition</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -117,13 +111,10 @@
                         <tr *ngFor="let item of flashsMetiers; let i = index">
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
-                            <td>{{ item.description }}</td>
                             <td>{{ item.capacite }}</td>
+                            <td>{{ item.nbRepetition }}</td>
                             <td>
-                                <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('flashs_metiers', item)">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('flashs_metiers', item.id)">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="deleteActivity('flashs_metiers', i)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </td>
@@ -137,47 +128,35 @@
         </div>
     </div>
 
-    <!-- Modal pour ajouter/modifier une activité -->
+    <!-- Modal pour ajouter une activité -->
     <div class="modal fade" [ngClass]="{'show': activeModal}" [ngStyle]="{'display': activeModal ? 'block' : 'none'}" id="activityModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <ng-container *ngIf="!isEditMode">
-                            <span *ngIf="activeModal === 'conferences'">Ajouter une Conférence</span>
-                            <span *ngIf="activeModal === 'tables_rondes'">Ajouter une Table Ronde</span>
-                            <span *ngIf="activeModal === 'flashs_metiers'">Ajouter un Flash Métier</span>
-                        </ng-container>
-                        <ng-container *ngIf="isEditMode">
-                            <span *ngIf="activeModal === 'conferences'">Modifier la Conférence</span>
-                            <span *ngIf="activeModal === 'tables_rondes'">Modifier la Table Ronde</span>
-                            <span *ngIf="activeModal === 'flashs_metiers'">Modifier le Flash Métier</span>
-                        </ng-container>
+                        <span *ngIf="activeModal === 'conferences'">Ajouter une Conférence</span>
+                        <span *ngIf="activeModal === 'tables_rondes'">Ajouter une Table Ronde</span>
+                        <span *ngIf="activeModal === 'flashs_metiers'">Ajouter un Flash Métier</span>
                     </h5>
                     <button type="button" class="btn-close" (click)="closeModal()"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Message d'erreur -->
-                    <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
-                        {{ errorMessage }}
-                    </div>
                     <div class="form-group mb-3">
                         <label for="nomInput">Nom</label>
                         <input type="text" class="form-control" id="nomInput" [(ngModel)]="newActivity.nom" placeholder="Entrez le nom">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="descriptionInput">Description</label>
-                        <input type="text" class="form-control" id="descriptionInput" [(ngModel)]="newActivity.description" placeholder="Entrez la description">
-                    </div>
-                    <div class="form-group mb-3">
                         <label for="capaciteInput">Capacité Maximale</label>
                         <input type="number" class="form-control" id="capaciteInput" [(ngModel)]="newActivity.capacite" placeholder="Entrez la capacité">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="nbRepetitionInput">Nombre de Répétition</label>
+                        <input type="number" class="form-control" id="nbRepetitionInput" [(ngModel)]="newActivity.nbRepetition" placeholder="Entrez le nombre de répétition">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
-                    <button *ngIf="!isEditMode" type="button" class="btn btn-primary" (click)="addActivity(activeModal)">Ajouter</button>
-                    <button *ngIf="isEditMode" type="button" class="btn btn-primary" (click)="updateActivity()">Modifier</button>
+                    <button type="button" class="btn btn-primary" (click)="addActivity(activeModal)">Ajouter</button>
                 </div>
             </div>
         </div>
