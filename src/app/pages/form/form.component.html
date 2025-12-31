@@ -107,10 +107,16 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">  
+            <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">
+              <button type="button" class="btn btn-secondary me-2" (click)="onSave()">
+                <i class="fa fa-save"></i> Enregistrer
+              </button>
               <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
                 <i class="fa fa-check"></i> Confirmer le choix
               </button>
+              <!-- <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
+                <i class="fa fa-check"></i> Confirmer le choix
+              </button> -->
             </div>
           </form>
         </div>

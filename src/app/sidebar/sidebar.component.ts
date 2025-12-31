@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../pages/auth.service';
 
 
 export interface RouteInfo {
@@ -7,6 +8,25 @@ export interface RouteInfo {
     icon: string;
     class: string;
 }
+
+export const ADMIN_ROUTES: RouteInfo[] = [
+    { path: '/dashboard',     title: 'Tableau de bord',        icon:'nc-chart-pie-36', class: '' },
+    { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
+    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
+    { path: '/user',          title: "Profil", icon:'nc-single-02',  class: '' },
+];
+
+export const STUDENT_ROUTES: RouteInfo[] = [
+    { path: '/accueil',       title: 'Accueil',           icon:'nc-bank',        class: '' },
+    { path: '/form',          title: 'Formulaire',        icon:'nc-bank',        class: '' },
+    { path: '/user',          title: 'Profil',            icon:'nc-single-02',   class: '' },
+];
+
+// Routes visibles pour le profil viewer (référent)
+export const VIEWER_ROUTES: RouteInfo[] = [
+    { path: '/viewer-dashboard', title: 'Dashboard', icon:'nc-chart-bar-32', class: '' },
+    // { path: '/activity',         title: 'Les activités',      icon:'nc-single-02',   class: '' },
+];
 
 export const ROUTES: RouteInfo[] = [
     { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
@@ -28,7 +48,23 @@ export const ROUTES: RouteInfo[] = [
 
 export class SidebarComponent implements OnInit {
     public menuItems: any[];
+    
+    constructor(private authService: AuthService) {}
+
     ngOnInit() {
-        this.menuItems = ROUTES.filter(menuItem => menuItem);
+        // Afficher un menu différent selon le rôle courant
+        if (this.authService.isAdmin()) {
+            // Admin + superadmin
+            this.menuItems = ADMIN_ROUTES.filter(menuItem => menuItem);
+        } else if (this.authService.isEleve()) {
+            // Élève
+            this.menuItems = STUDENT_ROUTES.filter(menuItem => menuItem);
+        } else if (this.authService.isViewer && this.authService.isViewer()) {
+            // Viewer / référent
+            this.menuItems = VIEWER_ROUTES.filter(menuItem => menuItem);
+        } else {
+            // Fallback générique
+            this.menuItems = ROUTES.filter(menuItem => menuItem);
+        }
     }
 }
