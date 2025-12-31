@@ -30,7 +30,8 @@
               <strong>Instructions :</strong>
               <ul class="mb-0">
                 <li>Vœux 1 et 2 : Conférences obligatoires (attribution garantie)</li>
-                <li>Vœux 3, 4 et 5 : Au choix parmi conférences, tables rondes ou flashs métiers</li>
+                <li>Vœux 3 et 4 : Au choix parmi conférences, tables rondes ou flashs métiers</li>
+                <li>Vœu 5 : Conférence obligatoire</li>
                 <li>Tous les vœux doivent être différents</li>
               </ul>
             </div>
@@ -90,9 +91,9 @@
               <label for="voeu5" class="form-label d-block"><strong>Vœu 5 :</strong> Au choix <span class="text-danger">*</span></label>
               <select id="voeu5" formControlName="voeu5" class="form-select" (change)="onVoeuChange()">
                 <option value="">-- Sélectionnez un vœu --</option>
-                <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option></optgroup>
-                <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu5')">{{ table }}</option></optgroup>
-                <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu5')">{{ flash }}</option></optgroup>
+                <optgroup label="Conférences">
+                  <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option>
+                </optgroup>
               </select>
               <div *ngIf="formGroup.get('voeu5')?.invalid && formGroup.get('voeu5')?.touched" class="text-danger"><small>Le vœu 5 est obligatoire.</small></div>
             </div>
@@ -106,10 +107,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">
-              <button type="button" class="btn btn-secondary me-2" (click)="onSave()">
-                <i class="fa fa-save"></i> Enregistrer
-              </button>
+            <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">  
               <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
                 <i class="fa fa-check"></i> Confirmer le choix
               </button>
