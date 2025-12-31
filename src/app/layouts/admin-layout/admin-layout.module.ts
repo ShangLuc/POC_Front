@@ -40,11 +40,8 @@ import { ViewerDashboardComponent } from 'app/pages/viewer-dashboard/viewer-dash
     TypographyComponent,
     IconsComponent,
     SectionComponent,
-<<<<<<< HEAD
     DashboardComponent,
-=======
-    ViewerDashboardComponent,
->>>>>>> 3ea1c488e19b459f24b6f81c064dcf4799d5a4aa
+    ViewerDashboardComponent
   ]
 })
 

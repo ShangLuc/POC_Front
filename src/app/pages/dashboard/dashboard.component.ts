@@ -5,16 +5,30 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+interface ActivityStat {
+    id: string;
+    titre: string;
+    count: number;
+}
+
 @Component({
     selector: 'dashboard-cmp',
     moduleId: module.id,
-    templateUrl: 'dashboard.component.html'
+    templateUrl: 'dashboard.component.html',
+    styleUrls: ['dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
     
     @ViewChild('inscriptionChart') inscriptionChartRef: ElementRef;
-    @ViewChild('activitiesChart') activitiesChartRef: ElementRef;
-    @ViewChild('activitiesByLyceeChart') activitiesByLyceeChartRef: ElementRef;
+    @ViewChild('conferencesChart') conferencesChartRef: ElementRef;
+    @ViewChild('tablesRondesChart') tablesRondesChartRef: ElementRef;
+    @ViewChild('flashsMetiersChart') flashsMetiersChartRef: ElementRef;
+
+    // Math for template
+    Math = Math;
+
+    // Active tab
+    activeTab: string = 'conferences';
 
     // Filters
     lycees: string[] = [];
@@ -28,22 +42,20 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     elevesNonInscrits: number = 0;
     tauxInscription: number = 0;
 
-    // Activity statistics
-    totalConferences: number = 0;
-    totalTablesRondes: number = 0;
-    totalFlashsMetiers: number = 0;
+    // Activity statistics - detailed by activity
+    conferencesStats: ActivityStat[] = [];
+    tablesRondesStats: ActivityStat[] = [];
+    flashsMetiersStats: ActivityStat[] = [];
 
     // Charts
     inscriptionChart: any;
-    activitiesChart: any;
-    activitiesByLyceeChart: any;
+    conferencesChart: any;
+    tablesRondesChart: any;
+    flashsMetiersChart: any;
 
     // Loading states
     isLoading: boolean = true;
     errorMessage: string = '';
-
-    // Data for charts - Map<String, Long> from backend
-    activitiesByLycee: { [key: string]: number } = {};
 
     constructor(
         private http: HttpClient,
@@ -137,12 +149,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                         ? Math.round((this.elevesInscrits / this.totalEleves) * 100) 
                         : 0;
 
-                    this.totalConferences = data.totalConferences || 0;
-                    this.totalTablesRondes = data.totalTablesRondes || 0;
-                    this.totalFlashsMetiers = data.totalFlashsMetiers || 0;
-
-                    // activitiesByLycee is a Map<String, Long> from backend
-                    this.activitiesByLycee = data.activitiesByLycee || {};
+                    // Detailed activity statistics - Map<String, Long> converted to array
+                    this.conferencesStats = this.mapToActivityStats(data.conferencesStats || {});
+                    this.tablesRondesStats = this.mapToActivityStats(data.tablesRondesStats || {});
+                    this.flashsMetiersStats = this.mapToActivityStats(data.flashsMetiersStats || {});
 
                     this.isLoading = false;
                     
@@ -157,6 +167,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     this.isLoading = false;
                 }
             });
+    }
+
+    // Convert Map<String, Long> to ActivityStat array
+    mapToActivityStats(map: { [key: string]: number }): ActivityStat[] {
+        return Object.entries(map).map(([titre, count]) => ({
+            id: titre,
+            titre: titre,
+            count: count
+        })).sort((a, b) => b.count - a.count); // Sort by count descending
     }
 
     onLyceeChange() {
@@ -178,8 +197,27 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     initCharts() {
         this.initInscriptionChart();
-        this.initActivitiesChart();
-        this.initActivitiesByLyceeChart();
+        this.initConferencesChart();
+        this.initTablesRondesChart();
+        this.initFlashsMetiersChart();
+    }
+
+    onTabChange(tab: string) {
+        this.activeTab = tab;
+        // Wait for Angular to render the DOM before initializing the chart
+        setTimeout(() => {
+            switch(tab) {
+                case 'conferences':
+                    this.initConferencesChart();
+                    break;
+                case 'tables-rondes':
+                    this.initTablesRondesChart();
+                    break;
+                case 'flashs-metiers':
+                    this.initFlashsMetiersChart();
+                    break;
+            }
+        }, 50);
     }
 
     initInscriptionChart() {
@@ -217,24 +255,23 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         });
     }
 
-    initActivitiesChart() {
-        if (this.activitiesChart) {
-            this.activitiesChart.destroy();
+    initConferencesChart() {
+        if (this.conferencesChart) {
+            this.conferencesChart.destroy();
         }
 
-        const ctx = this.activitiesChartRef?.nativeElement?.getContext('2d');
-        if (!ctx) return;
+        const ctx = this.conferencesChartRef?.nativeElement?.getContext('2d');
+        if (!ctx || this.conferencesStats.length === 0) return;
 
-        this.activitiesChart = new Chart(ctx, {
-            type: 'bar',
+        this.conferencesChart = new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                labels: ['Conférences', 'Tables Rondes', 'Flash Métiers'],
+                labels: this.conferencesStats.map(s => this.truncateLabel(s.titre, 30)),
                 datasets: [{
-                    label: 'Nombre de choix',
-                    data: [this.totalConferences, this.totalTablesRondes, this.totalFlashsMetiers],
-                    backgroundColor: ['#007bff', '#17a2b8', '#ffc107'],
-                    borderColor: ['#0056b3', '#117a8b', '#d39e00'],
-                    borderWidth: 1
+                    data: this.conferencesStats.map(s => s.count),
+                    backgroundColor: this.generateColors(this.conferencesStats.length, 'blue'),
+                    borderColor: '#fff',
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -242,18 +279,24 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
-                    },
-                    title: {
                         display: true,
-                        text: 'Répartition globale des activités choisies'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 11
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => {
+                                const index = items[0].dataIndex;
+                                return this.conferencesStats[index].titre;
+                            },
+                            label: (item) => ` ${item.raw} élève(s) inscrit(s)`
                         }
                     }
                 }
@@ -261,55 +304,193 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         });
     }
 
-    initActivitiesByLyceeChart() {
-        if (this.activitiesByLyceeChart) {
-            this.activitiesByLyceeChart.destroy();
+    initTablesRondesChart() {
+        if (this.tablesRondesChart) {
+            this.tablesRondesChart.destroy();
         }
 
-        const ctx = this.activitiesByLyceeChartRef?.nativeElement?.getContext('2d');
-        if (!ctx) return;
+        const ctx = this.tablesRondesChartRef?.nativeElement?.getContext('2d');
+        if (!ctx || this.tablesRondesStats.length === 0) return;
 
-        // activitiesByLycee is a Map<String, Long> - convert to arrays for chart
-        const lyceeLabels = Object.keys(this.activitiesByLycee);
-        const lyceeValues = Object.values(this.activitiesByLycee);
-
-        if (lyceeLabels.length === 0) return;
-
-        this.activitiesByLyceeChart = new Chart(ctx, {
-            type: 'bar',
+        this.tablesRondesChart = new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                labels: lyceeLabels.map(l => l || 'Non spécifié'),
-                datasets: [
-                    {
-                        label: 'Nombre total d\'activités choisies',
-                        data: lyceeValues,
-                        backgroundColor: '#007bff',
-                        borderColor: '#0056b3',
-                        borderWidth: 1
-                    }
-                ]
+                labels: this.tablesRondesStats.map(s => this.truncateLabel(s.titre, 30)),
+                datasets: [{
+                    data: this.tablesRondesStats.map(s => s.count),
+                    backgroundColor: this.generateColors(this.tablesRondesStats.length, 'teal'),
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom'
-                    },
-                    title: {
                         display: true,
-                        text: 'Répartition des activités par lycée'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 11
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => {
+                                const index = items[0].dataIndex;
+                                return this.tablesRondesStats[index].titre;
+                            },
+                            label: (item) => ` ${item.raw} élève(s) inscrit(s)`
                         }
                     }
                 }
             }
         });
+    }
+
+    initFlashsMetiersChart() {
+        if (this.flashsMetiersChart) {
+            this.flashsMetiersChart.destroy();
+        }
+
+        const ctx = this.flashsMetiersChartRef?.nativeElement?.getContext('2d');
+        if (!ctx || this.flashsMetiersStats.length === 0) return;
+
+        this.flashsMetiersChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: this.flashsMetiersStats.map(s => this.truncateLabel(s.titre, 30)),
+                datasets: [{
+                    data: this.flashsMetiersStats.map(s => s.count),
+                    backgroundColor: this.generateColors(this.flashsMetiersStats.length, 'orange'),
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 11
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => {
+                                const index = items[0].dataIndex;
+                                return this.flashsMetiersStats[index].titre;
+                            },
+                            label: (item) => ` ${item.raw} élève(s) inscrit(s)`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Generate colors for pie/doughnut charts
+    generateColors(count: number, baseColor: string): string[] {
+        const colors: string[] = [];
+        const colorPalettes: { [key: string]: string[] } = {
+            blue: [
+                'rgba(0, 123, 255, 0.9)',
+                'rgba(0, 86, 179, 0.9)',
+                'rgba(52, 152, 219, 0.9)',
+                'rgba(41, 128, 185, 0.9)',
+                'rgba(26, 82, 118, 0.9)',
+                'rgba(93, 173, 226, 0.9)',
+                'rgba(133, 193, 233, 0.9)',
+                'rgba(174, 214, 241, 0.9)',
+                'rgba(46, 134, 193, 0.9)',
+                'rgba(33, 97, 140, 0.9)',
+                'rgba(23, 165, 137, 0.9)',
+                'rgba(72, 201, 176, 0.9)',
+                'rgba(69, 179, 157, 0.9)',
+                'rgba(22, 160, 133, 0.9)',
+                'rgba(17, 122, 101, 0.9)',
+                'rgba(125, 206, 160, 0.9)',
+                'rgba(88, 214, 141, 0.9)',
+                'rgba(46, 204, 113, 0.9)',
+                'rgba(39, 174, 96, 0.9)',
+                'rgba(30, 132, 73, 0.9)'
+            ],
+            teal: [
+                'rgba(23, 162, 184, 0.9)',
+                'rgba(17, 122, 139, 0.9)',
+                'rgba(32, 201, 151, 0.9)',
+                'rgba(26, 188, 156, 0.9)',
+                'rgba(22, 160, 133, 0.9)',
+                'rgba(72, 201, 176, 0.9)',
+                'rgba(115, 198, 182, 0.9)',
+                'rgba(69, 179, 157, 0.9)',
+                'rgba(17, 122, 101, 0.9)',
+                'rgba(11, 83, 69, 0.9)',
+                'rgba(52, 152, 219, 0.9)',
+                'rgba(93, 173, 226, 0.9)',
+                'rgba(41, 128, 185, 0.9)',
+                'rgba(26, 82, 118, 0.9)',
+                'rgba(133, 193, 233, 0.9)',
+                'rgba(46, 134, 193, 0.9)',
+                'rgba(33, 97, 140, 0.9)',
+                'rgba(23, 67, 101, 0.9)',
+                'rgba(44, 62, 80, 0.9)',
+                'rgba(52, 73, 94, 0.9)'
+            ],
+            orange: [
+                'rgba(255, 193, 7, 0.9)',
+                'rgba(211, 158, 0, 0.9)',
+                'rgba(255, 159, 64, 0.9)',
+                'rgba(243, 156, 18, 0.9)',
+                'rgba(230, 126, 34, 0.9)',
+                'rgba(211, 84, 0, 0.9)',
+                'rgba(255, 195, 113, 0.9)',
+                'rgba(248, 196, 113, 0.9)',
+                'rgba(245, 176, 65, 0.9)',
+                'rgba(235, 152, 78, 0.9)',
+                'rgba(220, 118, 51, 0.9)',
+                'rgba(186, 74, 0, 0.9)',
+                'rgba(231, 76, 60, 0.9)',
+                'rgba(192, 57, 43, 0.9)',
+                'rgba(169, 50, 38, 0.9)',
+                'rgba(146, 43, 33, 0.9)',
+                'rgba(241, 148, 138, 0.9)',
+                'rgba(236, 112, 99, 0.9)',
+                'rgba(205, 97, 85, 0.9)',
+                'rgba(176, 58, 46, 0.9)'
+            ]
+        };
+
+        const palette = colorPalettes[baseColor] || colorPalettes['blue'];
+        for (let i = 0; i < count; i++) {
+            colors.push(palette[i % palette.length]);
+        }
+        return colors;
+    }
+
+    // Truncate long labels for better display
+    truncateLabel(label: string, maxLength: number): string {
+        if (label.length <= maxLength) {
+            return label;
+        }
+        return label.substring(0, maxLength - 3) + '...';
+    }
+
+    // Calculate total inscriptions for an activity type
+    getTotalInscriptions(stats: ActivityStat[]): number {
+        return stats.reduce((total, stat) => total + stat.count, 0);
     }
 }
