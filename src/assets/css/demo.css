@@ -1,81 +1,3 @@
-/* ===== Input filtre ===== */
-.filter-input {
-  min-height: 41px;
-  padding: 8px;
-  border: 1px solid #ced4da;       /* gris Bootstrap */
-  border-radius: 6px;
-  font-size: 0.85rem;
-  background-color: #ffffff;
-  color: #212529;
-}
-
-/* Placeholder */
-.filter-input::placeholder {
-  color: #6c757d;
-}
-
-/* Focus (identique ng-select / Bootstrap) */
-.filter-input:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
-}
-
-/* ===== Container ng-select (équivalent form-select-sm) ===== */
-.ng-select .ng-select-container  {
-  min-height: 41px;
-  padding: 8px;
-  border: 1px solid #ced4da;        /* gris Bootstrap */
-  border-radius: 6px;
-  background-color: #ffffff;        /* fond BLANC */
-  font-size: 0.85rem;
-}
-
-
-/* Texte sélectionné */
-.ng-select .ng-value {
-  color: #212529;
-}
-
-/* Placeholder */
-.ng-select .ng-placeholder {
-  color: #6c757d;
-}
-
-/* Focus (équivalent Bootstrap) */
-.ng-select.ng-select-focused .ng-select-container {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
-}
-
-/* ===== Dropdown panel ===== */
-.ng-dropdown-panel {
-  background-color: #ffffff !important; /* IMPORTANT */
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 1050; /* au-dessus des tables / cards */
-}
-
-/* Options */
-.ng-dropdown-panel .ng-option {
-  padding: 8px 12px;
-  background-color: #ffffff;
-  color: #212529;
-}
-
-/* Hover */
-.ng-dropdown-panel .ng-option:hover {
-  background-color: #e9ecef;
-}
-
-/* Option sélectionnée */
-.ng-dropdown-panel .ng-option.ng-option-selected {
-  background-color: #0d6efd;
-  color: #ffffff;
-}
-
-
-
 .tim-row {
   margin-bottom: 20px;
 }
@@ -104,7 +26,6 @@
   width: 260px;
   text-transform: none;
 }
-
 
 .tim-row {
   padding-top: 60px;

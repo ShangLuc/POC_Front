@@ -20,7 +20,7 @@
                             <i class="fa fa-arrow-left"></i> Retour
                         </a>
                     </h5>
-                    <h5 class="card-title" *ngIf="selectedProfile === 'viewer'">
+                    <h5 class="card-title" *ngIf="selectedProfile === 'referent'">
                         Authentification Référent
                         <a class="cursor-pointer float-right"
                             [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
@@ -52,7 +52,7 @@
                             <button 
                                 type="button" 
                                 class="btn btn-md w-100 "
-                                (click)="selectProfile('viewer')">
+                                (click)="selectProfile('referent')">
                                 <i class="fa fa-user"></i> Référent
                             </button>
                         </div>
@@ -86,14 +86,14 @@
                     <div *ngIf="selectedProfile === 'admin'">
                         <form>
                             <div class="form-group">
-                                <label for="adminUsername">Username</label>
+                                <label for="adminEmail">Email</label>
                                 <input 
-                                    type="username" 
+                                    type="email" 
                                     class="form-control" 
-                                    id="adminUsername"
-                                    placeholder="Entrez votre nom d'utilisateur"
-                                    [(ngModel)]="adminUsername"
-                                    name="adminUsername">
+                                    id="adminEmail"
+                                    placeholder="Entrez votre email"
+                                    [(ngModel)]="adminEmail"
+                                    name="adminEmail">
                             </div>
                             <div class="form-group">
                                 <label for="adminPassword">Mot de passe</label>
@@ -104,9 +104,6 @@
                                     placeholder="Entrez votre mot de passe"
                                     [(ngModel)]="adminPassword"
                                     name="adminPassword">
-                            </div>
-                            <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
-                                {{ errorMessage }}
                             </div>
                             <div class="d-flex justify-content-center">
                                 <button 
@@ -119,17 +116,17 @@
                         </form>
                     </div>
                     <!-- Admin Référent Form-->
-                    <div *ngIf="selectedProfile === 'viewer'">
+                    <div *ngIf="selectedProfile === 'referent'">
                         <form>
                             <div class="form-group">
-                                <label for="viewerUsername">Nom d'utilisateur</label>
+                                <label for="referentEmail">Nom d'utilisateur</label>
                                 <input 
                                     type="text" 
                                     class="form-control" 
-                                    id="viewerUsername"
+                                    id="referentUsername"
                                     placeholder="Entrez votre nom d'utilisateur"
-                                    [(ngModel)]="viewerUsername"
-                                    name="viewerUsername">
+                                    [(ngModel)]="referentUsername"
+                                    name="referentUsername">
                             </div>
                             
                             <div class="d-flex justify-content-center">

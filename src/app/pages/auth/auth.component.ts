@@ -10,9 +10,8 @@ import { AuthService } from '../auth.service';
 export class AuthComponent implements OnInit {
   selectedProfile: string = '';
   eleveIdentifiant: string = '';
-  adminUsername: string = '';
+  adminEmail: string = '';
   adminPassword: string = '';
-  viewerUsername: string = '';
 
   // Paramètres réglables pour le bouton retour
   backButtonColor: string = '#999999';
@@ -31,9 +30,8 @@ export class AuthComponent implements OnInit {
   selectProfile(profile: string) {
     this.selectedProfile = profile;
     this.eleveIdentifiant = '';
-    this.adminUsername = '';
+    this.adminEmail = '';
     this.adminPassword = '';
-    this.viewerUsername = '';
     this.errorMessage = '';
   }
 
@@ -47,10 +45,9 @@ export class AuthComponent implements OnInit {
       }
 
       this.authService.loginEleve(this.eleveIdentifiant).subscribe({
-        next: (response) => {
-          const storedId = response?.id || this.eleveIdentifiant;
-          this.authService.setCurrentEleveId(storedId);
-          this.router.navigate(['/accueil']); // accès accueil + profil + formulaire
+        next: () => {
+          this.authService.setCurrentEleveId(this.eleveIdentifiant);
+          this.router.navigate(['/form']); // route vers le formulaire de vœux
         },
         error: (err) => {
           console.error(err);
@@ -59,51 +56,23 @@ export class AuthComponent implements OnInit {
       });
 
     } else if (this.selectedProfile === 'admin') {
-      if (!this.adminUsername || !this.adminPassword) {
-        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur et votre mot de passe.';
+      if (!this.adminEmail || !this.adminPassword) {
+        this.errorMessage = 'Merci de saisir email et mot de passe.';
         return;
       }
 
-      this.authService.loginAdmin(this.adminUsername, this.adminPassword).subscribe({
+      this.authService.loginAdmin(this.adminEmail, this.adminPassword).subscribe({
         next: () => {
-          this.router.navigate(['/accueil']); // adapte cette route à ton écran admin
+          this.router.navigate(['/admin']); // adapte cette route à ton écran admin
         },
         error: (err) => {
           console.error(err);
-          // Display the error message from the API if available
-          if (err?.error && typeof err.error === 'string') {
-            this.errorMessage = err.error;
-          } else if (err?.error?.message) {
-            this.errorMessage = err.error.message;
-          } else {
-            this.errorMessage = 'Identifiants administrateur invalides.';
-          }
+          this.errorMessage = err?.error || 'Identifiants administrateur invalides.';
         }
       });
 
-    } else if (this.selectedProfile === 'viewer' ){
-      if(!this.viewerUsername){
-        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur.';
-        return;
-      }
-      this.authService.loginViewer(this.viewerUsername).subscribe({
-        next: () => {
-          this.router.navigate(['/accueil']); // adapte cette route à ton écran viewer
-        },
-        error: (err) => {
-          console.error(err);
-          if (err?.error && typeof err.error === 'string') {
-          this.errorMessage = err.error;
-        } else if (err?.error?.message) {
-          this.errorMessage = err.error.message;
-        } else {
-          this.errorMessage = 'Identifiant viewer invalide.';
-        }
-    }
-      });
-
-    }else {
-      this.errorMessage = 'Merci de choisir un profil (élève ou admin ou viewer).';
+    } else {
+      this.errorMessage = 'Merci de choisir un profil (élève ou admin).';
     }
   }
 }
