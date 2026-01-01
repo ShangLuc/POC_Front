@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
 export class AuthComponent implements OnInit {
   selectedProfile: string = '';
   eleveIdentifiant: string = '';
-  adminEmail: string = '';
+  adminUsername: string = '';
   adminPassword: string = '';
   viewerUsername: string = '';
 
@@ -31,7 +31,7 @@ export class AuthComponent implements OnInit {
   selectProfile(profile: string) {
     this.selectedProfile = profile;
     this.eleveIdentifiant = '';
-    this.adminEmail = '';
+    this.adminUsername = '';
     this.adminPassword = '';
     this.viewerUsername = '';
     this.errorMessage = '';
@@ -47,29 +47,44 @@ export class AuthComponent implements OnInit {
       }
 
       this.authService.loginEleve(this.eleveIdentifiant).subscribe({
-        next: () => {
-          this.authService.setCurrentEleveId(this.eleveIdentifiant);
-          this.router.navigate(['/form']); // route vers le formulaire de vœux
+        next: (response) => {
+          const storedId = response?.id || this.eleveIdentifiant;
+          this.authService.setCurrentEleveId(storedId);
+          this.router.navigate(['/accueil']); // accès accueil + profil + formulaire
         },
         error: (err) => {
           console.error(err);
-          this.errorMessage = err?.error || 'Identifiant invalide ou élève introuvable.';
+          // même logique que pour admin / viewer
+          if (err?.error && typeof err.error === 'string') {
+              this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message; // ex: "Élève non trouvé avec l'ID: XXX"
+          } else {
+            this.errorMessage = 'Identifiant invalide ou élève introuvable.';
+      }
         }
       });
 
     } else if (this.selectedProfile === 'admin') {
-      if (!this.adminEmail || !this.adminPassword) {
-        this.errorMessage = 'Merci de saisir email et mot de passe.';
+      if (!this.adminUsername || !this.adminPassword) {
+        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur et votre mot de passe.';
         return;
       }
 
-      this.authService.loginAdmin(this.adminEmail, this.adminPassword).subscribe({
+      this.authService.loginAdmin(this.adminUsername, this.adminPassword).subscribe({
         next: () => {
-          this.router.navigate(['/admin']); // adapte cette route à ton écran admin
+          this.router.navigate(['/accueil']); // adapte cette route à ton écran admin
         },
         error: (err) => {
           console.error(err);
-          this.errorMessage = err?.error || 'Identifiants administrateur invalides.';
+          // Display the error message from the API if available
+          if (err?.error && typeof err.error === 'string') {
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Identifiants administrateur invalides.';
+          }
         }
       });
 
@@ -80,7 +95,7 @@ export class AuthComponent implements OnInit {
       }
       this.authService.loginViewer(this.viewerUsername).subscribe({
         next: () => {
-          this.router.navigate(['/viewer-dashboard']); // adapte cette route à ton écran viewer
+          this.router.navigate(['/accueil']); // adapte cette route à ton écran viewer
         },
         error: (err) => {
           console.error(err);

@@ -44,6 +44,11 @@
                   <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu1')">{{ conf }}</option>
                 </optgroup>
               </select>
+              <div class="mt-1" *ngIf="formGroup.get('voeu1')?.value">
+                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu1')?.value)" title="Voir le descriptif du vœu 1">
+                  <i class="fa fa-eye"></i> Voir le descriptif
+                </a>
+              </div>
               <div *ngIf="formGroup.get('voeu1')?.invalid && formGroup.get('voeu1')?.touched" class="text-danger"><small>Le vœu 1 est obligatoire.</small></div>
             </div>
 
@@ -56,6 +61,11 @@
                   <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu2')">{{ conf }}</option>
                 </optgroup>
               </select>
+              <div class="mt-1" *ngIf="formGroup.get('voeu2')?.value">
+                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu2')?.value)" title="Voir le descriptif du vœu 2">
+                  <i class="fa fa-eye"></i> Voir le descriptif
+                </a>
+              </div>
               <div *ngIf="formGroup.get('voeu2')?.invalid && formGroup.get('voeu2')?.touched" class="text-danger"><small>Le vœu 2 est obligatoire.</small></div>
             </div>
 
@@ -70,6 +80,11 @@
                 <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu3')">{{ table }}</option></optgroup>
                 <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu3')">{{ flash }}</option></optgroup>
               </select>
+              <div class="mt-1" *ngIf="formGroup.get('voeu3')?.value">
+                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu3')?.value)" title="Voir le descriptif du vœu 3">
+                  <i class="fa fa-eye"></i> Voir le descriptif
+                </a>
+              </div>
               <div *ngIf="formGroup.get('voeu3')?.invalid && formGroup.get('voeu3')?.touched" class="text-danger"><small>Le vœu 3 est obligatoire.</small></div>
             </div>
 
@@ -82,6 +97,11 @@
                 <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu4')">{{ table }}</option></optgroup>
                 <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu4')">{{ flash }}</option></optgroup>
               </select>
+              <div class="mt-1" *ngIf="formGroup.get('voeu4')?.value">
+                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu4')?.value)" title="Voir le descriptif du vœu 4">
+                  <i class="fa fa-eye"></i> Voir le descriptif
+                </a>
+              </div>
               <div *ngIf="formGroup.get('voeu4')?.invalid && formGroup.get('voeu4')?.touched" class="text-danger"><small>Le vœu 4 est obligatoire.</small></div>
             </div>
 
@@ -90,10 +110,15 @@
               <label for="voeu5" class="form-label d-block"><strong>Vœu 5 :</strong> Au choix <span class="text-danger">*</span></label>
               <select id="voeu5" formControlName="voeu5" class="form-select" (change)="onVoeuChange()">
                 <option value="">-- Sélectionnez un vœu --</option>
-                <optgroup label="Conférences">
-                  <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option>
-                </optgroup>
+                <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option></optgroup>
+                <!-- <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu5')">{{ table }}</option></optgroup>
+                <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu5')">{{ flash }}</option></optgroup> -->
               </select>
+              <div class="mt-1" *ngIf="formGroup.get('voeu5')?.value">
+                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu5')?.value)" title="Voir le descriptif du vœu 5">
+                  <i class="fa fa-eye"></i> Voir le descriptif
+                </a>
+              </div>
               <div *ngIf="formGroup.get('voeu5')?.invalid && formGroup.get('voeu5')?.touched" class="text-danger"><small>Le vœu 5 est obligatoire.</small></div>
             </div>
 
@@ -107,12 +132,34 @@
 
             <!-- Action Buttons -->
             <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">
-              <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
+              <button type="button" class="btn btn-success" (click)="onSave()" [disabled]="formGroup.invalid">
                 <i class="fa fa-check"></i> Confirmer le choix
               </button>
+              <!-- <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
+                <i class="fa fa-check"></i> Confirmer le choix
+              </button> -->
             </div>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pop-up descriptif de vœu -->
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showDescriptionModal"
+     style="display:block; background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ selectedEventTitle }}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeDescription()"></button>
+      </div>
+      <div class="modal-body">
+        <p [innerHTML]="selectedEventDescription"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDescription()">Fermer</button>
       </div>
     </div>
   </div>

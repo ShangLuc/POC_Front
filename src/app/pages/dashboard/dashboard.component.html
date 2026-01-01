@@ -1,0 +1,386 @@
+<div class="content">
+  <div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Tableau de bord</h4>
+            <p class="card-category" *ngIf="!isViewer">Statistiques des inscriptions et activités</p>
+            <p class="card-category" *ngIf="isViewer">Statistiques de votre établissement : <strong>{{ viewerLycee }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Filtres</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Lycée filter - only visible for admins -->
+              <div class="col-md-4" *ngIf="!isViewer">
+                <div class="form-group">
+                  <label>Lycée</label>
+                  <select class="form-control" [(ngModel)]="selectedLycee" (change)="onLyceeChange()">
+                    <option value="">Tous les lycées</option>
+                    <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Établissement info for viewers (read-only) -->
+              <div class="col-md-4" *ngIf="isViewer">
+                <div class="form-group">
+                  <label>Établissement</label>
+                  <input type="text" class="form-control" [value]="viewerLycee" readonly disabled>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Classe</label>
+                  <select class="form-control" [(ngModel)]="selectedClasse" (change)="onClasseChange()">
+                    <option value="">Toutes les classes</option>
+                    <option *ngFor="let classe of classes" [value]="classe">{{ classe }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-secondary" (click)="resetFilters()">
+                  <i class="nc-icon nc-refresh-69"></i> Réinitialiser
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="row" *ngIf="errorMessage">
+      <div class="col-md-12">
+        <div class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="row" *ngIf="isLoading">
+      <div class="col-md-12">
+        <div class="alert alert-info">
+          <i class="nc-icon nc-refresh-69 spin"></i> Chargement des statistiques...
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-single-02 text-primary"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Total élèves</p>
+                  <p class="card-title">{{ totalEleves }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-check-2 text-success"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Élèves inscrits</p>
+                  <p class="card-title">{{ elevesInscrits }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-simple-remove text-danger"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Élèves non inscrits</p>
+                  <p class="card-title">{{ elevesNonInscrits }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 col-md-4">
+                <div class="icon-big text-center icon-warning">
+                  <i class="nc-icon nc-chart-pie-36 text-info"></i>
+                </div>
+              </div>
+              <div class="col-7 col-md-8">
+                <div class="numbers">
+                  <p class="card-category">Taux d'inscription</p>
+                  <p class="card-title">{{ tauxInscription }}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Taux d'inscription</h5>
+            <p class="card-category">Répartition des élèves inscrits / non inscrits</p>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 280px; max-width: 400px; margin: 0 auto;">
+              <canvas #inscriptionChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities Statistics with Tabs -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title"><i class="nc-icon nc-chart-bar-32"></i> Statistiques par type d'activité</h5>
+            <p class="card-category">Cliquez sur un onglet pour voir les détails des inscriptions</p>
+          </div>
+          <div class="card-body">
+            <!-- Nav Tabs -->
+            <ul class="nav nav-tabs nav-tabs-primary" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'conferences'" (click)="onTabChange('conferences'); $event.preventDefault()" href="javascript:void(0)" role="tab">
+                  <i class="nc-icon nc-single-02"></i>
+                  Conférences
+                  <span class="badge badge-primary ml-2">{{ conferencesStats.length }}</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'tables-rondes'" (click)="onTabChange('tables-rondes'); $event.preventDefault()" href="javascript:void(0)" role="tab">
+                  <i class="nc-icon nc-chat-33"></i>
+                  Tables Rondes
+                  <span class="badge badge-info ml-2">{{ tablesRondesStats.length }}</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'flashs-metiers'" (click)="onTabChange('flashs-metiers'); $event.preventDefault()" href="javascript:void(0)" role="tab">
+                  <i class="nc-icon nc-briefcase-24"></i>
+                  Flash Métiers
+                  <span class="badge badge-warning ml-2">{{ flashsMetiersStats.length }}</span>
+                </a>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content pt-4">
+              <!-- Conferences Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'conferences'" *ngIf="activeTab === 'conferences'">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="section-header mb-3">
+                      <h6 class="text-primary mb-1"><i class="nc-icon nc-single-02"></i> Inscriptions aux Conférences</h6>
+                      <small class="text-muted">{{ getTotalInscriptions(conferencesStats) }} inscription(s) au total</small>
+                    </div>
+                    <div *ngIf="conferencesStats.length === 0" class="alert alert-info">
+                      <i class="nc-icon nc-bell-55"></i> Aucune inscription aux conférences.
+                    </div>
+                    <div *ngIf="conferencesStats.length > 0">
+                      <div class="row">
+                        <div class="col-lg-7">
+                          <div class="chart-wrapper pie-chart-wrapper">
+                            <div class="chart-container" style="height: 350px;">
+                              <canvas #conferencesChart></canvas>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-5">
+                          <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                            <table class="table table-striped table-hover">
+                              <thead class="thead-light">
+                                <tr>
+                                  <th class="text-center" style="width: 50px;">#</th>
+                                  <th>Titre de la conférence</th>
+                                  <th class="text-center" style="width: 120px;">Élèves</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let conf of conferencesStats; let i = index">
+                                  <td class="text-center"><span class="badge badge-circle badge-primary">{{ i + 1 }}</span></td>
+                                  <td class="activity-title" [title]="conf.titre">{{ conf.titre }}</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-success">{{ conf.count }}</span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                              <tfoot>
+                                <tr>
+                                  <td colspan="2" class="text-right font-weight-bold">Total :</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-primary">{{ getTotalInscriptions(conferencesStats) }}</span>
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tables Rondes Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'tables-rondes'" *ngIf="activeTab === 'tables-rondes'">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="section-header mb-3">
+                      <h6 class="text-info mb-1"><i class="nc-icon nc-chat-33"></i> Inscriptions aux Tables Rondes</h6>
+                      <small class="text-muted">{{ getTotalInscriptions(tablesRondesStats) }} inscription(s) au total</small>
+                    </div>
+                    <div *ngIf="tablesRondesStats.length === 0" class="alert alert-info">
+                      <i class="nc-icon nc-bell-55"></i> Aucune inscription aux tables rondes.
+                    </div>
+                    <div *ngIf="tablesRondesStats.length > 0">
+                      <div class="row">
+                        <div class="col-lg-7">
+                          <div class="chart-wrapper pie-chart-wrapper">
+                            <div class="chart-container" style="height: 350px;">
+                              <canvas #tablesRondesChart></canvas>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-5">
+                          <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                            <table class="table table-striped table-hover">
+                              <thead class="thead-light">
+                                <tr>
+                                  <th class="text-center" style="width: 50px;">#</th>
+                                  <th>Titre de la table ronde</th>
+                                  <th class="text-center" style="width: 120px;">Élèves</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let tr of tablesRondesStats; let i = index">
+                                  <td class="text-center"><span class="badge badge-circle badge-info">{{ i + 1 }}</span></td>
+                                  <td class="activity-title" [title]="tr.titre">{{ tr.titre }}</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-success">{{ tr.count }}</span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                              <tfoot>
+                                <tr>
+                                  <td colspan="2" class="text-right font-weight-bold">Total :</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-info">{{ getTotalInscriptions(tablesRondesStats) }}</span>
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Flash Métiers Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'flashs-metiers'" *ngIf="activeTab === 'flashs-metiers'">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="section-header mb-3">
+                      <h6 class="text-warning mb-1"><i class="nc-icon nc-briefcase-24"></i> Inscriptions aux Flash Métiers</h6>
+                      <small class="text-muted">{{ getTotalInscriptions(flashsMetiersStats) }} inscription(s) au total</small>
+                    </div>
+                    <div *ngIf="flashsMetiersStats.length === 0" class="alert alert-info">
+                      <i class="nc-icon nc-bell-55"></i> Aucune inscription aux flash métiers.
+                    </div>
+                    <div *ngIf="flashsMetiersStats.length > 0">
+                      <div class="row">
+                        <div class="col-lg-7">
+                          <div class="chart-wrapper pie-chart-wrapper">
+                            <div class="chart-container" style="height: 350px;">
+                              <canvas #flashsMetiersChart></canvas>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-5">
+                          <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                            <table class="table table-striped table-hover">
+                              <thead class="thead-light">
+                                <tr>
+                                  <th class="text-center" style="width: 50px;">#</th>
+                                  <th>Titre du flash métier</th>
+                                  <th class="text-center" style="width: 120px;">Élèves</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let fm of flashsMetiersStats; let i = index">
+                                  <td class="text-center"><span class="badge badge-circle badge-warning">{{ i + 1 }}</span></td>
+                                  <td class="activity-title" [title]="fm.titre">{{ fm.titre }}</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-success">{{ fm.count }}</span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                              <tfoot>
+                                <tr>
+                                  <td colspan="2" class="text-right font-weight-bold">Total :</td>
+                                  <td class="text-center">
+                                    <span class="count-badge count-badge-warning">{{ getTotalInscriptions(flashsMetiersStats) }}</span>
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

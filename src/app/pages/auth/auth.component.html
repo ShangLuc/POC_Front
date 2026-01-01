@@ -20,7 +20,7 @@
                             <i class="fa fa-arrow-left"></i> Retour
                         </a>
                     </h5>
-                    <h5 class="card-title" *ngIf="selectedProfile === 'referent'">
+                    <h5 class="card-title" *ngIf="selectedProfile === 'viewer'">
                         Authentification Référent
                         <a class="cursor-pointer float-right"
                             [ngStyle]="{'color': backButtonColor, 'text-decoration': backButtonTextDecoration, 'font-size': backButtonFontSize, 'cursor': 'pointer'}"
@@ -52,7 +52,7 @@
                             <button 
                                 type="button" 
                                 class="btn btn-md w-100 "
-                                (click)="selectProfile('referent')">
+                                (click)="selectProfile('viewer')">
                                 <i class="fa fa-user"></i> Référent
                             </button>
                         </div>
@@ -71,6 +71,9 @@
                                     [(ngModel)]="eleveIdentifiant"
                                     name="eleveIdentifiant">
                             </div>
+                            <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+                                {{ errorMessage }}
+                            </div>
                             <div class="d-flex justify-content-center">
                                 <button 
                                     type="button" 
@@ -86,14 +89,14 @@
                     <div *ngIf="selectedProfile === 'admin'">
                         <form>
                             <div class="form-group">
-                                <label for="adminEmail">Email</label>
+                                <label for="adminUsername">Username</label>
                                 <input 
-                                    type="email" 
+                                    type="username" 
                                     class="form-control" 
-                                    id="adminEmail"
-                                    placeholder="Entrez votre email"
-                                    [(ngModel)]="adminEmail"
-                                    name="adminEmail">
+                                    id="adminUsername"
+                                    placeholder="Entrez votre nom d'utilisateur"
+                                    [(ngModel)]="adminUsername"
+                                    name="adminUsername">
                             </div>
                             <div class="form-group">
                                 <label for="adminPassword">Mot de passe</label>
@@ -104,6 +107,9 @@
                                     placeholder="Entrez votre mot de passe"
                                     [(ngModel)]="adminPassword"
                                     name="adminPassword">
+                            </div>
+                            <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+                                {{ errorMessage }}
                             </div>
                             <div class="d-flex justify-content-center">
                                 <button 
@@ -116,17 +122,20 @@
                         </form>
                     </div>
                     <!-- Admin Référent Form-->
-                    <div *ngIf="selectedProfile === 'referent'">
+                    <div *ngIf="selectedProfile === 'viewer'">
                         <form>
                             <div class="form-group">
-                                <label for="referentEmail">Nom d'utilisateur</label>
+                                <label for="viewerUsername">Nom d'utilisateur</label>
                                 <input 
                                     type="text" 
                                     class="form-control" 
-                                    id="referentUsername"
+                                    id="viewerUsername"
                                     placeholder="Entrez votre nom d'utilisateur"
-                                    [(ngModel)]="referentUsername"
-                                    name="referentUsername">
+                                    [(ngModel)]="viewerUsername"
+                                    name="viewerUsername">
+                            </div>
+                            <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+                                {{ errorMessage }}
                             </div>
                             
                             <div class="d-flex justify-content-center">
