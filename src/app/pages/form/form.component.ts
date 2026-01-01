@@ -21,6 +21,10 @@ export class FormComponent implements OnInit {
     messageSucces = '';
     messageErreur = '';
 
+    // Pour afficher le récapitulatif si déjà inscrit
+    showRecapitulatif = false;
+    voeuxRecapitulatif: any[] = [];
+
     // Tableaux dynamiques chargés depuis l'API
     conferences: string[] = [];
     tablesRondes: string[] = [];
@@ -58,6 +62,8 @@ export class FormComponent implements OnInit {
         const eleveId = localStorage.getItem('eleveId');
         if (eleveId) {
             this.formGroup.patchValue({ id: eleveId });
+            // Vérifier si l'élève est déjà inscrit
+            this.checkEleveStatus(eleveId);
         }
     }
 
@@ -73,6 +79,42 @@ export class FormComponent implements OnInit {
         return new HttpHeaders({
             'Content-Type': 'application/json'
         });
+    }
+
+    // Vérifier si l'élève est déjà inscrit
+    checkEleveStatus(eleveId: string) {
+        const headers = this.getAuthHeaders();
+        
+        this.http.get<any>(`http://localhost:8080/api/eleves/${eleveId}`, { headers })
+            .subscribe({
+                next: (eleve) => {
+                    if (eleve.inscrit) {
+                        // L'élève est déjà inscrit, charger ses vœux
+                        this.isConfirmed = true;
+                        this.showRecapitulatif = true;
+                        this.formGroup.disable();
+                        this.loadVoeux(eleveId);
+                    }
+                },
+                error: (err) => {
+                    console.error('Erreur lors de la vérification du statut de l\'élève:', err);
+                }
+            });
+    }
+
+    // Charger les vœux de l'élève pour le récapitulatif
+    loadVoeux(eleveId: string) {
+        const headers = this.getAuthHeaders();
+        
+        this.http.get<any[]>(`http://localhost:8080/api/eleves/${eleveId}/voeux`, { headers })
+            .subscribe({
+                next: (voeux) => {
+                    this.voeuxRecapitulatif = voeux.sort((a, b) => a.numeroVoeu - b.numeroVoeu);
+                },
+                error: (err) => {
+                    console.error('Erreur lors du chargement des vœux:', err);
+                }
+            });
     }
 
     // Charger les événements depuis l'API
@@ -176,13 +218,46 @@ export class FormComponent implements OnInit {
         const voeuxTitres = [raw.voeu1, raw.voeu2, raw.voeu3, raw.voeu4, raw.voeu5];
         const eventIds: number[] = voeuxTitres.map(titre => this.titreToId[titre]);
 
+        console.log('Enregistrement des vœux pour élève:', eleveId, 'eventIds:', eventIds);
+
         this.eleveService.saveVoeux(eleveId, eventIds).subscribe({
             next: (msg: string) => {
-                this.messageSucces = msg || 'Vos choix ont été enregistrés. Vous pouvez encore les modifier.';
+                console.log('Vœux enregistrés avec succès, inscription de l\'élève...');
+                // Vœux enregistrés, maintenant inscrire l'élève
+                this.inscrireEleve(eleveId);
             },
             error: (err) => {
+                console.error('Erreur lors de l\'enregistrement des vœux:', err);
                 this.messageErreur = err?.error || 'Erreur lors de l\'enregistrement des vœux.';
                 console.error(err);
+            }
+        });
+    }
+
+    // Inscrire l'élève (marquer comme inscrit)
+    inscrireEleve(eleveId: string) {
+        console.log('Appel de inscrireEleve pour:', eleveId);
+        const headers = this.getAuthHeaders();
+        
+        this.http.put<string>(`http://localhost:8080/api/eleves/${eleveId}/inscrire`, {}, 
+            { 
+                headers: headers,
+                responseType: 'text' as 'json'
+            }
+        ).subscribe({
+            next: (response) => {
+                console.log('Élève inscrit avec succès:', response);
+                this.messageSucces = 'Vos choix ont été confirmés et enregistrés avec succès.';
+                this.isConfirmed = true;
+                this.showRecapitulatif = true;
+                this.formGroup.disable();
+                // Charger les vœux pour afficher le récapitulatif
+                console.log('Chargement du récapitulatif...');
+                this.loadVoeux(eleveId);
+            },
+            error: (err) => {
+                console.error('Erreur lors de l\'inscription de l\'élève:', err);
+                this.messageErreur = 'Erreur lors de l\'inscription. Veuillez réessayer.';
             }
         });
     }
