@@ -6,7 +6,8 @@
         <div class="card">
           <div class="card-header">
             <h4 class="card-title">Tableau de bord</h4>
-            <p class="card-category">Statistiques des inscriptions et activités</p>
+            <p class="card-category" *ngIf="!isViewer">Statistiques des inscriptions et activités</p>
+            <p class="card-category" *ngIf="isViewer">Statistiques de votre établissement : <strong>{{ viewerLycee }}</strong></p>
           </div>
         </div>
       </div>
@@ -21,13 +22,21 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-4">
+              <!-- Lycée filter - only visible for admins -->
+              <div class="col-md-4" *ngIf="!isViewer">
                 <div class="form-group">
                   <label>Lycée</label>
                   <select class="form-control" [(ngModel)]="selectedLycee" (change)="onLyceeChange()">
                     <option value="">Tous les lycées</option>
                     <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
                   </select>
+                </div>
+              </div>
+              <!-- Établissement info for viewers (read-only) -->
+              <div class="col-md-4" *ngIf="isViewer">
+                <div class="form-group">
+                  <label>Établissement</label>
+                  <input type="text" class="form-control" [value]="viewerLycee" readonly disabled>
                 </div>
               </div>
               <div class="col-md-4">

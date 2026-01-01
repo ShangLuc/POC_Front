@@ -34,7 +34,7 @@ export class UserComponent implements OnInit {
     // Viewer (Référant) management properties
     viewers: any[] = [];
     newViewerLycee: string = '';
-    newViewerPassword: string = '';
+    newViewerUsername: string = '';
     showAddViewerForm: boolean = false;
     loadingViewers: boolean = false;
     viewerSuccessMessage: string = '';
@@ -182,6 +182,8 @@ export class UserComponent implements OnInit {
         this.viewerErrorMessage = '';
         this.adminManagementService.getAllViewers().subscribe({
             next: (response) => {
+                console.log('Viewers from backend:', response);
+                console.log('First viewer object:', response[0]);
                 this.viewers = response;
                 this.loadingViewers = false;
             },
@@ -195,19 +197,21 @@ export class UserComponent implements OnInit {
 
     // Add new viewer
     addViewer() {
-        if ( !this.newViewerLycee || !this.newViewerPassword) {
+        if ( !this.newViewerLycee || !this.newViewerUsername) {
             this.viewerErrorMessage = 'Veuillez remplir tous les champs.';
             return;
         }
 
+        console.log('Adding viewer with lycee:', this.newViewerLycee, 'username:', this.newViewerUsername);
+        
         this.viewerErrorMessage = '';
         this.viewerSuccessMessage = '';
 
-        this.adminManagementService.addViewer(this.newViewerLycee, this.newViewerPassword).subscribe({
+        this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerLycee ).subscribe({
             next: (response) => {
                 this.viewerSuccessMessage = 'Référant ajouté avec succès.';
                 this.newViewerLycee = '';
-                this.newViewerPassword = '';
+                this.newViewerUsername = '';
                 this.showAddViewerForm = false;
                 this.loadViewers(); // Reload the list
             },
@@ -220,7 +224,7 @@ export class UserComponent implements OnInit {
 
     // Delete viewer with confirmation
     deleteViewer(viewer: any) {
-        const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référant "${viewer.nom}"?`);
+        const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référant "${viewer.username}"?`);
         
         if (!confirmDelete) {
             return;
@@ -231,7 +235,7 @@ export class UserComponent implements OnInit {
 
         this.adminManagementService.deleteViewer(viewer.id).subscribe({
             next: () => {
-                this.viewerSuccessMessage = `Référant "${viewer.nom}" supprimé avec succès.`;
+                this.viewerSuccessMessage = `Référant "${viewer.username}" supprimé avec succès.`;
                 this.loadViewers(); // Reload the list
             },
             error: (err) => {
@@ -245,7 +249,7 @@ export class UserComponent implements OnInit {
     cancelAddViewer() {
         this.showAddViewerForm = false;
         this.newViewerLycee = '';
-        this.newViewerPassword = '';
+        this.newViewerUsername = '';
         this.viewerErrorMessage = '';
     }
 

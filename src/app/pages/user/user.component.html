@@ -321,16 +321,18 @@
               Aucun référant trouvé.
             </div>
             <div *ngIf="!loadingViewers && viewers.length > 0">
-              <table class="table table-striped">
+              <table class="table table-stsriped">
                 <thead>
                   <tr>
-                    <th>Lycée</th>
+                    <th>Etablissement</th>
+                    <th>Username</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let viewer of viewers">
-                    <td>{{ viewer.lycee }}</td>
+                    <td>{{ viewer.etablissement }}</td>
+                    <td>{{ viewer.username }}</td>
                     <td>
                       <button 
                         type="button" 
@@ -368,24 +370,24 @@
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Lycée</label>
+                      <label>Etablissement</label>
                       <input 
                         type="text" 
                         class="form-control" 
-                        placeholder="Entrez le lycée"
+                        placeholder="Entrez l'établissement"
                         [(ngModel)]="newViewerLycee"
                         name="newViewerLycee">
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Mot de passe</label>
+                      <label>Username</label>
                       <input 
-                        type="password" 
+                        type="username" 
                         class="form-control" 
-                        placeholder="Entrez le mot de passe"
-                        [(ngModel)]="newViewerPassword"
-                        name="newViewerPassword">
+                        placeholder="Entrez le username"
+                        [(ngModel)]="newViewerUsername"
+                        name="newViewerUsername">
                     </div>
                   </div>
                 </div>

@@ -186,12 +186,12 @@ export class FormComponent implements OnInit {
         }
 
         const raw = this.formGroup.getRawValue();
-const eleveId = raw.id;
+        const eleveId = raw.id;
 
-const voeuxTitres = [raw.voeu1, raw.voeu2, raw.voeu3, raw.voeu4, raw.voeu5];
-const eventIds: number[] = voeuxTitres.map(titre => this.titreToId[titre]);
+        const voeuxTitres = [raw.voeu1, raw.voeu2, raw.voeu3, raw.voeu4, raw.voeu5];
+        const eventIds: number[] = voeuxTitres.map(titre => this.titreToId[titre]);
 
-this.eleveService.saveVoeux(eleveId, eventIds).subscribe({
+        this.eleveService.saveVoeux(eleveId, eventIds).subscribe({
             next: (msg: string) => {
                 this.messageSucces = msg || 'Vos choix ont été enregistrés. Vous pouvez encore les modifier.';
             },

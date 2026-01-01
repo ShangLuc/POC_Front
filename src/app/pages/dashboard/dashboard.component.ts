@@ -30,6 +30,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     // Active tab
     activeTab: string = 'conferences';
 
+    // User role info
+    isViewer: boolean = false;
+    isAdmin: boolean = false;
+    viewerLycee: string = '';
+
     // Filters
     lycees: string[] = [];
     classes: string[] = [];
@@ -76,12 +81,45 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.loadFilters();
-        this.loadStatistics();
+        this.isViewer = this.authService.isViewer();
+        this.isAdmin = this.authService.isAdmin();
+        
+        if (this.isViewer) {
+            // Load viewer's lycee first, then load data
+            this.loadViewerInfo();
+        } else {
+            this.loadFilters();
+            this.loadStatistics();
+        }
     }
 
     ngAfterViewInit() {
         // Charts will be initialized after data is loaded
+    }
+
+    loadViewerInfo() {
+        const viewerUsername = this.authService.getCurrentViewerUsername();
+        if (!viewerUsername) {
+            this.errorMessage = 'Erreur: utilisateur non identifié.';
+            this.isLoading = false;
+            return;
+        }
+
+        this.http.get<any>(`http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}`, 
+            { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (viewer) => {
+                    this.viewerLycee = viewer.etablissement || '';
+                    this.selectedLycee = this.viewerLycee;
+                    this.loadClasses();
+                    this.loadStatistics();
+                },
+                error: (err) => {
+                    console.error('Error loading viewer info:', err);
+                    this.errorMessage = 'Erreur lors du chargement des informations.';
+                    this.isLoading = false;
+                }
+            });
     }
 
     loadFilters() {
@@ -189,8 +227,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     resetFilters() {
-        this.selectedLycee = '';
         this.selectedClasse = '';
+        // Reset lycee only if not a viewer (viewers are locked to their lycee)
+        if (!this.isViewer) {
+            this.selectedLycee = '';
+        }
         this.loadClasses();
         this.loadStatistics();
     }

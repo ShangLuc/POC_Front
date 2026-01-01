@@ -68,10 +68,10 @@ export class AdminManagementService {
   }
 
   // Add a new viewer (référant)
-  addViewer( lycee: string, password: string): Observable<string> {
+  addViewer(  username: string, lycee: string): Observable<string> {
     return this.http.post<string>(
-      `${this.baseUrl}/create-viewer`,
-      { lycee, password },
+      `${this.baseUrl}/viewers`,
+      {  username, etablissement: lycee },
       { 
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'
@@ -82,7 +82,18 @@ export class AdminManagementService {
   // Delete a viewer by ID
   deleteViewer(viewerId: string): Observable<string> {
     return this.http.delete<string>(
-      `${this.baseUrl}/viewer/${viewerId}`,
+      `${this.baseUrl}/viewers/${viewerId}`,
+      { 
+        headers: this.getAuthHeaders(),
+        responseType: 'text' as 'json'
+      }
+    );
+  }
+
+  updateViewer(viewerId: string,  username: string, lycee: string): Observable<string> {
+    return this.http.put<string>(
+      `${this.baseUrl}/viewers/${viewerId}`,
+      { username, etablissement: lycee },
       { 
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'

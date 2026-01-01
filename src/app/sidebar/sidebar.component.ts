@@ -24,8 +24,8 @@ export const STUDENT_ROUTES: RouteInfo[] = [
 
 // Routes visibles pour le profil viewer (référent)
 export const VIEWER_ROUTES: RouteInfo[] = [
-    { path: '/viewer-dashboard', title: 'Dashboard', icon:'nc-chart-bar-32', class: '' },
-    // { path: '/activity',         title: 'Les activités',      icon:'nc-single-02',   class: '' },
+    { path: '/dashboard', title: 'Tableau de bord', icon:'nc-chart-bar-32', class: '' },
+    { path: '/user',      title: 'Profil',          icon:'nc-single-02',   class: '' },
 ];
 
 export const ROUTES: RouteInfo[] = [
