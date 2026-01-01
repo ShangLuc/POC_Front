@@ -5,7 +5,7 @@ import { AuthService } from '../pages/auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AdminOrEleveGuard implements CanActivate {
   constructor(
     private authService: AuthService,
     private router: Router
@@ -15,16 +15,17 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    // If user is already authenticated, redirect based on role
-    if (this.authService.isAuthenticated()) {
-      if (this.authService.isAdmin() || this.authService.isViewer()) {
+    // Accueil et Form accessibles aux admins ET élèves
+    if (this.authService.isAdmin() || this.authService.isEleve()) {
+      return true;
+    } else {
+      // Redirect viewer to dashboard
+      if (this.authService.isViewer()) {
         this.router.navigate(['/dashboard']);
       } else {
-        this.router.navigate(['/accueil']);
+        this.router.navigate(['/auth']);
       }
       return false;
     }
-    // Allow access to auth page if not authenticated
-    return true;
   }
 }
