@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EleveService } from '../eleve.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../auth.service';
 
 
 @Component({
@@ -19,88 +21,21 @@ export class FormComponent implements OnInit {
     messageSucces = '';
     messageErreur = '';
 
-    
-    conferences = [
-        'Etudes et métiers des arts, de la culture et du design',
-        'Etudes et métiers du commerce',
-        'Les études médicales',
-        'Management économie gestion Licences CPGE',
-        'Sciences et innovations technologiques BTS BUT',
-        'Sociologie, sciences de l\'éducation, histoire géographie Licences CPGE',
-        'Etudes et métiers de l\'informatique et du numérique',
-        'Etudes et métiers du droit - Science Po',
-        'Etudes et métiers du soin et de la santé',
-        'Etudes et métiers du tourisme et de l\'hôtellerie BTS',
-        'Etudes et métiers de l\'habitat et de la construction',
-        'Sciences et techniques Licence CPGE',
-        'Etudes et métiers de l\'ingénieur',
-        'Etudes et métiers du management, économie, gestion (BTS/BUT)',
-        'Etudes et métiers du secteur social',
-        'Etudes et métiers du sport',
-        'Lettres et langues Licences CPGE',
-        'Sciences de la vie, de l\'environnement et de l\'agronomie BTS BUT',
-        'Etre étudiant _ Parcoursup'
-    ];
+    // Tableaux dynamiques chargés depuis l'API
+    conferences: string[] = [];
+    tablesRondes: string[] = [];
+    flashsMetiers: string[] = [];
 
-   
-    tablesRondes = [
-        'Table ronde: Etre étudiant en BTS (animation par des étudiants)',
-        'Table ronde: Etre étudiant en BUT (animation par des étudiants)',
-        'Table ronde: Etre étudiant en prépa CPI ou CPGE (animation par des étudiants)',
-        'Table ronde: Etre alternant dans l\'enseignement supérieur (animation par des étudiants)',
-        'Table ronde: Etre étudiant en Licences (animation par des étudiants)'
-    ];
-
-    
-    flashsMetiers = [
-        'Flash métier: ingénieur (animation par des professionnels)',
-        'Flash métier: social (animation par des professionnels)',
-        'Flash métier: commerce (animation par des professionnels)',
-        'Flash métier: sport (animation par des professionnels)',
-        'Flash métier: paramédical (animation par des professionnels)',
-        'Flash métier: design / architecture (animation par des professionnels)'
-    ];
-
-    // Mapping simple titre -> id_event en base
-    private titreToId: { [titre: string]: number } = {
-        'Etudes et métiers des arts, de la culture et du design':1,
-        'Etudes et métiers du commerce':2,
-        'Les études médicales':3,
-        'Management économie gestion Licences CPGE':4,
-        'Sciences et innovations technologiques BTS BUT':5,
-        'Sociologie, sciences de l\'éducation, histoire géographie Licences CPGE':6,
-        'Etudes et métiers de l\'informatique et du numérique':7,
-        'Etudes et métiers du droit - Science Po':8,
-        'Etudes et métiers du soin et de la santé':9,
-        'Etudes et métiers du tourisme et de l\'hôtellerie BTS':10,
-        'Etudes et métiers de l\'habitat et de la construction':11,
-        'Sciences et techniques Licence CPGE':12,
-        'Etudes et métiers de l\'ingénieur':13,
-        'Etudes et métiers du management, économie, gestion (BTS/BUT)':14,
-        'Etudes et métiers du secteur social':15,
-        'Etudes et métiers du sport':16,
-        'Lettres et langues Licences CPGE':17,
-        'Sciences de la vie, de l\'environnement et de l\'agronomie BTS BUT':18,
-        'Etre étudiant _ Parcoursup':19,
-        // TABLE RONDES
-        'Table ronde: Etre étudiant en BTS (animation par des étudiants)': 20,
-        'Table ronde: Etre étudiant en BUT (animation par des étudiants)':21,
-        'Table ronde: Etre étudiant en prépa CPI ou CPGE (animation par des étudiants)':22,
-        'Table ronde: Etre alternant dans l\'enseignement supérieur (animation par des étudiants)':23,
-        'Table ronde: Etre étudiant en Licences (animation par des étudiants)':24,
-        // FLASH METIERS
-        'Flash métier: ingénieur (animation par des professionnels)':25,
-        'Flash métier: social (animation par des professionnels)':26,
-        'Flash métier: commerce (animation par des professionnels)':27,
-        'Flash métier: sport (animation par des professionnels)':28,
-        'Flash métier: paramédical (animation par des professionnels)':29,
-        'Flash métier: design / architecture (animation par des professionnels)':30
-
-    };
+    // Mapping dynamique titre -> id
+    private titreToId: { [titre: string]: number } = {};
 
     formGroup: FormGroup;
 
-    constructor(private eleveService: EleveService) {
+    constructor(
+        private eleveService: EleveService,
+        private http: HttpClient,
+        private authService: AuthService
+    ) {
         this.formGroup = new FormGroup({
             Prénom: new FormControl({ value: '', disabled: true }),
             Nom: new FormControl({ value: '', disabled: true }),
@@ -116,22 +51,72 @@ export class FormComponent implements OnInit {
     }
 
     ngOnInit() {
-        // Simuler la récupération des informations de l'utilisateur
-        // Dans une application réelle, ces données viendraient d'un service d'authentification
-        // const userInfo = {
-        //     Prénom: 'Jean',
-        //     Nom: 'Dupont',
-        //     id: '123456789',
-        //     Etablissement: 'Lycée Victor Hugo',
-        //     Lib: 'Structure A'
-        // };
+        // Charger les événements depuis l'API
+        this.loadEvents();
 
-        // Mettre à jour les valeurs du formulaire avec les données de l'utilisateur
-        // this.formGroup.patchValue(userInfo);
+        // Récupérer l'ID de l'élève depuis le localStorage
         const eleveId = localStorage.getItem('eleveId');
-        if(eleveId){
+        if (eleveId) {
             this.formGroup.patchValue({ id: eleveId });
         }
+    }
+
+    // Méthode pour récupérer les headers d'authentification
+    private getAuthHeaders(): HttpHeaders {
+        const token = this.authService.getAuthToken();
+        if (token) {
+            return new HttpHeaders({
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            });
+        }
+        return new HttpHeaders({
+            'Content-Type': 'application/json'
+        });
+    }
+
+    // Charger les événements depuis l'API
+    loadEvents() {
+        const headers = this.getAuthHeaders();
+        
+        this.http.get<any[]>('http://localhost:8080/api/activites', { headers })
+            .subscribe({
+                next: (events) => {
+                    // Réinitialiser les tableaux
+                    this.conferences = [];
+                    this.tablesRondes = [];
+                    this.flashsMetiers = [];
+                    this.titreToId = {};
+
+                    // Trier les événements par type
+                    events.forEach(event => {
+                        const nom = event.nom;
+                        const id = event.id;
+
+                        // Stocker le mapping nom -> id
+                        this.titreToId[nom] = id;
+
+                        // Classer par type
+                        if (event.type === 'CONFERENCE') {
+                            this.conferences.push(nom);
+                        } else if (event.type === 'TABLE_RONDE') {
+                            this.tablesRondes.push(nom);
+                        } else if (event.type === 'FLASH_METIER') {
+                            this.flashsMetiers.push(nom);
+                        }
+                    });
+
+                    console.log('Événements chargés:', {
+                        conferences: this.conferences,
+                        tablesRondes: this.tablesRondes,
+                        flashsMetiers: this.flashsMetiers
+                    });
+                },
+                error: (err) => {
+                    console.error('Erreur lors du chargement des événements:', err);
+                    this.messageErreur = 'Erreur lors du chargement des activités disponibles.';
+                }
+            });
     }
 
     onVoeuChange(): void {
