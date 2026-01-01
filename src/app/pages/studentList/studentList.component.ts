@@ -407,9 +407,18 @@ export class StudentListComponent implements OnInit{
         this.http.delete<string>('http://localhost:8080/api/admin/eleves', { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
                 this.successMessage = response || 'Tous les élèves ont été supprimés avec succès.';
+                // Réinitialiser toutes les données
                 this.students = [];
-                this.updateNumbers();
-                this.recalcDisplayed();
+                this.displayedStudents = [];
+                this.etablissements = [];
+                this.libStructures = [];
+                this.currentPage = 1;
+                this.totalPages = 0;
+                // Réinitialiser les filtres
+                this.searchQuery = '';
+                this.filterEtablissement = '';
+                this.filterLibStructure = '';
+                this.filterInscrit = 'tous';
                 setTimeout(() => { this.successMessage = ''; }, 3000);
             },
             error: (err) => {
