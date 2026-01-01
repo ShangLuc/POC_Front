@@ -68,6 +68,7 @@ export class ActivityComponent implements OnInit{
         this.http.get<any[]>('http://localhost:8080/api/admin/events', { headers })
             .subscribe({
                 next: (activities) => {
+                    console.log('Activités chargées:', activities); // Debug log
                     // Reset arrays
                     this.conferences = [];
                     this.tablesRondes = [];
@@ -78,6 +79,11 @@ export class ActivityComponent implements OnInit{
 
                     // Sort activities by type
                     activities.forEach(activity => {
+                        // Vérifier que l'activité a bien un ID
+                        if (!activity.id) {
+                            console.warn('Activité sans ID trouvée:', activity);
+                        }
+
                         const localActivity = {
                             id: activity.id,
                             numero: 0,
@@ -138,6 +144,13 @@ export class ActivityComponent implements OnInit{
             return;
         }
 
+        // Valider la capacité : doit être un entier positif > 0
+        const capacite = Number(this.newActivity.capacite);
+        if (isNaN(capacite) || capacite <= 0 || !Number.isInteger(capacite)) {
+            this.errorMessage = 'La capacité doit être un nombre entier positif supérieur à 0';
+            return;
+        }
+
         // Vérifier la présence du token avant l'appel
         const headers = this.getAuthHeaders();
         if (!headers.get('Authorization')) {
@@ -179,30 +192,9 @@ export class ActivityComponent implements OnInit{
         ).subscribe({
             next: (response) => {
                 this.successMessage = 'Activité ajoutée avec succès.';
-                
-                // Add the activity to the local list
-                const localActivity = {
-                    numero: 0,
-                    nom: this.newActivity.nom,
-                    description: this.newActivity.description,
-                    capacite: this.newActivity.capacite
-                };
-
-                if (type === 'conferences') {
-                    this.conferenceCounter++;
-                    localActivity.numero = this.conferenceCounter;
-                    this.conferences.push(localActivity);
-                } else if (type === 'tables_rondes') {
-                    this.tableRondeCounter++;
-                    localActivity.numero = this.tableRondeCounter;
-                    this.tablesRondes.push(localActivity);
-                } else if (type === 'flashs_metiers') {
-                    this.flashMetierCounter++;
-                    localActivity.numero = this.flashMetierCounter;
-                    this.flashsMetiers.push(localActivity);
-                }
-                
                 this.closeModal();
+                // Recharger les activités depuis le backend pour avoir les IDs
+                this.loadActivities();
                 setTimeout(() => { this.successMessage = ''; }, 3000);
             },
             error: (err) => {
@@ -218,6 +210,13 @@ export class ActivityComponent implements OnInit{
 
     // Ouvrir la modal en mode édition
     openEditModal(type: string, activity: any) {
+        // Vérification de l'ID avant toute chose
+        if (!activity || !activity.id) {
+            this.errorMessage = 'Erreur: Activité invalide. Veuillez recharger la page.';
+            console.error('Tentative d\'édition avec activité invalide:', activity);
+            return;
+        }
+
         this.activeModal = type;
         this.isEditMode = true;
         this.editActivityId = activity.id;
@@ -233,6 +232,13 @@ export class ActivityComponent implements OnInit{
     updateActivity() {
         if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.description) {
             this.errorMessage = 'Veuillez remplir tous les champs';
+            return;
+        }
+
+        // Valider la capacité : doit être un entier positif > 0
+        const capacite = Number(this.newActivity.capacite);
+        if (isNaN(capacite) || capacite <= 0 || !Number.isInteger(capacite)) {
+            this.errorMessage = 'La capacité doit être un nombre entier positif supérieur à 0';
             return;
         }
 
@@ -292,6 +298,13 @@ export class ActivityComponent implements OnInit{
 
     // Supprimer une activité
     deleteActivity(type: string, id: string) {
+        // Vérification de l'ID avant toute chose
+        if (!id || id === 'undefined' || id === undefined) {
+            this.errorMessage = 'Erreur: ID de l\'activité manquant. Veuillez recharger la page.';
+            console.error('Tentative de suppression avec ID invalide:', id);
+            return;
+        }
+
         if (!confirm('Voulez-vous vraiment supprimer cette activité ?')) {
             return;
         }
