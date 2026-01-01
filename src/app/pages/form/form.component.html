@@ -6,7 +6,37 @@
           <h5 class="card-title mb-0">Inscription aux conférences - Forum de l'orientation</h5>
         </div>
         <div class="card-body p-5">
-          <form [formGroup]="formGroup">
+          <!-- Récapitulatif pour élève déjà inscrit -->
+          <div *ngIf="showRecapitulatif" class="recap-container">
+            <div class="alert alert-success mb-4" role="alert">
+              <i class="fa fa-check-circle"></i> <strong>Inscription confirmée !</strong>
+              <p class="mb-0 mt-2">Vos vœux ont été enregistrés avec succès. Vous ne pouvez plus les modifier.</p>
+            </div>
+
+            <h6 class="mb-3"><i class="fa fa-list"></i> Récapitulatif de vos vœux :</h6>
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                  <tr>
+                    <th>Numéro</th>
+                    <th>Activité choisie</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let voeu of voeuxRecapitulatif">
+                    <td><strong>Vœu {{ voeu.numeroVoeu }}</strong></td>
+                    <td>{{ voeu.eventNom }}</td>
+                  </tr>
+                  <tr *ngIf="voeuxRecapitulatif.length === 0">
+                    <td colspan="2" class="text-center text-muted">Chargement de vos vœux...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Formulaire de sélection des vœux -->
+          <form [formGroup]="formGroup" *ngIf="!showRecapitulatif">
             
             <!-- User Info Display
             <div class="user-info-card mb-4 p-3 border rounded bg-light">
@@ -30,8 +60,10 @@
               <strong>Instructions :</strong>
               <ul class="mb-0">
                 <li>Vœux 1 et 2 : Conférences obligatoires (attribution garantie)</li>
-                <li>Vœux 3, 4 et 5 : Au choix parmi conférences, tables rondes ou flashs métiers</li>
+                <li>Vœux 3 et 4 : Au choix parmi conférences, tables rondes et flashs métiers</li>
+                <li>Vœu 5 : Conférence obligatoire</li>
                 <li>Tous les vœux doivent être différents</li>
+                <li>Après confirmation, il sera possible de consulter les voeux mais il ne sera plus possible de les modifier</li>
               </ul>
             </div>
 
@@ -125,8 +157,14 @@
             <!-- Validation Message -->
             <div *ngIf="validationMessage" class="alert alert-danger mt-3" role="alert">{{ validationMessage }}</div>
             
+            <!-- Success Message -->
+            <div *ngIf="messageSucces" class="alert alert-success mt-3" role="alert">{{ messageSucces }}</div>
+            
+            <!-- Error Message -->
+            <div *ngIf="messageErreur" class="alert alert-danger mt-3" role="alert">{{ messageErreur }}</div>
+            
             <!-- Confirmation Message -->
-            <div *ngIf="isConfirmed" class="alert alert-success mt-3" role="alert">
+            <div *ngIf="isConfirmed && !showRecapitulatif" class="alert alert-success mt-3" role="alert">
               Vos choix ont été confirmés et ne peuvent plus être modifiés.
             </div>
 

@@ -146,16 +146,8 @@
     </div>
 
     <!-- Modal pour ajouter un étudiant -->
-    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1">
+    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1" style="z-index: 1050;">
         <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Ajouter un Étudiant</h5>
-                    <button type="button" class="btn-close" (click)="closeModal()"></button>
-                </div>
-                <div class="modal-body">
-    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1">
-        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Ajouter un Étudiant</h5>
@@ -261,10 +253,10 @@
     </div>
 
     <!-- Overlay pour modal -->
-    <div class="modal-backdrop fade" [ngClass]="{'show': showModal}" *ngIf="showModal"></div>
+    <div class="modal-backdrop fade" [ngClass]="{'show': showModal}" *ngIf="showModal" style="z-index: 1040;"></div>
 
     <!-- Modal pour importer un fichier Excel -->
-    <div class="modal fade" [ngClass]="{'show': showImportModal}" [ngStyle]="{'display': showImportModal ? 'block' : 'none'}" id="importModal" tabindex="-1">
+    <div class="modal fade" [ngClass]="{'show': showImportModal}" [ngStyle]="{'display': showImportModal ? 'block' : 'none'}" id="importModal" tabindex="-1" style="z-index: 1050;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -350,6 +342,6 @@
     </div>
 
     <!-- Overlay pour modal import -->
-    <div class="modal-backdrop fade" [ngClass]="{'show': showImportModal}" *ngIf="showImportModal"></div>
+    <div class="modal-backdrop fade" [ngClass]="{'show': showImportModal}" *ngIf="showImportModal" style="z-index: 1040;"></div>
 
 </div>

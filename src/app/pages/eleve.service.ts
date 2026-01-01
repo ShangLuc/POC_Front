@@ -13,11 +13,20 @@ export class EleveService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   saveVoeux(eleveId: string, eventIds: number[]) {
-  return this.http.post(
-    `http://localhost:8080/api/eleves/${eleveId}/voeux`,
-    { eventIds }  // <-- clé identique à VoeuxRequest
-  );
-}
+    const token = this.authService.getAuthToken();
+    const headers = token 
+      ? { Authorization: `Bearer ${token}` }
+      : {};
+      
+    return this.http.post(
+      `http://localhost:8080/api/eleves/${eleveId}/voeux`,
+      { eventIds },
+      { 
+        headers,
+        responseType: 'text' as 'json'
+      }
+    );
+  }
 
   confirmerVoeux(eleveId: string): Observable<string> {
     return this.http.put(`${this.baseUrl}/eleves/${eleveId}/voeux/confirmer`, {}, {

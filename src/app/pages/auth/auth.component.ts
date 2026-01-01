@@ -73,7 +73,7 @@ export class AuthComponent implements OnInit {
 
       this.authService.loginAdmin(this.adminUsername, this.adminPassword).subscribe({
         next: () => {
-          this.router.navigate(['/accueil']); // adapte cette route à ton écran admin
+          this.router.navigate(['/dashboard']); // Admin accède au dashboard
         },
         error: (err) => {
           console.error(err);
@@ -95,7 +95,7 @@ export class AuthComponent implements OnInit {
       }
       this.authService.loginViewer(this.viewerUsername).subscribe({
         next: () => {
-          this.router.navigate(['/accueil']); // adapte cette route à ton écran viewer
+          this.router.navigate(['/dashboard']); // adapte cette route à ton écran viewer
         },
         error: (err) => {
           console.error(err);

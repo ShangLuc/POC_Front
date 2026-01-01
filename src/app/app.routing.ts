@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { AuthComponent } from './pages/auth/auth.component';
+import { AuthGuard } from './guards/auth.guard';
+import { RequireAuthGuard } from './guards/require-auth.guard';
 
 export const AppRoutes: Routes = [
   {
@@ -11,11 +13,13 @@ export const AppRoutes: Routes = [
   }, 
   {
     path: 'auth',
-    component: AuthComponent
+    component: AuthComponent,
+    canActivate: [AuthGuard] // Redirige si déjà authentifié
   },
   {
     path: '',
     component: AdminLayoutComponent,
+    canActivate: [RequireAuthGuard], // Toutes les pages nécessitent une authentification
     children: [
         {
       path: '',
@@ -23,6 +27,6 @@ export const AppRoutes: Routes = [
   }]},
   {
     path: '**',
-    redirectTo: 'accueil'
+    redirectTo: 'auth'
   }
 ]
