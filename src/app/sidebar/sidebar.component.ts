@@ -10,34 +10,35 @@ export interface RouteInfo {
 }
 
 export const ADMIN_ROUTES: RouteInfo[] = [
-    { path: '/dashboard',     title: 'Tableau de bord',        icon:'nc-chart-pie-36', class: '' },
-    { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
-    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
-    { path: '/user',          title: "Profil", icon:'nc-single-02',  class: '' },
+    { path: '/dashboard', title: 'Tableau de bord', icon: 'nc-chart-pie-36', class: '' },
+    { path: '/activity', title: 'Les activités', icon: 'nc-single-02', class: '' },
+    { path: '/studentList', title: "Liste des élèves", icon: 'nc-bullet-list-67', class: '' },
+    { path: '/user', title: "Profil", icon: 'nc-single-02', class: '' },
 ];
 
 export const STUDENT_ROUTES: RouteInfo[] = [
-    { path: '/accueil',       title: 'Accueil',           icon:'nc-bank',        class: '' },
-    { path: '/form',          title: 'Formulaire',        icon:'nc-paper',        class: '' },
-    { path: '/user',          title: 'Profil',            icon:'nc-single-02',   class: '' },
+    { path: '/accueil', title: 'Accueil', icon: 'nc-bank', class: '' },
+    { path: '/form', title: 'Formulaire', icon: 'nc-paper', class: '' },
+    { path: '/user', title: 'Profil', icon: 'nc-single-02', class: '' },
 ];
 
 // Routes visibles pour le profil viewer (référent)
 export const VIEWER_ROUTES: RouteInfo[] = [
-    { path: '/dashboard', title: 'Tableau de bord', icon:'nc-chart-bar-32', class: '' },
-    { path: '/user',      title: 'Profil',          icon:'nc-single-02',   class: '' },
+    { path: '/dashboard', title: 'Tableau de bord', icon: 'nc-chart-bar-32', class: '' },
+    { path: '/studentList', title: "Liste des élèves", icon: 'nc-bullet-list-67', class: '' },
+    { path: '/user', title: 'Profil', icon: 'nc-single-02', class: '' },
 ];
 
 export const ROUTES: RouteInfo[] = [
-    { path: '/accueil',       title: 'Accueil',                icon:'nc-bank',       class: '' },
-    { path: '/form',          title: 'formulaire',        icon:'nc-paper',       class: '' },
-    { path: '/activity',      title: 'Les activités',          icon:'nc-single-02',  class: '' },
-    { path: '/user',          title: "Profil d'utilisateur",   icon:'nc-single-02',  class: '' },
-    { path: '/studentList',   title: "Liste des élèves",       icon:'nc-bullet-list-67',  class: '' },
-    { path: '/table',         title: 'Table List',             icon:'nc-tile-56',    class: '' },
-    { path: '/section',       title: 'Section',                icon:'nc-pin-3',      class: '' },
-    { path: '/icons',         title: 'Icons',                  icon:'nc-diamond',    class: '' },
-    { path: '/typography',    title: 'Typography',             icon:'nc-caps-small', class: '' },
+    { path: '/accueil', title: 'Accueil', icon: 'nc-bank', class: '' },
+    { path: '/form', title: 'formulaire', icon: 'nc-paper', class: '' },
+    { path: '/activity', title: 'Les activités', icon: 'nc-single-02', class: '' },
+    { path: '/user', title: "Profil d'utilisateur", icon: 'nc-single-02', class: '' },
+    { path: '/studentList', title: "Liste des élèves", icon: 'nc-bullet-list-67', class: '' },
+    { path: '/table', title: 'Table List', icon: 'nc-tile-56', class: '' },
+    { path: '/section', title: 'Section', icon: 'nc-pin-3', class: '' },
+    { path: '/icons', title: 'Icons', icon: 'nc-diamond', class: '' },
+    { path: '/typography', title: 'Typography', icon: 'nc-caps-small', class: '' },
 ];
 
 @Component({
@@ -48,8 +49,8 @@ export const ROUTES: RouteInfo[] = [
 
 export class SidebarComponent implements OnInit {
     public menuItems: any[];
-    
-    constructor(private authService: AuthService) {}
+
+    constructor(private authService: AuthService) { }
 
     ngOnInit() {
         // Afficher un menu différent selon le rôle courant

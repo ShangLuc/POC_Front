@@ -13,37 +13,42 @@ import { AuthService } from '../auth.service';
 
 
 
-export class StudentListComponent implements OnInit{   
-    
+export class StudentListComponent implements OnInit {
+
     constructor(
-    private http: HttpClient,
-    private authService: AuthService
-    ) {}
+        private http: HttpClient,
+        private authService: AuthService
+    ) { }
 
     // Get authorization headers with Bearer token
     private getAuthHeaders(): HttpHeaders {
         const token = this.authService.getAuthToken();
         if (token) {
-          return new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          });
+            return new HttpHeaders({
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            });
         }
         return new HttpHeaders({
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         });
-      }
+    }
 
-        // Headers for file upload: only Authorization, let browser set multipart boundary
-        private getAuthHeadersForUpload(): HttpHeaders {
-                const token = this.authService.getAuthToken();
-                if (token) {
-                        return new HttpHeaders({
-                                'Authorization': `Bearer ${token}`
-                        });
-                }
-                return new HttpHeaders();
+    // Headers for file upload: only Authorization, let browser set multipart boundary
+    private getAuthHeadersForUpload(): HttpHeaders {
+        const token = this.authService.getAuthToken();
+        if (token) {
+            return new HttpHeaders({
+                'Authorization': `Bearer ${token}`
+            });
         }
+        return new HttpHeaders();
+    }
+
+    // User role info
+    isViewer: boolean = false;
+    isAdmin: boolean = false;
+    viewerLycee: string = '';
 
     students: any[] = [];
     displayedStudents: any[] = [];
@@ -53,7 +58,7 @@ export class StudentListComponent implements OnInit{
     successMessage: string = '';
     // Filtres & recherche
     searchQuery: string = '';
-    filterEtablissement: string ;
+    filterEtablissement: string;
     filterLibStructure: string;
     filterInscrit: 'tous' | 'oui' | 'non' = 'tous';
     etablissements: string[] = [];
@@ -62,7 +67,7 @@ export class StudentListComponent implements OnInit{
     pageSize: number = 12;
     currentPage: number = 1;
     totalPages: number = 0;
-    
+
     // Modal state
     showModal: boolean = false;
     addingStudent: boolean = false;
@@ -86,14 +91,14 @@ export class StudentListComponent implements OnInit{
     selectedFile: File | null = null;
     selectedFileName: string = '';
     importErrorMessage: string = '';
-    
+
     // Date/time selection arrays
-    days: number[] = Array.from({length: 31}, (_, i) => i + 1);
+    days: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
     months: string[] = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    years: number[] = Array.from({length: 10}, (_, i) => new Date().getFullYear() - 5 + i);
-    hours: number[] = Array.from({length: 24}, (_, i) => i);
-    minutes: number[] = Array.from({length: 60}, (_, i) => i);
-    
+    years: number[] = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i);
+    hours: number[] = Array.from({ length: 24 }, (_, i) => i);
+    minutes: number[] = Array.from({ length: 60 }, (_, i) => i);
+
     // Import date object
     importDate = {
         day: new Date().getDate(),
@@ -103,8 +108,38 @@ export class StudentListComponent implements OnInit{
         minute: new Date().getMinutes()
     };
 
-    ngOnInit(){
+    ngOnInit() {
+        this.isViewer = this.authService.isViewer();
+        this.isAdmin = this.authService.isAdmin();
+
+        if (this.isViewer) {
+            this.loadViewerInfo();
+        }
         this.loadEleves();
+    }
+
+    loadViewerInfo() {
+        const viewerUsername = this.authService.getCurrentViewerUsername();
+        if (!viewerUsername) {
+            this.errorMessage = 'Erreur: utilisateur non identifié.';
+            return;
+        }
+
+        this.http.get<any>(`http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}`,
+            { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (viewer) => {
+                    this.viewerLycee = viewer.etablissement || '';
+                    this.filterEtablissement = this.viewerLycee;
+                    // Restrict establishments list immediately to prevent leakage
+                    this.etablissements = [this.viewerLycee];
+                    this.applyFilters();
+                },
+                error: (err) => {
+                    console.error('Error loading viewer info:', err);
+                    this.errorMessage = 'Erreur lors du chargement des informations.';
+                }
+            });
     }
 
     // Ouvrir la modal
@@ -141,7 +176,7 @@ export class StudentListComponent implements OnInit{
 
     // Ajouter un étudiant
     addStudent() {
-        if (!this.newStudent.id || !this.newStudent.nom || 
+        if (!this.newStudent.id || !this.newStudent.nom ||
             !this.newStudent.prenom || !this.newStudent.etablissement) {
             this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
             return;
@@ -172,7 +207,7 @@ export class StudentListComponent implements OnInit{
 
         this.http.post<string>('http://localhost:8080/api/admin/eleves',
             student,
-            { 
+            {
                 headers: headers,
                 responseType: 'text' as 'json'  // Handle text response
             }
@@ -208,21 +243,41 @@ export class StudentListComponent implements OnInit{
     loadEleves() {
         this.loadingEleves = true;
         this.errorMessage = '';
-        this.getAllEleves().subscribe({
-            next: (response) => {
-                this.students = response;
-                this.updateNumbers();
-                this.updateMetadata();
-                this.applyFilters();
-                this.recalcDisplayed();
-                this.loadingEleves = false;
-            },
-            error: (err) => {
-                console.error('Error loading Eleves:', err);
-                this.errorMessage = 'Erreur lors du chargement des élèves.';
-                this.loadingEleves = false;
-            }
-        });
+
+        if (this.isAdmin) {
+            this.getAllEleves().subscribe({
+                next: (response) => {
+                    this.students = response;
+                    this.updateNumbers();
+                    this.updateMetadata();
+                    this.applyFilters();
+                    this.recalcDisplayed();
+                    this.loadingEleves = false;
+                },
+                error: (err) => {
+                    console.error('Error loading Eleves:', err);
+                    this.errorMessage = 'Erreur lors du chargement des élèves.';
+                    this.loadingEleves = false;
+                }
+            });
+        }
+        else if (this.isViewer) {
+            this.getAllElevesViewer().subscribe({
+                next: (response) => {
+                    this.students = response;
+                    this.updateNumbers();
+                    this.updateMetadata();
+                    this.applyFilters();
+                    this.recalcDisplayed();
+                    this.loadingEleves = false;
+                },
+                error: (err) => {
+                    console.error('Error loading Eleves:', err);
+                    this.errorMessage = 'Erreur lors du chargement des élèves.';
+                    this.loadingEleves = false;
+                }
+            });
+        }
     }
 
 
@@ -230,6 +285,19 @@ export class StudentListComponent implements OnInit{
     getAllEleves(): Observable<any[]> {
         return this.http.get<any[]>(
             'http://localhost:8080/api/admin/eleves',
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    getAllElevesViewer(): Observable<any[]> {
+        const viewerUsername = this.authService.getCurrentViewerUsername();
+        if (!viewerUsername) {
+            this.errorMessage = 'Erreur: utilisateur non identifié.';
+            return;
+        }
+
+        return this.http.get<any[]>(
+            `http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}/eleves`,
             { headers: this.getAuthHeaders() }
         );
     }
@@ -321,11 +389,20 @@ export class StudentListComponent implements OnInit{
     private updateMetadata() {
         const etabs = new Set<string>();
         const libs = new Set<string>();
-        this.students.forEach(s => {
-            if (s.etablissement) etabs.add(String(s.etablissement));
-            if (s.libStructure) libs.add(String(s.libStructure));
-        });
-        this.etablissements = Array.from(etabs).sort();
+
+        if (this.isViewer && this.viewerLycee) {
+            this.students.forEach(s => {
+                if (s.libStructure) libs.add(String(s.libStructure));
+            });
+        }
+        else {
+            this.students.forEach(s => {
+                if (s.etablissement) etabs.add(String(s.etablissement));
+                if (s.libStructure) libs.add(String(s.libStructure));
+            });
+            this.etablissements = Array.from(etabs).sort();
+        }
+
         this.libStructures = Array.from(libs).sort();
     }
 
@@ -339,7 +416,7 @@ export class StudentListComponent implements OnInit{
 
         const filtered = src.filter(s => {
             // Etablissement
-            if (filtEt && String(s.etablissement || '').toLowerCase() !== filtEt) return false;
+            if (!this.isViewer && filtEt && String(s.etablissement || '').toLowerCase() !== filtEt) return false;
             // Lib Structure
             if (filtLib && String(s.libStructure || '').toLowerCase() !== filtLib) return false;
             // Inscrit
