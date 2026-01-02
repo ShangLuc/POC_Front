@@ -125,17 +125,27 @@
                 </div>
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item" [class.disabled]="currentPage === 1">
-                            <button class="page-link" (click)="prevPage()"
-                                [disabled]="currentPage === 1">Précédent</button>
+                        <!-- Première page -->
+                        <li class="page-item" *ngIf="currentPage > 1">
+                            <button class="page-link" (click)="setPage(1)">&lt;&lt;</button>
                         </li>
-                        <li class="page-item" *ngFor="let p of [].constructor(totalPages); let idx = index"
-                            [class.active]="(idx+1) === currentPage">
-                            <button class="page-link" (click)="setPage(idx+1)">{{ idx+1 }}</button>
+                        <!-- Précédent -->
+                        <li class="page-item" *ngIf="currentPage > 1">
+                            <button class="page-link" (click)="prevPage()">&lt;</button>
                         </li>
-                        <li class="page-item" [class.disabled]="currentPage === totalPages">
-                            <button class="page-link" (click)="nextPage()"
-                                [disabled]="currentPage === totalPages">Suivant</button>
+
+                        <!-- Pages visibles -->
+                        <li class="page-item" *ngFor="let p of visiblePages" [class.active]="p === currentPage">
+                            <button class="page-link" (click)="setPage(p)">{{ p }}</button>
+                        </li>
+
+                        <!-- Suivant -->
+                        <li class="page-item" *ngIf="currentPage < totalPages">
+                            <button class="page-link" (click)="nextPage()">></button>
+                        </li>
+                        <!-- Dernière page -->
+                        <li class="page-item" *ngIf="currentPage < totalPages">
+                            <button class="page-link" (click)="setPage(totalPages)">>></button>
                         </li>
                     </ul>
                 </nav>
@@ -233,6 +243,11 @@
                             <option value="non">Non</option>
                             <option value="oui">Oui</option>
                         </select>
+                    </div>
+
+                    <!-- Message d'erreur -->
+                    <div *ngIf="createErrorMessage" class="alert alert-danger mt-3" role="alert">
+                        {{ createErrorMessage }}
                     </div>
                 </div>
                 <div class="modal-footer">

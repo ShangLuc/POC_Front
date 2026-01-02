@@ -71,6 +71,7 @@ export class StudentListComponent implements OnInit {
     // Modal state
     showModal: boolean = false;
     addingStudent: boolean = false;
+    createErrorMessage: string = '';
     newStudent = {
         id: '',
         nom: '',
@@ -170,7 +171,7 @@ export class StudentListComponent implements OnInit {
             hour: now.getHours(),
             minute: now.getMinutes()
         };
-        this.errorMessage = '';
+        this.createErrorMessage = '';
         this.successMessage = '';
     }
 
@@ -178,18 +179,18 @@ export class StudentListComponent implements OnInit {
     addStudent() {
         if (!this.newStudent.id || !this.newStudent.nom ||
             !this.newStudent.prenom || !this.newStudent.etablissement) {
-            this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+            this.createErrorMessage = 'Veuillez remplir tous les champs obligatoires.';
             return;
         }
 
         this.addingStudent = true;
-        this.errorMessage = '';
+        this.createErrorMessage = '';
         this.successMessage = '';
 
         // Vérifier la présence du token avant l'appel
         const headers = this.getAuthHeaders();
         if (!headers.get('Authorization')) {
-            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
+            this.createErrorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
             this.addingStudent = false;
             return;
         }
@@ -231,7 +232,7 @@ export class StudentListComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Erreur lors de l\'ajout de l\'étudiant:', err);
-                this.errorMessage = err?.error?.message || 'Erreur lors de l\'ajout de l\'étudiant.';
+                this.createErrorMessage = err?.error?.message || 'Erreur lors de l\'ajout de l\'étudiant.';
                 this.addingStudent = false;
             },
             complete: () => {
@@ -383,6 +384,18 @@ export class StudentListComponent implements OnInit {
             this.currentPage -= 1;
             this.recalcDisplayed();
         }
+    }
+
+    get visiblePages(): number[] {
+        const range = 3;
+        const pages: number[] = [];
+        const start = Math.max(1, this.currentPage - range);
+        const end = Math.min(this.totalPages, this.currentPage + range);
+
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
     }
 
     // Construire les listes uniques pour les sélecteurs
