@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 
@@ -110,6 +110,7 @@ export class StudentListComponent implements OnInit {
     };
 
     ngOnInit() {
+        this.checkScreenSize();
         this.isViewer = this.authService.isViewer();
         this.isAdmin = this.authService.isAdmin();
 
@@ -386,8 +387,19 @@ export class StudentListComponent implements OnInit {
         }
     }
 
+    isMobile: boolean = false;
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event: any) {
+        this.checkScreenSize();
+    }
+
+    private checkScreenSize() {
+        this.isMobile = window.innerWidth < 768; // Bootstrap md breakpoint
+    }
+
     get visiblePages(): number[] {
-        const range = 3;
+        const range = this.isMobile ? 2 : 3;
         const pages: number[] = [];
         const start = Math.max(1, this.currentPage - range);
         const end = Math.min(this.totalPages, this.currentPage + range);
