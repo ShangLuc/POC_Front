@@ -20,7 +20,7 @@ export const AdminLayoutRoutes: Routes = [
 
     // Dashboard - accessible aux admins ET viewers uniquement
     { path: 'dashboard', component: DashboardComponent, canActivate: [AdminOrViewerGuard] },
-    { path: 'studentList', component: StudentListComponent, canActivate: [AdminOrViewerGuard] }
+    { path: 'studentList', component: StudentListComponent, canActivate: [AdminOrViewerGuard] },
 
     // Admin-only screens (liste des élèves, liste des activités)
     { path: 'activity', component: ActivityComponent, canActivate: [AdminGuard] },
