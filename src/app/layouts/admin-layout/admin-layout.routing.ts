@@ -12,16 +12,16 @@ import { AdminOrEleveGuard } from '../../guards/admin-or-eleve.guard';
 
 export const AdminLayoutRoutes: Routes = [
     // Profile - accessible à tous les utilisateurs authentifiés (admin, élève, viewer)
-    { path: 'user',           component: UserComponent },
+    { path: 'user', component: UserComponent },
 
     // Accueil et Form - accessibles aux élèves ET admins uniquement
-    { path: 'accueil',        component: AccueilComponent, canActivate: [AdminOrEleveGuard] },
-    { path: 'form',           component: FormComponent, canActivate: [AdminOrEleveGuard] },
+    { path: 'accueil', component: AccueilComponent, canActivate: [AdminOrEleveGuard] },
+    { path: 'form', component: FormComponent, canActivate: [AdminOrEleveGuard] },
 
     // Dashboard - accessible aux admins ET viewers uniquement
-    { path: 'dashboard',      component: DashboardComponent, canActivate: [AdminOrViewerGuard] },
+    { path: 'dashboard', component: DashboardComponent, canActivate: [AdminOrViewerGuard] },
+    { path: 'studentList', component: StudentListComponent, canActivate: [AdminOrViewerGuard] }
 
     // Admin-only screens (liste des élèves, liste des activités)
-    { path: 'activity',       component: ActivityComponent, canActivate: [AdminGuard] },
-    { path: 'studentList',    component: StudentListComponent, canActivate: [AdminGuard] }
+    { path: 'activity', component: ActivityComponent, canActivate: [AdminGuard] },
 ];

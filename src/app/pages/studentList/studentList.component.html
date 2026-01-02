@@ -20,7 +20,7 @@
                 <i class="fa fa-spinner fa-spin"></i> Chargement des élèves...
             </div>
 
-            <div class="mb-3 d-flex justify-content-between">
+            <div class="mb-3 d-flex justify-content-between" *ngIf="isAdmin">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
                 </button>
@@ -34,39 +34,31 @@
                 <div class="row g-2 align-items-end">
                     <div class="col-md-4">
                         <label class="form-label">Recherche</label>
-                        <input type="text" class="form-control form-control-sm filter-input" [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()" placeholder="Entrez votre recherche" />
+                        <input type="text" class="form-control form-control-sm filter-input" [(ngModel)]="searchQuery"
+                            (ngModelChange)="onFilterChange()" placeholder="Entrez votre recherche" />
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label">Établissement</label>
-                        <ng-select
-                            [items]="etablissements"
-                            [(ngModel)]="filterEtablissement"
-                            [placeholder]="filterEtablissement ? '' : 'Tous'"
-                            class="ng-select-sm"
-                            (change)="onFilterChange()">
+                        <ng-select [items]="etablissements" [(ngModel)]="filterEtablissement"
+                            [placeholder]="filterEtablissement ? '' : 'Tous'" class="ng-select-sm" [disabled]="isViewer"
+                            [readonly]="isViewer" (change)="onFilterChange()">
                         </ng-select>
                     </div>
 
 
                     <div class="col-md-3">
                         <label class="form-label">Lib. Structure</label>
-                        <ng-select
-                            [items]="libStructures"
-                            [(ngModel)]="filterLibStructure"
-                            [placeholder]="filterLibStructure ? '' : 'Toutes'"
-                            class="ng-select-sm"
+                        <ng-select [items]="libStructures" [(ngModel)]="filterLibStructure"
+                            [placeholder]="filterLibStructure ? '' : 'Toutes'" class="ng-select-sm"
                             (change)="onFilterChange()">
                         </ng-select>
                     </div>
 
-  
+
                     <div class="col-md-2">
                         <label class="form-label">Inscrit</label>
-                        <ng-select
-                            [(ngModel)]="filterInscrit"
-                            class="ng-select-sm"
-                            (change)="onFilterChange()"
+                        <ng-select [(ngModel)]="filterInscrit" class="ng-select-sm" (change)="onFilterChange()"
                             [clearable]="false">
 
                             <ng-option value="tous">Tous</ng-option>
@@ -83,37 +75,43 @@
                     <thead>
                         <tr>
                             <th>Numéro</th>
-                            <th>Identifiant National</th>
+                            <th *ngIf="isAdmin">Identifiant National</th>
                             <th>Nom</th>
                             <th>Prénom</th>
-                            <th>Établissement</th>
+                            <th *ngIf="isAdmin">Établissement</th>
                             <th>Lib. Structure</th>
                             <th>Inscrit</th>
-                            <th>Demi journée</th>
-                            <th>Action</th>
+                            <th *ngIf="isAdmin">Demi journée</th>
+                            <th *ngIf="isAdmin">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let student of displayedStudents; let i = index">
                             <td>{{ student.numero }}</td>
-                            <td>{{ student.identifiantNational || student.id || '-' }}</td>
+                            <td *ngIf="isAdmin">{{ student.identifiantNational || student.id || '-' }}</td>
                             <td>{{ student.nom }}</td>
                             <td>{{ student.prenom }}</td>
-                            <td>{{ student.etablissement }}</td>
+                            <td *ngIf="isAdmin">{{ student.etablissement }}</td>
                             <td>{{ student.libStructure || '-' }}</td>
                             <td>
-                                <span *ngIf="student.inscrit === true || student.inscrit === 'true' || student.inscrit === 'oui'" class="badge badge-success">Oui</span>
-                                <span *ngIf="student.inscrit === false || student.inscrit === 'false' || student.inscrit === 'non'" class="badge badge-danger">Non</span>
+                                <span
+                                    *ngIf="student.inscrit === true || student.inscrit === 'true' || student.inscrit === 'oui'"
+                                    class="badge badge-success">Oui</span>
+                                <span
+                                    *ngIf="student.inscrit === false || student.inscrit === 'false' || student.inscrit === 'non'"
+                                    class="badge badge-danger">Non</span>
                             </td>
-                            <td>{{ student.demiJournee || '-' }}</td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(i + (currentPage - 1) * pageSize)">
+                            <td *ngIf="isAdmin">{{ student.demiJournee || '-' }}</td>
+                            <td *ngIf="isAdmin">
+                                <button type="button" class="btn btn-danger btn-sm"
+                                    (click)="confirmDelete(i + (currentPage - 1) * pageSize)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </td>
                         </tr>
                         <tr *ngIf="!loadingEleves && displayedStudents.length === 0">
-                            <td colspan="9" class="text-center text-muted">Aucun étudiant trouvé</td>
+                            <td [attr.colspan]="!isAdmin ? 5 : 9" class="text-center text-muted">Aucun étudiant trouvé
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -128,25 +126,30 @@
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         <li class="page-item" [class.disabled]="currentPage === 1">
-                            <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">Précédent</button>
+                            <button class="page-link" (click)="prevPage()"
+                                [disabled]="currentPage === 1">Précédent</button>
                         </li>
-                        <li class="page-item" *ngFor="let p of [].constructor(totalPages); let idx = index" [class.active]="(idx+1) === currentPage">
+                        <li class="page-item" *ngFor="let p of [].constructor(totalPages); let idx = index"
+                            [class.active]="(idx+1) === currentPage">
                             <button class="page-link" (click)="setPage(idx+1)">{{ idx+1 }}</button>
                         </li>
                         <li class="page-item" [class.disabled]="currentPage === totalPages">
-                            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Suivant</button>
+                            <button class="page-link" (click)="nextPage()"
+                                [disabled]="currentPage === totalPages">Suivant</button>
                         </li>
                     </ul>
                 </nav>
             </div>
-            <div class="mb-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-danger btn-sm"  (click)="confirmDeleteAllStudents()" > Supprimer tous les élèves </button>
+            <div class="mb-3 d-flex justify-content-between" *ngIf="isAdmin">
+                <button type="button" class="btn btn-danger btn-sm" (click)="confirmDeleteAllStudents()"> Supprimer tous
+                    les élèves </button>
             </div>
         </div>
     </div>
 
     <!-- Modal pour ajouter un étudiant -->
-    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}" id="studentModal" tabindex="-1" style="z-index: 1050;">
+    <div class="modal fade" [ngClass]="{'show': showModal}" [ngStyle]="{'display': showModal ? 'block' : 'none'}"
+        id="studentModal" tabindex="-1" style="z-index: 1050;">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -156,38 +159,30 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label for="identifiantInput">Identifiant National *</label>
-                        <input type="text" class="form-control" id="identifiantInput" 
-                               [(ngModel)]="newStudent.id" 
-                               name="id"
-                               placeholder="Entrez l'identifiant national">
+                        <input type="text" class="form-control" id="identifiantInput" [(ngModel)]="newStudent.id"
+                            name="id" placeholder="Entrez l'identifiant national">
                     </div>
                     <div class="form-group mb-3">
                         <label for="nomInput">Nom *</label>
-                        <input type="text" class="form-control" id="nomInput" 
-                               [(ngModel)]="newStudent.nom" 
-                               name="nom"
-                               placeholder="Entrez le nom">
+                        <input type="text" class="form-control" id="nomInput" [(ngModel)]="newStudent.nom" name="nom"
+                            placeholder="Entrez le nom">
                     </div>
                     <div class="form-group mb-3">
                         <label for="prenomInput">Prénom *</label>
-                        <input type="text" class="form-control" id="prenomInput" 
-                               [(ngModel)]="newStudent.prenom" 
-                               name="prenom"
-                               placeholder="Entrez le prénom">
+                        <input type="text" class="form-control" id="prenomInput" [(ngModel)]="newStudent.prenom"
+                            name="prenom" placeholder="Entrez le prénom">
                     </div>
                     <div class="form-group mb-3">
                         <label for="etablissementInput">Établissement *</label>
-                        <input type="text" class="form-control" id="etablissementInput" 
-                               [(ngModel)]="newStudent.etablissement" 
-                               name="etablissement"
-                               placeholder="Entrez l'établissement">
+                        <input type="text" class="form-control" id="etablissementInput"
+                            [(ngModel)]="newStudent.etablissement" name="etablissement"
+                            placeholder="Entrez l'établissement">
                     </div>
                     <div class="form-group mb-3">
                         <label for="libStructureInput">Lib. Structure</label>
-                        <input type="text" class="form-control" id="libStructureInput" 
-                               [(ngModel)]="newStudent.libStructure" 
-                               name="libStructure"
-                               placeholder="Entrez la lib. structure" >
+                        <input type="text" class="form-control" id="libStructureInput"
+                            [(ngModel)]="newStudent.libStructure" name="libStructure"
+                            placeholder="Entrez la lib. structure">
                     </div>
                     <div class="form-group mb-3">
                         <label>Date de la demi-journée</label>
@@ -212,7 +207,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Sélection de l'heure -->
                     <div class="form-group mb-3">
                         <label><strong>Heure</strong></label>
@@ -226,23 +221,23 @@
                             <div class="col-6">
                                 <label for="minute">Minute</label>
                                 <select class="form-control" id="minute" [(ngModel)]="newStudent.minute" name="minute">
-                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min }}</option>
+                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min
+                                            }}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-3">
                         <label for="inscritSelect">Inscrit</label>
-                        <select class="form-control" id="inscritSelect" 
-                                [(ngModel)]="newStudent.inscrit"
-                                name="inscrit">
+                        <select class="form-control" id="inscritSelect" [(ngModel)]="newStudent.inscrit" name="inscrit">
                             <option value="non">Non</option>
                             <option value="oui">Oui</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="addingStudent">Annuler</button>
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()"
+                        [disabled]="addingStudent">Annuler</button>
                     <button type="button" class="btn btn-primary" (click)="addStudent()" [disabled]="addingStudent">
                         <span *ngIf="!addingStudent">Ajouter</span>
                         <span *ngIf="addingStudent"><i class="fa fa-spinner fa-spin"></i> Ajout en cours...</span>
@@ -256,7 +251,9 @@
     <div class="modal-backdrop fade" [ngClass]="{'show': showModal}" *ngIf="showModal" style="z-index: 1040;"></div>
 
     <!-- Modal pour importer un fichier Excel -->
-    <div class="modal fade" [ngClass]="{'show': showImportModal}" [ngStyle]="{'display': showImportModal ? 'block' : 'none'}" id="importModal" tabindex="-1" style="z-index: 1050;">
+    <div class="modal fade" [ngClass]="{'show': showImportModal}"
+        [ngStyle]="{'display': showImportModal ? 'block' : 'none'}" id="importModal" tabindex="-1"
+        style="z-index: 1050;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -270,39 +267,45 @@
                         <div class="row mt-2">
                             <div class="col-4">
                                 <label for="importDay">Jour</label>
-                                <select class="form-control" id="importDay" [(ngModel)]="importDate.day" name="importDay">
+                                <select class="form-control" id="importDay" [(ngModel)]="importDate.day"
+                                    name="importDay">
                                     <option *ngFor="let d of days" [value]="d">{{ d }}</option>
                                 </select>
                             </div>
                             <div class="col-4">
                                 <label for="importMonth">Mois</label>
-                                <select class="form-control" id="importMonth" [(ngModel)]="importDate.month" name="importMonth">
+                                <select class="form-control" id="importMonth" [(ngModel)]="importDate.month"
+                                    name="importMonth">
                                     <option *ngFor="let m of months; let i = index" [value]="i + 1">{{ m }}</option>
                                 </select>
                             </div>
                             <div class="col-4">
                                 <label for="importYear">Année</label>
-                                <select class="form-control" id="importYear" [(ngModel)]="importDate.year" name="importYear">
+                                <select class="form-control" id="importYear" [(ngModel)]="importDate.year"
+                                    name="importYear">
                                     <option *ngFor="let y of years" [value]="y">{{ y }}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Sélection de l'heure -->
                     <div class="form-group mb-3">
                         <label><strong>Heure</strong></label>
                         <div class="row mt-2">
                             <div class="col-6">
                                 <label for="importHour">Heure</label>
-                                <select class="form-control" id="importHour" [(ngModel)]="importDate.hour" name="importHour">
+                                <select class="form-control" id="importHour" [(ngModel)]="importDate.hour"
+                                    name="importHour">
                                     <option *ngFor="let h of hours" [value]="h">{{ h < 10 ? '0' + h : h }}</option>
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label for="importMinute">Minute</label>
-                                <select class="form-control" id="importMinute" [(ngModel)]="importDate.minute" name="importMinute">
-                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min }}</option>
+                                <select class="form-control" id="importMinute" [(ngModel)]="importDate.minute"
+                                    name="importMinute">
+                                    <option *ngFor="let min of minutes" [value]="min">{{ min < 10 ? '0' + min : min
+                                            }}</option>
                                 </select>
                             </div>
                         </div>
@@ -312,16 +315,16 @@
                     <div class="form-group mb-3">
                         <label for="excelFile"><strong>Fichier Excel</strong></label>
                         <div class="mt-2">
-                            <label for="excelFile" class="btn btn-outline-primary btn-sm d-block text-center py-3 cursor-pointer border-dashed">
+                            <label for="excelFile"
+                                class="btn btn-outline-primary btn-sm d-block text-center py-3 cursor-pointer border-dashed">
                                 <i class="fa fa-upload"></i> Cliquez pour sélectionner un fichier Excel
                             </label>
-                            <input type="file" class="form-control d-none" id="excelFile" 
-                                   (change)="onImportFileSelect($event)" 
-                                   accept=".xlsx, .xls"
-                                   #fileInput>
+                            <input type="file" class="form-control d-none" id="excelFile"
+                                (change)="onImportFileSelect($event)" accept=".xlsx, .xls" #fileInput>
                         </div>
                         <div *ngIf="selectedFileName" class="mt-2">
-                            <p class="text-success fw-bold"><i class="fa fa-check-circle"></i> Fichier sélectionné: {{ selectedFileName }}</p>
+                            <p class="text-success fw-bold"><i class="fa fa-check-circle"></i> Fichier sélectionné: {{
+                                selectedFileName }}</p>
                         </div>
                     </div>
 
@@ -331,8 +334,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeImportModal()" [disabled]="importingFile">Annuler</button>
-                    <button type="button" class="btn btn-success" (click)="submitImport()" [disabled]="importingFile || !selectedFile">
+                    <button type="button" class="btn btn-secondary" (click)="closeImportModal()"
+                        [disabled]="importingFile">Annuler</button>
+                    <button type="button" class="btn btn-success" (click)="submitImport()"
+                        [disabled]="importingFile || !selectedFile">
                         <span *ngIf="!importingFile"><i class="fa fa-check"></i> Valider l'import</span>
                         <span *ngIf="importingFile"><i class="fa fa-spinner fa-spin"></i> Import en cours...</span>
                     </button>
@@ -342,6 +347,7 @@
     </div>
 
     <!-- Overlay pour modal import -->
-    <div class="modal-backdrop fade" [ngClass]="{'show': showImportModal}" *ngIf="showImportModal" style="z-index: 1040;"></div>
+    <div class="modal-backdrop fade" [ngClass]="{'show': showImportModal}" *ngIf="showImportModal"
+        style="z-index: 1040;"></div>
 
 </div>
