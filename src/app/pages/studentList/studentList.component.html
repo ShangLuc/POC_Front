@@ -75,7 +75,7 @@
                     <thead>
                         <tr>
                             <th>Numéro</th>
-                            <th *ngIf="isAdmin">Identifiant National</th>
+                            <th>Identifiant National</th>
                             <th>Nom</th>
                             <th>Prénom</th>
                             <th *ngIf="isAdmin">Établissement</th>
@@ -88,7 +88,7 @@
                     <tbody>
                         <tr *ngFor="let student of displayedStudents; let i = index">
                             <td>{{ student.numero }}</td>
-                            <td *ngIf="isAdmin">{{ student.identifiantNational || student.id || '-' }}</td>
+                            <td>{{ student.identifiantNational || student.id || '-' }}</td>
                             <td>{{ student.nom }}</td>
                             <td>{{ student.prenom }}</td>
                             <td *ngIf="isAdmin">{{ student.etablissement }}</td>
@@ -110,7 +110,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="!loadingEleves && displayedStudents.length === 0">
-                            <td [attr.colspan]="!isAdmin ? 5 : 9" class="text-center text-muted">Aucun étudiant trouvé
+                            <td [attr.colspan]="!isAdmin ? 6 : 9" class="text-center text-muted">Aucun étudiant trouvé
                             </td>
                         </tr>
                     </tbody>

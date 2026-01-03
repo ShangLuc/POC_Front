@@ -440,7 +440,8 @@ export class StudentListComponent implements OnInit {
         const filtIns = this.filterInscrit;
 
         const filtered = src.filter(s => {
-            // Etablissement
+            // Etablissement - TOUJOURS filtrer pour les viewers
+            if (this.isViewer && filtEt && String(s.etablissement || '').toLowerCase() !== filtEt) return false;
             if (!this.isViewer && filtEt && String(s.etablissement || '').toLowerCase() !== filtEt) return false;
             // Lib Structure
             if (filtLib && String(s.libStructure || '').toLowerCase() !== filtLib) return false;
