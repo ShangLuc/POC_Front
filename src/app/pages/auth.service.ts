@@ -11,6 +11,7 @@ export class AuthService {
   private readonly eleveIdKey = 'eleveId';
   private readonly viewerUsernameKey = 'viewerUsername';
   private currentUserRole: string = '';
+  viewerData: any = null;
 
   constructor(private http: HttpClient) {
     this.currentUserRole = localStorage.getItem('userRole') || '';
@@ -71,6 +72,8 @@ export class AuthService {
 
     return this.http.get<any>(`${this.baseUrl}/viewers/by-username/${encodeURIComponent(username)}`).pipe(
       tap((response) => {
+        this.viewerData = response;
+        console.log('Viewer data loaded:', this.viewerData);
         localStorage.setItem('userRole', 'viewer');
         localStorage.setItem(this.viewerUsernameKey, username);
 

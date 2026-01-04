@@ -14,6 +14,7 @@ import { Eleve } from '../../models/eleve.model';
 export class UserComponent implements OnInit {
     isAdmin: boolean = false;
     isEleve: boolean = false;
+    isViewer: boolean = false;
     isSuperAdmin: boolean = false;
     adminUsername: string = '';
     adminData: any = null;
@@ -21,6 +22,10 @@ export class UserComponent implements OnInit {
     student?: Eleve;
     isStudentLoading = false;
     profileErrorMessage = '';
+
+    // viewer data
+    viewerUsername: string = '';
+    viewerEtablissement: string = '';
     
     // Admin management properties
     admins: any[] = [];
@@ -58,6 +63,7 @@ export class UserComponent implements OnInit {
     ngOnInit() {
         this.isAdmin = this.authService.isAdmin();
         this.isEleve = this.authService.isEleve();
+        this.isViewer = this.authService.isViewer();
         this.isSuperAdmin = this.authService.getCurrentRole() === 'superadmin';
         
         if (this.isAdmin) {
@@ -74,7 +80,18 @@ export class UserComponent implements OnInit {
             this.loadAdmins();
             this.loadViewers();
         }
+
+        if (this.isViewer) {
+            this.viewerUsername = this.authService.viewerData?.username || '';
+            this.viewerEtablissement  = this.authService.viewerData?.etablissement || '';
+        }
+
+
+
     }
+
+
+
 
     private loadStudentProfile(): void {
         this.profileErrorMessage = '';
