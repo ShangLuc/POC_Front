@@ -3,7 +3,7 @@
     <div class="col-lg-10">
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white">
-          <h5 class="card-title mb-0">Inscription aux conférences - Forum de l'orientation</h5>
+          <h5 class="card-title ">Inscription aux activités - Forum de l'orientation</h5>
         </div>
         <div class="card-body p-5">
           <!-- Récapitulatif pour élève déjà inscrit -->
@@ -38,144 +38,219 @@
           <!-- Formulaire de sélection des vœux -->
           <form [formGroup]="formGroup" *ngIf="!showRecapitulatif">
             
-            <!-- User Info Display
-            <div class="user-info-card mb-4 p-3 border rounded bg-light">
-              <h6 class="border-bottom pb-2 mb-3">Vos informations</h6>
-              <div class="row">
-                <div class="col-md-6">
-                  <p><strong>Prénom:</strong> {{ formGroup.get('Prénom')?.value }}</p>
-                  <p><strong>Nom:</strong> {{ formGroup.get('Nom')?.value }}</p>
-                  <p><strong>ID National:</strong> {{ formGroup.get('id')?.value }}</p>
-                </div>
-                <div class="col-md-6">
-                  <p><strong>Établissement:</strong> {{ formGroup.get('Etablissement')?.value }}</p>
-                  <p><strong>Lib.Structure:</strong> {{ formGroup.get('Lib')?.value }}</p>
-                </div>
-              </div>
-            </div> -->
-
-            <!-- Vœux Selection -->
-            <h6 class="mb-3">Sélection de vos vœux</h6>
-            <div class="alert alert-info" role="alert">
-              <strong>Instructions :</strong>
-              <ul class="mb-0">
+            <!-- Vœux Selection Instructions -->
+            <h6 class="mb-3 fw-bold">Sélection de vos vœux</h6>
+            <div class="alert alert-info-soft border-0 rounded-3" role="alert">
+              <strong><i class="fa fa-info-circle me-2"></i>Instructions :</strong>
+              <ul class="mb-0 mt-2 ms-3">
                 <li>Vœux 1 et 2 : Conférences obligatoires (attribution garantie)</li>
                 <li>Vœux 3 et 4 : Au choix parmi conférences, tables rondes et flashs métiers</li>
                 <li>Vœu 5 : Conférence obligatoire</li>
                 <li>Tous les vœux doivent être différents</li>
-                <li>Après confirmation, il sera possible de consulter les voeux mais il ne sera plus possible de les modifier</li>
+                <li>Après confirmation, il sera possible de consulter les vœux mais il ne sera plus possible de les modifier</li>
               </ul>
             </div>
 
-            <!-- Vœu 1 -->
-            <div class="mb-3">
-              <label for="voeu1" class="form-label d-block"><strong>Vœu 1 :</strong> Conférence <span class="text-danger">*</span></label>
-              <select id="voeu1" formControlName="voeu1" class="form-select" (change)="onVoeuChange()">
-                <option value="">-- Sélectionnez une conférence --</option>
-                <optgroup label="Conférences">
-                  <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu1')">{{ conf }}</option>
-                </optgroup>
-              </select>
-              <div class="mt-1" *ngIf="formGroup.get('voeu1')?.value">
-                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu1')?.value)" title="Voir le descriptif du vœu 1">
-                  <i class="fa fa-eye"></i> Voir le descriptif
-                </a>
+            <!-- CONTAINER 1: Vœux 1 & 2 (Obligatoires) -->
+            <div class="form-section mb-4">
+              <h6 class="section-title text-primary mb-4 fw-bold">
+                Vœux obligatoires (Conférences)
+              </h6>
+
+              <!-- Vœu 1 -->
+              <div class="activity-row mb-4">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-10">
+                    <label for="voeu1" class="form-label mb-2">
+                      <strong>Vœu 1 :</strong> Conférence <span class="text-danger">*</span>
+                    </label>
+                    <select id="voeu1" formControlName="voeu1" class="form-select form-select-custom" 
+                            aria-label="Sélectionnez votre premier vœu"
+                            (change)="onVoeuChange()">
+                      <option value="">-- Sélectionnez une conférence --</option>
+                      <optgroup label="Conférences">
+                        <option *ngFor="let conf of conferences" [value]="conf" 
+                                [disabled]="isVoeuSelected(conf, 'voeu1')">
+                          {{ conf }}
+                        </option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm activity-icon-btn" 
+                            *ngIf="formGroup.get('voeu1')?.value"
+                            (click)="openActivityModal(formGroup.get('voeu1')?.value)"
+                            title="Voir la description">
+                      <i class="fa fa-info-circle"></i> Détails
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="formGroup.get('voeu1')?.invalid && formGroup.get('voeu1')?.touched" 
+                     class="text-danger mt-2">
+                  <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 1 est obligatoire.</small>
+                </div>
               </div>
-              <div *ngIf="formGroup.get('voeu1')?.invalid && formGroup.get('voeu1')?.touched" class="text-danger"><small>Le vœu 1 est obligatoire.</small></div>
+
+              <!-- Vœu 2 -->
+              <div class="activity-row">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-10">
+                    <label for="voeu2" class="form-label mb-2">
+                      <strong>Vœu 2 :</strong> Conférence <span class="text-danger">*</span>
+                    </label>
+                    <select id="voeu2" formControlName="voeu2" class="form-select form-select-custom" 
+                            aria-label="Sélectionnez votre deuxième vœu"
+                            (change)="onVoeuChange()">
+                      <option value="">-- Sélectionnez une conférence --</option>
+                      <optgroup label="Conférences">
+                        <option *ngFor="let conf of conferences" [value]="conf" 
+                                [disabled]="isVoeuSelected(conf, 'voeu2')">
+                          {{ conf }}
+                        </option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm activity-icon-btn" 
+                            *ngIf="formGroup.get('voeu2')?.value"
+                            (click)="openActivityModal(formGroup.get('voeu2')?.value)"
+                            title="Voir la description">
+                      <i class="fa fa-info-circle"></i> Détails
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="formGroup.get('voeu2')?.invalid && formGroup.get('voeu2')?.touched" 
+                     class="text-danger mt-2">
+                  <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 2 est obligatoire.</small>
+                </div>
+              </div>
             </div>
 
-            <!-- Vœu 2 -->
-            <div class="mb-3">
-              <label for="voeu2" class="form-label d-block"><strong>Vœu 2 :</strong> Conférence <span class="text-danger">*</span></label>
-              <select id="voeu2" formControlName="voeu2" class="form-select" (change)="onVoeuChange()">
-                <option value="">-- Sélectionnez une conférence --</option>
-                <optgroup label="Conférences">
-                  <option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu2')">{{ conf }}</option>
-                </optgroup>
-              </select>
-              <div class="mt-1" *ngIf="formGroup.get('voeu2')?.value">
-                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu2')?.value)" title="Voir le descriptif du vœu 2">
-                  <i class="fa fa-eye"></i> Voir le descriptif
-                </a>
-              </div>
-              <div *ngIf="formGroup.get('voeu2')?.invalid && formGroup.get('voeu2')?.touched" class="text-danger"><small>Le vœu 2 est obligatoire.</small></div>
-            </div>
+            <hr class="my-4 border-light">
 
-            <hr class="my-4">
+            <!-- CONTAINER 2: Vœux 3, 4 & 5 (Au choix) -->
+            <div class="form-section mb-4">
+              <h6 class="section-title text-primary mb-4 fw-bold">
+               Vœux au choix
+              </h6>
 
-            <!-- Vœu 3 -->
-            <div class="mb-3">
-              <label for="voeu3" class="form-label d-block"><strong>Vœu 3 :</strong> Au choix <span class="text-danger">*</span></label>
-              <select id="voeu3" formControlName="voeu3" class="form-select" (change)="onVoeuChange()">
-                <option value="">-- Sélectionnez un vœu --</option>
-                <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu3')">{{ conf }}</option></optgroup>
-                <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu3')">{{ table }}</option></optgroup>
-                <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu3')">{{ flash }}</option></optgroup>
-              </select>
-              <div class="mt-1" *ngIf="formGroup.get('voeu3')?.value">
-                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu3')?.value)" title="Voir le descriptif du vœu 3">
-                  <i class="fa fa-eye"></i> Voir le descriptif
-                </a>
+              <!-- Vœu 3 -->
+              <div class="activity-row mb-4">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-10">
+                    <label for="voeu3" class="form-label mb-2">
+                      <strong>Vœu 3 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+                    </label>
+                    <select id="voeu3" formControlName="voeu3" class="form-select form-select-custom" 
+                            aria-label="Sélectionnez votre troisième vœu"
+                            (change)="onVoeuChange()">
+                      <option value="">-- Sélectionnez un vœu --</option>
+                      <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu3')">{{ conf }}</option></optgroup>
+                      <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu3')">{{ table }}</option></optgroup>
+                      <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu3')">{{ flash }}</option></optgroup>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm activity-icon-btn" 
+                            *ngIf="formGroup.get('voeu3')?.value"
+                            (click)="openActivityModal(formGroup.get('voeu3')?.value)"
+                            title="Voir la description">
+                      <i class="fa fa-info-circle"></i> Détails
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="formGroup.get('voeu3')?.invalid && formGroup.get('voeu3')?.touched" 
+                     class="text-danger mt-2">
+                  <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 3 est obligatoire.</small>
+                </div>
               </div>
-              <div *ngIf="formGroup.get('voeu3')?.invalid && formGroup.get('voeu3')?.touched" class="text-danger"><small>Le vœu 3 est obligatoire.</small></div>
-            </div>
 
-            <!-- Vœu 4 -->
-            <div class="mb-3">
-              <label for="voeu4" class="form-label d-block"><strong>Vœu 4 :</strong> Au choix <span class="text-danger">*</span></label>
-              <select id="voeu4" formControlName="voeu4" class="form-select" (change)="onVoeuChange()">
-                <option value="">-- Sélectionnez un vœu --</option>
-                <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu4')">{{ conf }}</option></optgroup>
-                <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu4')">{{ table }}</option></optgroup>
-                <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu4')">{{ flash }}</option></optgroup>
-              </select>
-              <div class="mt-1" *ngIf="formGroup.get('voeu4')?.value">
-                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu4')?.value)" title="Voir le descriptif du vœu 4">
-                  <i class="fa fa-eye"></i> Voir le descriptif
-                </a>
+              <!-- Vœu 4 -->
+              <div class="activity-row mb-4">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-10">
+                    <label for="voeu4" class="form-label mb-2">
+                      <strong>Vœu 4 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+                    </label>
+                    <select id="voeu4" formControlName="voeu4" class="form-select form-select-custom" 
+                            aria-label="Sélectionnez votre quatrième vœu"
+                            (change)="onVoeuChange()">
+                      <option value="">-- Sélectionnez un vœu --</option>
+                      <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu4')">{{ conf }}</option></optgroup>
+                      <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu4')">{{ table }}</option></optgroup>
+                      <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu4')">{{ flash }}</option></optgroup>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm activity-icon-btn" 
+                            *ngIf="formGroup.get('voeu4')?.value"
+                            (click)="openActivityModal(formGroup.get('voeu4')?.value)"
+                            title="Voir la description">
+                      <i class="fa fa-info-circle"></i> Détails
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="formGroup.get('voeu4')?.invalid && formGroup.get('voeu4')?.touched" 
+                     class="text-danger mt-2">
+                  <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 4 est obligatoire.</small>
+                </div>
               </div>
-              <div *ngIf="formGroup.get('voeu4')?.invalid && formGroup.get('voeu4')?.touched" class="text-danger"><small>Le vœu 4 est obligatoire.</small></div>
-            </div>
 
-            <!-- Vœu 5 -->
-            <div class="mb-3">
-              <label for="voeu5" class="form-label d-block"><strong>Vœu 5 :</strong> Au choix <span class="text-danger">*</span></label>
-              <select id="voeu5" formControlName="voeu5" class="form-select" (change)="onVoeuChange()">
-                <option value="">-- Sélectionnez un vœu --</option>
-                <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option></optgroup>
-                <!-- <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu5')">{{ table }}</option></optgroup>
-                <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu5')">{{ flash }}</option></optgroup> -->
-              </select>
-              <div class="mt-1" *ngIf="formGroup.get('voeu5')?.value">
-                <a href="javascript:void(0)" (click)="openDescription(formGroup.get('voeu5')?.value)" title="Voir le descriptif du vœu 5">
-                  <i class="fa fa-eye"></i> Voir le descriptif
-                </a>
+              <!-- Vœu 5 -->
+              <div class="activity-row">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-10">
+                    <label for="voeu5" class="form-label mb-2">
+                      <strong>Vœu 5 :</strong> Conférence <span class="text-danger">*</span>
+                    </label>
+                    <select id="voeu5" formControlName="voeu5" class="form-select form-select-custom" 
+                            aria-label="Sélectionnez un vœu"
+                            (change)="onVoeuChange()">
+                      <option value="">-- Sélectionnez un vœu --</option>
+                      <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option></optgroup>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm activity-icon-btn" 
+                            *ngIf="formGroup.get('voeu5')?.value"
+                            (click)="openActivityModal(formGroup.get('voeu5')?.value)"
+                            title="Voir la description">
+                      <i class="fa fa-info-circle"></i> Détails
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="formGroup.get('voeu5')?.invalid && formGroup.get('voeu5')?.touched" 
+                     class="text-danger mt-2">
+                  <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 5 est obligatoire.</small>
+                </div>
               </div>
-              <div *ngIf="formGroup.get('voeu5')?.invalid && formGroup.get('voeu5')?.touched" class="text-danger"><small>Le vœu 5 est obligatoire.</small></div>
             </div>
 
             <!-- Validation Message -->
-            <div *ngIf="validationMessage" class="alert alert-danger mt-3" role="alert">{{ validationMessage }}</div>
+            <div *ngIf="validationMessage" class="alert alert-danger mt-4 border-0 rounded-3" role="alert">
+              <i class="fa fa-exclamation-triangle me-2"></i>{{ validationMessage }}
+            </div>
             
             <!-- Success Message -->
-            <div *ngIf="messageSucces" class="alert alert-success mt-3" role="alert">{{ messageSucces }}</div>
+            <div *ngIf="messageSucces" class="alert alert-success mt-4 border-0 rounded-3" role="alert">
+              <i class="fa fa-check-circle me-2"></i>{{ messageSucces }}
+            </div>
             
             <!-- Error Message -->
-            <div *ngIf="messageErreur" class="alert alert-danger mt-3" role="alert">{{ messageErreur }}</div>
+            <div *ngIf="messageErreur" class="alert alert-danger mt-4 border-0 rounded-3" role="alert">
+              <i class="fa fa-times-circle me-2"></i>{{ messageErreur }}
+            </div>
             
             <!-- Confirmation Message -->
-            <div *ngIf="isConfirmed && !showRecapitulatif" class="alert alert-success mt-3" role="alert">
-              Vos choix ont été confirmés et ne peuvent plus être modifiés.
+            <div *ngIf="isConfirmed && !showRecapitulatif" class="alert alert-success mt-4 border-0 rounded-3" role="alert">
+              <i class="fa fa-check-circle me-2"></i>Vos choix ont été confirmés et ne peuvent plus être modifiés.
             </div>
 
             <!-- Action Buttons -->
-            <div class="d-flex justify-content-end mt-4" *ngIf="!isConfirmed">
-              <button type="button" class="btn btn-success" (click)="onSave()" [disabled]="formGroup.invalid">
-                <i class="fa fa-check"></i> Confirmer le choix
+            <div class="d-flex justify-content-end gap-2 mt-5" *ngIf="!isConfirmed">
+              <button type="button" class="btn btn-success btn-lg" (click)="onSave()" [disabled]="formGroup.invalid">
+                <i class="fa fa-check me-2"></i> Confirmer le choix
               </button>
-              <!-- <button type="button" class="btn btn-success" (click)="onConfirm()" [disabled]="formGroup.invalid">
-                <i class="fa fa-check"></i> Confirmer le choix
-              </button> -->
             </div>
           </form>
         </div>
@@ -184,21 +259,441 @@
   </div>
 </div>
 
-<!-- Pop-up descriptif de vœu -->
-<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showDescriptionModal"
+<!-- Modal: Activity Description -->
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showActivityModal"
      style="display:block; background: rgba(0,0,0,0.5);">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ selectedEventTitle }}</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="closeDescription()"></button>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content border-0 rounded-3">
+      <div class="modal-header border-0 bg-light">
+        <h5 class="modal-title fw-bold">
+          <i class="fa fa-info-circle text-primary me-2"></i>
+          <span *ngIf="selectedActivityName">{{ selectedActivityName }}</span>
+          <span *ngIf="!selectedActivityName">Détails de l'activité</span>
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeActivityModal()"></button>
       </div>
       <div class="modal-body">
-        <p [innerHTML]="selectedEventDescription"></p>
+        <div *ngIf="selectedActivityDescription">
+          <p [innerHTML]="selectedActivityDescription" class="line-height-relaxed"></p>
+        </div>
+        <div *ngIf="!selectedActivityDescription" class="text-muted">
+          <p>Aucune description disponible.</p>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDescription()">Fermer</button>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-primary" (click)="closeActivityModal()">
+          <i class="fa fa-check me-2"></i>Fermer
+        </button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal: Confirmation Summary -->
+<div class="modal-backdrop" *ngIf="showConfirmationModal" (click)="closeConfirmationModal()"></div>
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showConfirmationModal"
+     style="display:block;">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content border-0 rounded-3 shadow-lg">
+      <div class="modal-header border-0 bg-warning bg-opacity-25">
+        <h5 class="modal-title fw-bold">
+          <i class="fa fa-exclamation-triangle text-warning me-2"></i>Confirmation de vos vœux
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeConfirmationModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning-soft mt-4 border-0 rounded-3">
+          <i class="fa fa-info-circle me-2"></i>
+          <strong>Attention :</strong> Veuillez vérifier attentivement vos choix. 
+          Une fois confirmés, ils ne pourront plus être modifiés.
+        </div>
+        
+        <h6 class="mb-3 fw-bold"><i class="fa fa-list me-2"></i>Récapitulatif de vos vœux :</h6>
+        <div class="confirmation-summary">
+          <div class="summary-item mb-3">
+            <span class="summary-number">1</span>
+            <div class="summary-content">
+              <span class="summary-label">Vœu 1 (Conférence obligatoire)</span>
+              <span class="summary-value">{{ formGroup.get('voeu1')?.value }}</span>
+            </div>
+          </div>
+          <div class="summary-item mb-3">
+            <span class="summary-number">2</span>
+            <div class="summary-content">
+              <span class="summary-label">Vœu 2 (Conférence obligatoire)</span>
+              <span class="summary-value">{{ formGroup.get('voeu2')?.value }}</span>
+            </div>
+          </div>
+          <div class="summary-item mb-3">
+            <span class="summary-number">3</span>
+            <div class="summary-content">
+              <span class="summary-label">Vœu 3 (Au choix)</span>
+              <span class="summary-value">{{ formGroup.get('voeu3')?.value }}</span>
+            </div>
+          </div>
+          <div class="summary-item mb-3">
+            <span class="summary-number">4</span>
+            <div class="summary-content">
+              <span class="summary-label">Vœu 4 (Au choix)</span>
+              <span class="summary-value">{{ formGroup.get('voeu4')?.value }}</span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <span class="summary-number">5</span>
+            <div class="summary-content">
+              <span class="summary-label">Vœu 5 (Conférence obligatoire)</span>
+              <span class="summary-value">{{ formGroup.get('voeu5')?.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary " (click)="closeConfirmationModal()">
+          <i class="fa fa-arrow-left me-2"></i>Retour pour modifier
+        </button>
+        <button type="button" class="btn btn-success" (click)="confirmSubmit()">
+          <i class="fa fa-check me-2"></i>Confirmer définitivement
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Reset box-sizing */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* Container principal */
+  .container-fluid {
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .card {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .card-body {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Custom form styling */
+  .form-select-custom {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .form-select-custom:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+  }
+
+  .form-select-custom:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .form-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #e7f1ff;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .activity-row {
+    padding: 1.25rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .activity-row:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .activity-row .row {
+    width: 100%;
+    margin: 0;
+  }
+
+  .activity-row .col-lg-10,
+  .activity-row .col-lg-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .activity-icon-btn {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .activity-icon-btn:hover {
+    background-color: #0d6efd;
+    color: white;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+
+  /* Modal styling */
+  .modal-dialog {
+    width: auto;
+    margin: 1.75rem auto;
+  }
+
+  .modal-content {
+    width : auto;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    word-wrap: break-word;
+  }
+
+  /* Modal backdrop */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+  }
+
+  .modal {
+    z-index: 1050;
+  }
+
+  .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+  }
+
+  /* Confirmation summary styling */
+  .confirmation-summary {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e9ecef;
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 0.375rem;
+    border: 1px solid #e9ecef;
+  }
+
+  .summary-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .summary-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+  }
+
+  .summary-value {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+
+  .line-height-relaxed {
+    line-height: 1.75;
+    word-wrap: break-word;
+  }
+
+  /* Récapitulatif table */
+  .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .recap-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .alert-warning-soft {
+  background-color: #fff9e6;  
+  color: #664d03;             
+  border-left: 4px solid #ffc107;
+}
+
+.alert-info-soft {
+  background-color: #e7f1ff;    
+  color: #084298;             
+  border-left: 4px solid #0d6efd;
+}
+
+  /* Responsive breakpoints */
+  @media (max-width: 992px) {
+    .activity-row .col-lg-10 {
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .activity-row .col-lg-2 {
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+      text-align: left !important;
+      margin-top: 0.75rem;
+    }
+
+    .modal-dialog {
+      max-width: 95%;
+      margin: 1rem auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container-fluid {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .card-body {
+      padding: 1.5rem !important;
+    }
+
+    .form-section {
+      padding: 1rem;
+    }
+
+    .activity-row {
+      padding: 1rem;
+    }
+
+    .form-select-custom {
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .activity-icon-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+    }
+
+    .modal-dialog {
+      max-width: 98%;
+      margin: 0.5rem auto;
+    }
+
+    .modal-body {
+      max-height: 70vh;
+      padding: 1rem;
+    }
+
+    .summary-item {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 1rem !important;
+    }
+
+    .form-section {
+      padding: 0.75rem;
+      border-left-width: 3px;
+    }
+
+    .activity-row {
+      padding: 0.75rem;
+    }
+
+    .alert ul {
+      padding-left: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-lg {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .card-header h5 {
+      font-size: 1rem;
+    }
+  }
+</style>

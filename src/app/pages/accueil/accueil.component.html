@@ -6,9 +6,10 @@
             <div class="card-body p-5">
                
                 <!-- Titre -->
-                <h1 class="text-center fw-bold mb-4" style="color:#0a264e;">
-                    Bienvenue sur la plateforme des vœux !
+                <h1 class="page-title text-center fw-bold mb-4">
+                Bienvenue au Forum de l'Enseignement Supérieur !
                 </h1>
+
                 <img src="assets/img/home_pic.png" alt="home" class="d-block mx-auto mb-4" style=" width: 100%; height: auto;">
                 <!-- Sous-titre -->
                 <p class="text-center text-muted mb-5">
@@ -42,7 +43,7 @@
                 </ul>
 
                 <!-- Règles importantes -->
-                <div class="alert alert-warning rounded-3 text-dark">
+                <div class="alert alert-warning-soft rounded-3 text-dark">
                     <h5 class="fw-bold mb-2">Les règles du choix</h5>
                     <ul class="mb-0 ">
                         <li><strong>Aucune activité ne peut être choisie deux fois.</strong></li>
@@ -52,7 +53,7 @@
 
                 <!-- Bouton principal -->
                 <div class="text-center mt-5">
-                    <a routerLink="/form" class="btn btn-outline-primary btn-lg px-4 py-2">
+                    <a routerLink="/form" class="btn btn-outline-primary  px-4 py-2">
                         Accéder au formulaire
                     </a>
                 </div>
@@ -61,3 +62,35 @@
         </div>
 
     </div>
+
+
+
+<style>
+    .alert-warning-soft {
+    background-color: #fff9e6;  
+    color: #664d03;             
+    border-left: 4px solid #ffc107;
+    }
+
+    .page-title {
+  color: #0a264e;
+  font-size: 2.2rem;   /* Desktop */
+  line-height: 1.2;
+}
+
+    /* Tablette */
+    @media (max-width: 992px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+    .page-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.25rem;
+    }
+    }
+
+</style>
