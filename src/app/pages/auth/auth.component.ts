@@ -5,7 +5,8 @@ import { AuthService } from '../auth.service';
 @Component({
   selector: 'dashboard-cmp',
   moduleId: module.id,
-  templateUrl: 'auth.component.html'
+  templateUrl: 'auth.component.html',
+  styleUrls: ['auth.component.css']
 })
 export class AuthComponent implements OnInit {
   selectedProfile: string = '';
