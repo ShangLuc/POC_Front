@@ -26,7 +26,7 @@ export class UserComponent implements OnInit {
     // viewer data
     viewerUsername: string = '';
     viewerEtablissement: string = '';
-    
+
     // Admin management properties
     admins: any[] = [];
     newAdminUsername: string = '';
@@ -57,19 +57,28 @@ export class UserComponent implements OnInit {
     passwordErrorMessage: string = '';
     isChangingPassword: boolean = false;
 
+    // Viewer password change properties
+    currentViewerPassword: string = '';
+    newViewerPassword: string = '';
+    confirmNewViewerPassword: string = '';
+    showViewerPasswordForm: boolean = false;
+    viewerPasswordSuccessMessage: string = '';
+    viewerPasswordErrorMessage: string = '';
+    isChangingViewerPassword: boolean = false;
+
     constructor(
         private authService: AuthService,
         private adminManagementService: AdminManagementService,
         private eleveService: EleveService,
         private http: HttpClient
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.isAdmin = this.authService.isAdmin();
         this.isEleve = this.authService.isEleve();
         this.isViewer = this.authService.isViewer();
         this.isSuperAdmin = this.authService.getCurrentRole() === 'superadmin';
-        
+
         if (this.isAdmin) {
             this.adminUsername = this.authService.getAdminUsername() || '';
             this.adminData = this.authService.getAdminData();
@@ -87,8 +96,8 @@ export class UserComponent implements OnInit {
         }
 
         if (this.isViewer) {
-            this.viewerUsername = this.authService.viewerData?.username || '';
-            this.viewerEtablissement  = this.authService.viewerData?.etablissement || '';
+            this.viewerUsername = JSON.parse(localStorage.getItem('viewerData') || '')?.username || '';
+            this.viewerEtablissement = JSON.parse(localStorage.getItem('viewerData') || '')?.etablissement || '';
         }
 
 
@@ -199,7 +208,7 @@ export class UserComponent implements OnInit {
     // Delete admin with confirmation
     deleteAdmin(admin: any) {
         const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer l'administrateur "${admin.username}"?`);
-        
+
         if (!confirmDelete) {
             return;
         }
@@ -248,17 +257,17 @@ export class UserComponent implements OnInit {
 
     // Add new viewer
     addViewer() {
-        if ( !this.newViewerLycee || !this.newViewerUsername) {
+        if (!this.newViewerLycee || !this.newViewerUsername) {
             this.viewerErrorMessage = 'Veuillez remplir tous les champs.';
             return;
         }
 
         console.log('Adding viewer with lycee:', this.newViewerLycee, 'username:', this.newViewerUsername);
-        
+
         this.viewerErrorMessage = '';
         this.viewerSuccessMessage = '';
 
-        this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerLycee ).subscribe({
+        this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerLycee).subscribe({
             next: (response) => {
                 this.viewerSuccessMessage = 'Référent ajouté avec succès.';
                 this.newViewerLycee = '';
@@ -276,7 +285,7 @@ export class UserComponent implements OnInit {
     // Delete viewer with confirmation
     deleteViewer(viewer: any) {
         const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référent "${viewer.username}"?`);
-        
+
         if (!confirmDelete) {
             return;
         }
@@ -353,6 +362,57 @@ export class UserComponent implements OnInit {
         this.confirmNewPassword = '';
         this.passwordErrorMessage = '';
         this.passwordSuccessMessage = '';
+    }
+
+    // Change viewer password
+    changeViewerPassword() {
+        // Reset messages
+        this.viewerPasswordErrorMessage = '';
+        this.viewerPasswordSuccessMessage = '';
+
+        // Validation
+        if (!this.currentViewerPassword || !this.newViewerPassword || !this.confirmNewViewerPassword) {
+            this.viewerPasswordErrorMessage = 'Veuillez remplir tous les champs.';
+            return;
+        }
+
+        if (this.newViewerPassword !== this.confirmNewViewerPassword) {
+            this.viewerPasswordErrorMessage = 'Les nouveaux mots de passe ne correspondent pas.';
+            return;
+        }
+
+        if (this.newViewerPassword.length < 6) {
+            this.viewerPasswordErrorMessage = 'Le nouveau mot de passe doit contenir au moins 6 caractères.';
+            return;
+        }
+
+        this.isChangingViewerPassword = true;
+
+        this.adminManagementService.changeViewerPassword(this.currentViewerPassword, this.newViewerPassword).subscribe({
+            next: (response) => {
+                this.viewerPasswordSuccessMessage = 'Mot de passe modifié avec succès.';
+                this.currentViewerPassword = '';
+                this.newViewerPassword = '';
+                this.confirmNewViewerPassword = '';
+                this.showViewerPasswordForm = false;
+                this.isChangingViewerPassword = false;
+            },
+            error: (err) => {
+                console.error('Error changing password:', err);
+                this.viewerPasswordErrorMessage = err?.error?.message || err?.error || 'Erreur lors du changement de mot de passe.';
+                this.isChangingViewerPassword = false;
+            }
+        });
+    }
+
+    // Cancel viewer password change
+    cancelViewerPasswordChange() {
+        this.showViewerPasswordForm = false;
+        this.currentViewerPassword = '';
+        this.newViewerPassword = '';
+        this.confirmNewViewerPassword = '';
+        this.viewerPasswordErrorMessage = '';
+        this.viewerPasswordSuccessMessage = '';
     }
 }
 

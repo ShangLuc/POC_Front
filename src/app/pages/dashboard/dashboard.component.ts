@@ -18,7 +18,7 @@ interface ActivityStat {
     styleUrls: ['dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-    
+
     @ViewChild('inscriptionChart') inscriptionChartRef: ElementRef;
     @ViewChild('conferencesChart') conferencesChartRef: ElementRef;
     @ViewChild('tablesRondesChart') tablesRondesChartRef: ElementRef;
@@ -65,7 +65,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     constructor(
         private http: HttpClient,
         private authService: AuthService
-    ) {}
+    ) { }
 
     private getAuthHeaders(): HttpHeaders {
         const token = this.authService.getAuthToken();
@@ -83,7 +83,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.isViewer = this.authService.isViewer();
         this.isAdmin = this.authService.isAdmin();
-        
+
         if (this.isViewer) {
             // Load viewer's lycee first, then load data
             this.loadViewerInfo();
@@ -105,21 +105,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        this.http.get<any>(`http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}`, 
-            { headers: this.getAuthHeaders() })
-            .subscribe({
-                next: (viewer) => {
-                    this.viewerLycee = viewer.etablissement || '';
-                    this.selectedLycee = this.viewerLycee;
-                    this.loadClasses();
-                    this.loadStatistics();
-                },
-                error: (err) => {
-                    console.error('Error loading viewer info:', err);
-                    this.errorMessage = 'Erreur lors du chargement des informations.';
-                    this.isLoading = false;
-                }
-            });
+        this.viewerLycee = JSON.parse(localStorage.getItem('viewerData') || '')?.etablissement || '';
+        this.selectedLycee = this.viewerLycee;
+        this.loadClasses();
+        this.loadStatistics();
     }
 
     loadFilters() {
@@ -143,7 +132,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         if (this.selectedLycee) {
             classesUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
         }
-        
+
         this.http.get<string[]>(classesUrl, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (classes) => {
@@ -165,14 +154,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
         let url = 'http://localhost:8080/api/dashboard/statistics';
         const params: string[] = [];
-        
+
         if (this.selectedLycee) {
             params.push(`lycee=${encodeURIComponent(this.selectedLycee)}`);
         }
         if (this.selectedClasse) {
             params.push(`classe=${encodeURIComponent(this.selectedClasse)}`);
         }
-        
+
         if (params.length > 0) {
             url += '?' + params.join('&');
         }
@@ -183,8 +172,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     this.totalEleves = data.totalEleves || 0;
                     this.elevesInscrits = data.elevesInscrits || 0;
                     this.elevesNonInscrits = data.elevesNonInscrits || 0;
-                    this.tauxInscription = this.totalEleves > 0 
-                        ? Math.round((this.elevesInscrits / this.totalEleves) * 100) 
+                    this.tauxInscription = this.totalEleves > 0
+                        ? Math.round((this.elevesInscrits / this.totalEleves) * 100)
                         : 0;
 
                     // Detailed activity statistics - Map<String, Long> converted to array
@@ -193,7 +182,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     this.flashsMetiersStats = this.mapToActivityStats(data.flashsMetiersStats || {});
 
                     this.isLoading = false;
-                    
+
                     // Wait for Angular to render the DOM before initializing charts
                     setTimeout(() => {
                         this.initCharts();
@@ -247,7 +236,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.activeTab = tab;
         // Wait for Angular to render the DOM before initializing the chart
         setTimeout(() => {
-            switch(tab) {
+            switch (tab) {
                 case 'conferences':
                     this.initConferencesChart();
                     break;

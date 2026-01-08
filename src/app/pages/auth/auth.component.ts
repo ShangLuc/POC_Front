@@ -14,6 +14,7 @@ export class AuthComponent implements OnInit {
   adminUsername: string = '';
   adminPassword: string = '';
   viewerUsername: string = '';
+  viewerPassword: string = '';
 
   // Paramètres réglables pour le bouton retour
   backButtonColor: string = '#999999';
@@ -25,9 +26,9 @@ export class AuthComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   selectProfile(profile: string) {
     this.selectedProfile = profile;
@@ -57,12 +58,12 @@ export class AuthComponent implements OnInit {
           console.error(err);
           // même logique que pour admin / viewer
           if (err?.error && typeof err.error === 'string') {
-              this.errorMessage = err.error;
+            this.errorMessage = err.error;
           } else if (err?.error?.message) {
             this.errorMessage = err.error.message; // ex: "Élève non trouvé avec l'ID: XXX"
           } else {
             this.errorMessage = 'Identifiant invalide ou élève introuvable.';
-      }
+          }
         }
       });
 
@@ -89,28 +90,28 @@ export class AuthComponent implements OnInit {
         }
       });
 
-    } else if (this.selectedProfile === 'viewer' ){
-      if(!this.viewerUsername){
-        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur.';
+    } else if (this.selectedProfile === 'viewer') {
+      if (!this.viewerUsername || !this.viewerPassword) {
+        this.errorMessage = 'Merci de saisir votre nom d\'utilisateur et votre mot de passe.';
         return;
       }
-      this.authService.loginViewer(this.viewerUsername).subscribe({
+      this.authService.loginViewer(this.viewerUsername, this.viewerPassword).subscribe({
         next: () => {
           this.router.navigate(['/dashboard']); // adapte cette route à ton écran viewer
         },
         error: (err) => {
           console.error(err);
           if (err?.error && typeof err.error === 'string') {
-          this.errorMessage = err.error;
-        } else if (err?.error?.message) {
-          this.errorMessage = err.error.message;
-        } else {
-          this.errorMessage = 'Identifiant viewer invalide.';
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Identifiant viewer invalide.';
+          }
         }
-    }
       });
 
-    }else {
+    } else {
       this.errorMessage = 'Merci de choisir un profil (élève ou admin ou viewer).';
     }
   }

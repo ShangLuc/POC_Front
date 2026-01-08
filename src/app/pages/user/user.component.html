@@ -99,10 +99,7 @@
         </div>
 
         <!-- Password Change Button -->
-        <button 
-          type="button" 
-          class="btn btn-primary btn-sm" 
-          *ngIf="!showPasswordForm"
+        <button type="button" class="btn btn-primary btn-sm" *ngIf="!showPasswordForm"
           (click)="showPasswordForm = true">
           <i class="nc-icon nc-key-25"></i> Modifier le mot de passe
         </button>
@@ -113,12 +110,8 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label>Mot de passe actuel</label>
-                <input 
-                  type="password" 
-                  class="form-control" 
-                  placeholder="Entrez votre mot de passe actuel"
-                  [(ngModel)]="currentPassword"
-                  name="currentPassword">
+                <input type="password" class="form-control" placeholder="Entrez votre mot de passe actuel"
+                  [(ngModel)]="currentPassword" name="currentPassword">
               </div>
             </div>
           </div>
@@ -126,40 +119,26 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label>Nouveau mot de passe</label>
-                <input 
-                  type="password" 
-                  class="form-control" 
-                  placeholder="Entrez le nouveau mot de passe"
-                  [(ngModel)]="newPassword"
-                  name="newPassword">
+                <input type="password" class="form-control" placeholder="Entrez le nouveau mot de passe"
+                  [(ngModel)]="newPassword" name="newPassword">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label>Confirmer le nouveau mot de passe</label>
-                <input 
-                  type="password" 
-                  class="form-control" 
-                  placeholder="Confirmez le nouveau mot de passe"
-                  [(ngModel)]="confirmNewPassword"
-                  name="confirmNewPassword">
+                <input type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe"
+                  [(ngModel)]="confirmNewPassword" name="confirmNewPassword">
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-12">
-              <button 
-                type="button" 
-                class="btn btn-success btn-sm"
-                [disabled]="isChangingPassword"
+              <button type="button" class="btn btn-success btn-sm" [disabled]="isChangingPassword"
                 (click)="changePassword()">
-                <i class="nc-icon nc-check-2"></i> 
+                <i class="nc-icon nc-check-2"></i>
                 {{ isChangingPassword ? 'Modification en cours...' : 'Confirmer' }}
               </button>
-              <button 
-                type="button" 
-                class="btn btn-secondary btn-sm ms-2"
-                [disabled]="isChangingPassword"
+              <button type="button" class="btn btn-secondary btn-sm ms-2" [disabled]="isChangingPassword"
                 (click)="cancelPasswordChange()">
                 <i class="nc-icon nc-simple-remove"></i> Annuler
               </button>
@@ -238,10 +217,7 @@
                   <tr *ngFor="let admin of admins">
                     <td>{{ admin.username }}</td>
                     <td>
-                      <button 
-                        type="button" 
-                        class="btn btn-danger btn-sm"
-                        (click)="deleteAdmin(admin)">
+                      <button type="button" class="btn btn-danger btn-sm" (click)="deleteAdmin(admin)">
                         <i class="nc-icon nc-simple-remove"></i> Supprimer
                       </button>
                     </td>
@@ -252,19 +228,15 @@
           </div>
         </div>
 
-    <!-- Add Admin Button -->
+        <!-- Add Admin Button -->
         <div class="row mb-3">
           <div class="col-md-12">
-            <button 
-              type="button" 
-              class="btn btn-primary" 
-              *ngIf="!showAddAdminForm"
-              (click)="showAddAdminForm = true">
+            <button type="button" class="btn btn-primary" *ngIf="!showAddAdminForm" (click)="showAddAdminForm = true">
               <i class="nc-icon nc-simple-add"></i> Ajouter un administrateur
             </button>
           </div>
         </div>
-        
+
         <!-- Add Admin Form -->
         <div class="row mb-3" *ngIf="showAddAdminForm">
           <div class="col-md-12">
@@ -275,38 +247,24 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Nom d'utilisateur</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        placeholder="Entrez le nom d'utilisateur"
-                        [(ngModel)]="newAdminUsername"
-                        name="newAdminUsername">
+                      <input type="text" class="form-control" placeholder="Entrez le nom d'utilisateur"
+                        [(ngModel)]="newAdminUsername" name="newAdminUsername">
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Mot de passe</label>
-                      <input 
-                        type="password" 
-                        class="form-control" 
-                        placeholder="Entrez le mot de passe"
-                        [(ngModel)]="newAdminPassword"
-                        name="newAdminPassword">
+                      <input type="password" class="form-control" placeholder="Entrez le mot de passe"
+                        [(ngModel)]="newAdminPassword" name="newAdminPassword">
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <button 
-                      type="button" 
-                      class="btn btn-success btn-sm"
-                      (click)="addAdmin()">
+                    <button type="button" class="btn btn-success btn-sm" (click)="addAdmin()">
                       <i class="nc-icon nc-check-2"></i> Ajouter
                     </button>
-                    <button 
-                      type="button" 
-                      class="btn btn-secondary btn-sm ms-2"
-                      (click)="cancelAddAdmin()">
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" (click)="cancelAddAdmin()">
                       <i class="nc-icon nc-simple-remove"></i> Annuler
                     </button>
                   </div>
@@ -361,10 +319,7 @@
                     <td>{{ viewer.etablissement }}</td>
                     <td>{{ viewer.username }}</td>
                     <td>
-                      <button 
-                        type="button" 
-                        class="btn btn-danger btn-sm"
-                        (click)="deleteViewer(viewer)">
+                      <button type="button" class="btn btn-danger btn-sm" (click)="deleteViewer(viewer)">
                         <i class="nc-icon nc-simple-remove"></i> Supprimer
                       </button>
                     </td>
@@ -378,16 +333,18 @@
         <!-- Add Viewer Button -->
         <div class="row mb-3">
           <div class="col-md-12">
-            <button 
-              type="button" 
-              class="btn btn-primary" 
-              *ngIf="!showAddViewerForm"
-              (click)="showAddViewerForm = true">
+            <button type="button" class="btn btn-primary" *ngIf="!showAddViewerForm" (click)="showAddViewerForm = true">
               <i class="nc-icon nc-simple-add"></i> Ajouter un référent
+            </button>
+
+            <!-- Password Change Button -->
+            <button type="button" class="btn btn-primary" *ngIf="!showViewerPasswordForm"
+              (click)="showViewerPasswordForm = true">
+              <i class="nc-icon nc-key-25"></i> Modifier le mot de passe
             </button>
           </div>
         </div>
-        
+
         <!-- Add Viewer Form -->
         <div class="row mb-3" *ngIf="showAddViewerForm">
           <div class="col-md-12">
@@ -398,10 +355,7 @@
                   <div class="col-md-4">
                     <div class="form-group" *ngIf="!isViewer">
                       <label>Entrez l'établissement</label>
-                      <select
-                        class="form-control"
-                        [(ngModel)]="newViewerLycee"
-                        name="newViewerLycee">
+                      <select class="form-control" [(ngModel)]="newViewerLycee" name="newViewerLycee">
                         <option value="">Sélectionnez un lycée</option>
                         <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
                       </select>
@@ -410,27 +364,17 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Username</label>
-                      <input 
-                        type="username" 
-                        class="form-control" 
-                        placeholder="Entrez le username"
-                        [(ngModel)]="newViewerUsername"
-                        name="newViewerUsername">
+                      <input type="username" class="form-control" placeholder="Entrez le username"
+                        [(ngModel)]="newViewerUsername" name="newViewerUsername">
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <button 
-                      type="button" 
-                      class="btn btn-success btn-sm"
-                      (click)="addViewer()">
+                    <button type="button" class="btn btn-success btn-sm" (click)="addViewer()">
                       <i class="nc-icon nc-check-2"></i> Ajouter
                     </button>
-                    <button 
-                      type="button" 
-                      class="btn btn-secondary btn-sm ms-2"
-                      (click)="cancelAddViewer()">
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" (click)="cancelAddViewer()">
                       <i class="nc-icon nc-simple-remove"></i> Annuler
                     </button>
                   </div>
@@ -440,8 +384,58 @@
           </div>
         </div>
 
+        <!-- Success/Error Messages for Password Change -->
+        <div *ngIf="viewerPasswordSuccessMessage" class="alert alert-success alert-with-icon" role="alert">
+          <span data-notify="icon" class="nc-icon nc-check-2"></span>
+          <span data-notify="message">{{ viewerPasswordSuccessMessage }}</span>
+        </div>
+        <div *ngIf="viewerPasswordErrorMessage" class="alert alert-danger alert-with-icon" role="alert">
+          <span data-notify="icon" class="nc-icon nc-alert-circle-i"></span>
+          <span data-notify="message">{{ viewerPasswordErrorMessage }}</span>
+        </div>
+
+        <!-- Password Change Form -->
+        <div *ngIf="showViewerPasswordForm" class="mt-3">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Mot de passe actuel</label>
+                <input type="password" class="form-control" placeholder="Entrez votre mot de passe actuel"
+                  [(ngModel)]="currentViewerPassword" name="currentPassword">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Nouveau mot de passe</label>
+                <input type="password" class="form-control" placeholder="Entrez le nouveau mot de passe"
+                  [(ngModel)]="newViewerPassword" name="newPassword">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Confirmer le nouveau mot de passe</label>
+                <input type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe"
+                  [(ngModel)]="confirmNewViewerPassword" name="confirmNewPassword">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <button type="button" class="btn btn-success btn-sm" [disabled]="isChangingViewerPassword"
+                (click)="changeViewerPassword()">
+                <i class="nc-icon nc-check-2"></i>
+                {{ isChangingViewerPassword ? 'Modification en cours...' : 'Confirmer' }}
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm ms-2" [disabled]="isChangingViewerPassword"
+                (click)="cancelViewerPasswordChange()">
+                <i class="nc-icon nc-simple-remove"></i> Annuler
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-

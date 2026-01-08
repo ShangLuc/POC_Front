@@ -127,21 +127,10 @@ export class StudentListComponent implements OnInit {
             return;
         }
 
-        this.http.get<any>(`http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}`,
-            { headers: this.getAuthHeaders() })
-            .subscribe({
-                next: (viewer) => {
-                    this.viewerLycee = viewer.etablissement || '';
-                    this.filterEtablissement = this.viewerLycee;
-                    // Restrict establishments list immediately to prevent leakage
-                    this.etablissements = [this.viewerLycee];
-                    this.applyFilters();
-                },
-                error: (err) => {
-                    console.error('Error loading viewer info:', err);
-                    this.errorMessage = 'Erreur lors du chargement des informations.';
-                }
-            });
+        this.viewerLycee = JSON.parse(localStorage.getItem('viewerData') || '')?.etablissement || '';
+        this.filterEtablissement = this.viewerLycee;
+        this.etablissements = [this.viewerLycee];
+        this.applyFilters();
     }
 
     // Ouvrir la modal
