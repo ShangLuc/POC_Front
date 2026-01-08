@@ -43,9 +43,8 @@
             <div class="alert alert-info-soft border-0 rounded-3" role="alert">
               <strong><i class="fa fa-info-circle me-2"></i>Instructions :</strong>
               <ul class="mb-0 mt-2 ms-3">
-                <li>Vœux 1 et 2 : Conférences obligatoires (attribution garantie)</li>
-                <li>Vœux 3 et 4 : Au choix parmi conférences, tables rondes et flashs métiers</li>
-                <li>Vœu 5 : Conférence obligatoire</li>
+                <li>Vœux 1, 2 et 3 : Conférences obligatoires (attribution garantie)</li>
+                <li>Vœux 4 et 5 : Au choix parmi conférences, tables rondes et flashs métiers</li>
                 <li>Tous les vœux doivent être différents</li>
                 <li>Après confirmation, il sera possible de consulter les vœux mais il ne sera plus possible de les modifier</li>
               </ul>
@@ -128,7 +127,7 @@
 
             <hr class="my-4 border-light">
 
-            <!-- CONTAINER 2: Vœux 3, 4 & 5 (Au choix) -->
+            <!-- CONTAINER 2: Vœux 3, 4 & 5 (Au choix / mixte) -->
             <div class="form-section mb-4">
               <h6 class="section-title text-primary mb-4 fw-bold">
                Vœux au choix
@@ -139,15 +138,13 @@
                 <div class="row g-3 align-items-end">
                   <div class="col-lg-10">
                     <label for="voeu3" class="form-label mb-2">
-                      <strong>Vœu 3 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
+                      <strong>Vœu 3 :</strong> Conférence <span class="text-danger">*</span>
                     </label>
                     <select id="voeu3" formControlName="voeu3" class="form-select form-select-custom" 
                             aria-label="Sélectionnez votre troisième vœu"
                             (change)="onVoeuChange()">
-                      <option value="">-- Sélectionnez un vœu --</option>
+                      <option value="">-- Sélectionnez une conférence --</option>
                       <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu3')">{{ conf }}</option></optgroup>
-                      <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu3')">{{ table }}</option></optgroup>
-                      <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu3')">{{ flash }}</option></optgroup>
                     </select>
                   </div>
                   <div class="col-lg-2 text-end">
@@ -201,13 +198,15 @@
                 <div class="row g-3 align-items-end">
                   <div class="col-lg-10">
                     <label for="voeu5" class="form-label mb-2">
-                      <strong>Vœu 5 :</strong> Conférence <span class="text-danger">*</span>
+                      <strong>Vœu 5 :</strong> Conférence, Table ronde ou Flash métier <span class="text-danger">*</span>
                     </label>
                     <select id="voeu5" formControlName="voeu5" class="form-select form-select-custom" 
                             aria-label="Sélectionnez un vœu"
                             (change)="onVoeuChange()">
                       <option value="">-- Sélectionnez un vœu --</option>
                       <optgroup label="Conférences"><option *ngFor="let conf of conferences" [value]="conf" [disabled]="isVoeuSelected(conf, 'voeu5')">{{ conf }}</option></optgroup>
+                      <optgroup label="Tables rondes"><option *ngFor="let table of tablesRondes" [value]="table" [disabled]="isVoeuSelected(table, 'voeu5')">{{ table }}</option></optgroup>
+                      <optgroup label="Flashs métiers"><option *ngFor="let flash of flashsMetiers" [value]="flash" [disabled]="isVoeuSelected(flash, 'voeu5')">{{ flash }}</option></optgroup>
                     </select>
                   </div>
                   <div class="col-lg-2 text-end">

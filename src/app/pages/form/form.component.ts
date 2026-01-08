@@ -155,6 +155,7 @@ export class FormComponent implements OnInit {
         if (new Set(voeux).size !== 5) return 'Tous les vœux doivent être différents.';
         if (!this.conferences.includes(voeuxValues.voeu1)) return 'Le vœu 1 doit être une conférence.';
         if (!this.conferences.includes(voeuxValues.voeu2)) return 'Le vœu 2 doit être une conférence.';
+        if (!this.conferences.includes(voeuxValues.voeu3)) return 'Le vœu 3 doit être une conférence.';
         return '';
     }
 
