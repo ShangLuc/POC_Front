@@ -33,6 +33,9 @@ export class FormComponent implements OnInit {
     selectedActivityName = '';
     selectedActivityDescription = '';
 
+    // Message de bienvenue personnalisé
+    eleveIntroMessage: string = '';
+
     formGroup: FormGroup;
 
     constructor(
@@ -59,6 +62,7 @@ export class FormComponent implements OnInit {
         const eleveId = localStorage.getItem('eleveId');
         if (eleveId) {
             this.formGroup.patchValue({ id: eleveId });
+            this.loadEleveInfo(eleveId);
             this.checkEleveStatus(eleveId);
         }
     }
@@ -87,6 +91,35 @@ export class FormComponent implements OnInit {
                     }
                 },
                 error: (err) => console.error('Erreur statut élève:', err)
+            });
+    }
+
+    // Charge les infos de l'élève pour afficher le message d'introduction
+    private loadEleveInfo(eleveId: string) {
+        const headers = this.getAuthHeaders();
+        this.http.get<any>(`http://localhost:8080/api/eleves/${eleveId}`, { headers })
+            .subscribe({
+                next: (eleve) => {
+                    if (eleve) {
+                        // Remplir les champs désactivés
+                        this.formGroup.patchValue({
+                            Prénom: eleve.prenom || '',
+                            Nom: eleve.nom || '',
+                            Etablissement: eleve.etablissement || '',
+                            Lib: eleve.libStructure || ''
+                        });
+
+                        
+                        const nomAffiche = eleve.nom || '';
+                        const prenomAffiche = eleve.prenom || '';
+                        const lycee = eleve.etablissement || '';
+
+                        this.eleveIntroMessage = `Vous remplissez actuellement le formulaire de voeux en tant que  ${prenomAffiche} ${nomAffiche}, éléve du ${lycee}.`;
+                    }
+                },
+                error: (err) => {
+                    console.error('Erreur chargement info élève pour intro formulaire:', err);
+                }
             });
     }
 

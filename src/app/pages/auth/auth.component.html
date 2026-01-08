@@ -262,6 +262,20 @@
                                     </small>
                                 </div>
 
+                                <div class="auth-form__group">
+                                    <label for="adminPassword" class="auth-form__label">
+                                        <i class="fa fa-lock" aria-hidden="true"></i>
+                                        Mot de passe
+                                    </label>
+                                    <div class="auth-form__input-wrapper">
+                                        <input type="password" class="auth-form__input" id="adminPassword" placeholder="Entrez votre mot de passe"
+                                            [(ngModel)]="adminPassword" name="adminPassword" autocomplete="current-password">
+                                        <span class="auth-form__input-icon">
+                                            <i class="fa fa-lock" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
                                 <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
                                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
                                     <span>{{ errorMessage }}</span>

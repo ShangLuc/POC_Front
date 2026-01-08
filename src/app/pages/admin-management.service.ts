@@ -59,7 +59,7 @@ export class AdminManagementService {
     );
   }
 
-  // Get all viewers (référants)
+  // Get all viewers (référents)
   getAllViewers(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.baseUrl}/viewers`,
@@ -67,7 +67,7 @@ export class AdminManagementService {
     );
   }
 
-  // Add a new viewer (référant)
+  // Add a new viewer (référent)
   addViewer(  username: string, lycee: string): Observable<string> {
     return this.http.post<string>(
       `${this.baseUrl}/viewers`,

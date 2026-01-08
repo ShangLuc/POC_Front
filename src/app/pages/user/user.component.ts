@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { AdminManagementService } from '../admin-management.service';
 import { EleveService } from '../eleve.service';
@@ -36,7 +36,7 @@ export class UserComponent implements OnInit {
     successMessage: string = '';
     errorMessage: string = '';
 
-    // Viewer (Référant) management properties
+    // Viewer (Référent) management properties
     viewers: any[] = [];
     newViewerLycee: string = '';
     newViewerUsername: string = '';
@@ -44,6 +44,9 @@ export class UserComponent implements OnInit {
     loadingViewers: boolean = false;
     viewerSuccessMessage: string = '';
     viewerErrorMessage: string = '';
+
+    // Liste des lycées existants en base pour le filtrage/choix
+    lycees: string[] = [];
 
     // Password change properties
     currentPassword: string = '';
@@ -57,7 +60,8 @@ export class UserComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private adminManagementService: AdminManagementService,
-        private eleveService: EleveService
+        private eleveService: EleveService,
+        private http: HttpClient
     ) {}
 
     ngOnInit() {
@@ -79,6 +83,7 @@ export class UserComponent implements OnInit {
         if (this.isSuperAdmin) {
             this.loadAdmins();
             this.loadViewers();
+            this.loadLycees();
         }
 
         if (this.isViewer) {
@@ -88,6 +93,35 @@ export class UserComponent implements OnInit {
 
 
 
+    }
+
+
+    private getAuthHeaders(): HttpHeaders {
+        const token = this.authService.getAuthToken();
+        if (token) {
+            return new HttpHeaders({
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            });
+        }
+        return new HttpHeaders({
+            'Content-Type': 'application/json'
+        });
+    }
+
+    // Charge la liste des lycées existants en base (même logique que DashboardComponent)
+    private loadLycees(): void {
+        this.http.get<string[]>(
+            'http://localhost:8080/api/eleves/lycees',
+            { headers: this.getAuthHeaders() }
+        ).subscribe({
+            next: (lycees) => {
+                this.lycees = lycees || [];
+            },
+            error: (err: HttpErrorResponse) => {
+                console.error('Erreur lors du chargement des lycées', err);
+            }
+        });
     }
 
 
@@ -206,7 +240,7 @@ export class UserComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error loading viewers:', err);
-                this.viewerErrorMessage = 'Erreur lors du chargement des référants.';
+                this.viewerErrorMessage = 'Erreur lors du chargement des référents.';
                 this.loadingViewers = false;
             }
         });
@@ -226,7 +260,7 @@ export class UserComponent implements OnInit {
 
         this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerLycee ).subscribe({
             next: (response) => {
-                this.viewerSuccessMessage = 'Référant ajouté avec succès.';
+                this.viewerSuccessMessage = 'Référent ajouté avec succès.';
                 this.newViewerLycee = '';
                 this.newViewerUsername = '';
                 this.showAddViewerForm = false;
@@ -234,14 +268,14 @@ export class UserComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error adding viewer:', err);
-                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de l\'ajout du référant.';
+                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de l\'ajout du référent.';
             }
         });
     }
 
     // Delete viewer with confirmation
     deleteViewer(viewer: any) {
-        const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référant "${viewer.username}"?`);
+        const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer le référent "${viewer.username}"?`);
         
         if (!confirmDelete) {
             return;
@@ -252,12 +286,12 @@ export class UserComponent implements OnInit {
 
         this.adminManagementService.deleteViewer(viewer.id).subscribe({
             next: () => {
-                this.viewerSuccessMessage = `Référant "${viewer.username}" supprimé avec succès.`;
+                this.viewerSuccessMessage = `Référent "${viewer.username}" supprimé avec succès.`;
                 this.loadViewers(); // Reload the list
             },
             error: (err) => {
                 console.error('Error deleting viewer:', err);
-                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de la suppression du référant.';
+                this.viewerErrorMessage = err?.error?.message || 'Erreur lors de la suppression du référent.';
             }
         });
     }

@@ -6,6 +6,12 @@
           <h5 class="card-title ">Inscription aux activités - Forum de l'orientation</h5>
         </div>
         <div class="card-body p-5">
+          <!-- Message d'introduction personnalisé pour l'élève connecté -->
+          <div *ngIf="eleveIntroMessage" class="alert alert-secondary mb-4 text-dark" role="alert">
+            <i class="fa fa-user me-2"></i>
+            {{ eleveIntroMessage }}
+          </div>
+
           <!-- Récapitulatif pour élève déjà inscrit -->
           <div *ngIf="showRecapitulatif" class="recap-container">
             <div class="alert alert-success mb-4" role="alert">

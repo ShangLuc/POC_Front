@@ -174,7 +174,7 @@
   <div class="col justify-content-md-center" *ngIf="isViewer">
     <div class="card card-user" style="height: auto;">
       <div class="card-header">
-        <h5 class="card-title">Profil référant</h5>
+        <h5 class="card-title">Profil référent</h5>
       </div>
       <div class="card-body p-3">
         <form>
@@ -320,12 +320,12 @@
   </div>
 </div>
 
-<!-- Viewer (Référant) Management Section -->
+<!-- Viewer (Référent) Management Section -->
 <div class="row" *ngIf="isSuperAdmin">
   <div class="col-md-12">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title">Gérer les référants</h5>
+        <h5 class="card-title">Gérer les référents</h5>
       </div>
       <div class="card-body">
         <!-- Success/Error Messages -->
@@ -342,10 +342,10 @@
         <div class="row">
           <div class="col-md-12">
             <div *ngIf="loadingViewers" class="alert alert-info">
-              Chargement des référants...
+              Chargement des référents...
             </div>
             <div *ngIf="!loadingViewers && viewers.length === 0" class="alert alert-info">
-              Aucun référant trouvé.
+              Aucun référent trouvé.
             </div>
             <div *ngIf="!loadingViewers && viewers.length > 0">
               <table class="table table-stsriped">
@@ -383,7 +383,7 @@
               class="btn btn-primary" 
               *ngIf="!showAddViewerForm"
               (click)="showAddViewerForm = true">
-              <i class="nc-icon nc-simple-add"></i> Ajouter un référant
+              <i class="nc-icon nc-simple-add"></i> Ajouter un référent
             </button>
           </div>
         </div>
@@ -393,17 +393,18 @@
           <div class="col-md-12">
             <div class="card">
               <div class="card-body">
-                <h6 class="card-title">Nouveau référant</h6>
+                <h6 class="card-title">Nouveau référent</h6>
                 <div class="row">
                   <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Etablissement</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        placeholder="Entrez l'établissement"
+                    <div class="form-group" *ngIf="!isViewer">
+                      <label>Entrez l'établissement</label>
+                      <select
+                        class="form-control"
                         [(ngModel)]="newViewerLycee"
                         name="newViewerLycee">
+                        <option value="">Sélectionnez un lycée</option>
+                        <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
+                      </select>
                     </div>
                   </div>
                   <div class="col-md-4">
