@@ -664,26 +664,21 @@ export class StudentListComponent implements OnInit {
                     // Créer la feuille Excel
                     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
 
-                    // Ajuster la largeur des colonnes
-                    const wscols = [
-                        { wch: 20 }, // Etablissement
-                        { wch: 15 }, // Nom
-                        { wch: 15 }, // Prenom
-                        { wch: 15 }, // ID
-                        { wch: 15 }, // Lib Structure
-                        { wch: 20 }, // V1
-                        { wch: 20 }, // V2
-                        { wch: 20 }, // V3
-                        { wch: 20 }, // V4
-                        { wch: 20 }  // V5
-                    ];
-                    ws['!cols'] = wscols;
+                    // Générer le CSV avec séparateur point-virgule
+                    const csvOutput = XLSX.utils.sheet_to_csv(ws, { FS: ";" });
 
-                    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Eleves');
+                    // Créer un Blob avec le BOM UTF-8
+                    const blob = new Blob(["\uFEFF" + csvOutput], { type: 'text/csv;charset=utf-8;' });
 
-                    // Télécharger le fichier
-                    XLSX.writeFile(wb, 'Eleves_Voeux.xlsx');
+                    // Déclencher le téléchargement
+                    const link = document.createElement("a");
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "Eleves_Voeux.csv");
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 },
                 error: (err) => {
                     console.error('Erreur lors de l\'export:', err);
