@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
+import * as XLSX from 'xlsx';
 
 
 
@@ -613,5 +614,81 @@ export class StudentListComponent implements OnInit {
     formatStudentDate(): string {
         const pad = (n: number) => n < 10 ? '0' + n : String(n);
         return `${pad(this.newStudent.day)}/${pad(this.newStudent.month)}/${this.newStudent.year} ${pad(this.newStudent.hour)}:${pad(this.newStudent.minute)}`;
+    }
+
+
+    openExportModal() {
+        const headers = this.getAuthHeaders();
+        if (!headers.get('Authorization')) {
+            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
+            return;
+        }
+
+        this.http.get<any[]>('http://localhost:8080/api/admin/eleves/export-data', { headers })
+            .subscribe({
+                next: (data) => {
+                    // Trier: Etablissement > Nom > Prénom
+                    data.sort((a, b) => {
+                        const etablissementComparison = (a.etablissement || '').localeCompare(b.etablissement || '');
+                        if (etablissementComparison !== 0) return etablissementComparison;
+
+                        const nomComparison = (a.nom || '').localeCompare(b.nom || '');
+                        if (nomComparison !== 0) return nomComparison;
+
+                        return (a.prenom || '').localeCompare(b.prenom || '');
+                    });
+
+                    // Mapper les données pour Excel
+                    const exportData = data.map(eleve => {
+                        const row: any = {
+                            "Etablissement": eleve.etablissement,
+                            "Nom de famille": eleve.nom,
+                            "Prenom": eleve.prenom,
+                            "ID National": eleve.id,
+                            "Lib. Structure": eleve.libStructure
+                        };
+
+                        // Ajouter les voeux
+                        if (eleve.voeux && Array.isArray(eleve.voeux)) {
+                            // Trier par numeroVoeu
+                            eleve.voeux.sort((v1: any, v2: any) => v1.numeroVoeu - v2.numeroVoeu);
+
+                            eleve.voeux.forEach((voeu: any) => {
+                                row[`Voeu ${voeu.numeroVoeu}`] = voeu.eventNom;
+                            });
+                        }
+
+                        return row;
+                    });
+
+                    // Créer la feuille Excel
+                    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+
+                    // Ajuster la largeur des colonnes
+                    const wscols = [
+                        { wch: 20 }, // Etablissement
+                        { wch: 15 }, // Nom
+                        { wch: 15 }, // Prenom
+                        { wch: 15 }, // ID
+                        { wch: 15 }, // Lib Structure
+                        { wch: 20 }, // V1
+                        { wch: 20 }, // V2
+                        { wch: 20 }, // V3
+                        { wch: 20 }, // V4
+                        { wch: 20 }  // V5
+                    ];
+                    ws['!cols'] = wscols;
+
+                    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Eleves');
+
+                    // Télécharger le fichier
+                    XLSX.writeFile(wb, 'Eleves_Voeux.xlsx');
+                },
+                error: (err) => {
+                    console.error('Erreur lors de l\'export:', err);
+                    this.errorMessage = 'Erreur lors de la génération du fichier Excel.';
+                }
+            });
     }
 }
