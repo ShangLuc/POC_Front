@@ -48,6 +48,38 @@
                   </select>
                 </div>
               </div>
+
+              <!-- Day Filter -->
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="jourFilter">Jour</label>
+                  <select 
+                      id="jourFilter" 
+                      class="form-control"
+                      [(ngModel)]="selectedJour"
+                      (change)="onJourChange()">
+                      <option value="">Tous les jours</option>
+                      <option *ngFor="let jour of jours" [value]="jour">{{ jour }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Hour Filter -->
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="heureFilter">Heure</label>
+                  <select 
+                      id="heureFilter" 
+                      class="form-control"
+                      [(ngModel)]="selectedHeure"
+                      (change)="onHeureChange()"
+                      [disabled]="!selectedJour">
+                      <option value="">Toutes les heures</option>
+                      <option *ngFor="let heure of heures" [value]="heure">{{ heure }}</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="col-md-4 d-flex align-items-end">
                 <button class="btn btn-secondary" (click)="resetFilters()">
                   <i class="nc-icon nc-refresh-69"></i> Réinitialiser

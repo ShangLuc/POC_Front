@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { Chart, registerables } from 'chart.js';
+import { log } from 'console';
 
 Chart.register(...registerables);
 
@@ -40,6 +41,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     classes: string[] = [];
     selectedLycee: string = '';
     selectedClasse: string = '';
+    
+    // Day and hour filters
+    jours: string[] = [];
+    heures: string[] = [];
+    selectedJour: string = '';
+    selectedHeure: string = '';
 
     // Statistics
     totalEleves: number = 0;
@@ -108,6 +115,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.viewerLycee = JSON.parse(localStorage.getItem('viewerData') || '')?.etablissement || '';
         this.selectedLycee = this.viewerLycee;
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
         this.loadStatistics();
     }
 
@@ -123,8 +132,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                 }
             });
 
-        // Load classes (with optional lycee filter)
+        // Load classes, jours, heures
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
     }
 
     loadClasses() {
@@ -148,6 +159,58 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             });
     }
 
+    loadJours() {
+        let joursUrl = 'http://localhost:8080/api/eleves/jours';
+        if (this.selectedLycee) {
+            joursUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
+        }
+
+        this.http.get<string[]>(joursUrl, { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (jours) => {
+                    this.jours = jours;
+                    // Reset selected jour if it's not in the new list
+                    if (this.selectedJour && !jours.includes(this.selectedJour)) {
+                        this.selectedJour = '';
+                        this.selectedHeure = '';
+                    }
+                },
+                error: (err) => {
+                    console.error('Error loading jours:', err);
+                }
+            });
+    }
+
+    loadHeures() {
+        let heuresUrl = 'http://localhost:8080/api/eleves/heures';
+        const params: string[] = [];
+        
+        if (this.selectedLycee) {
+            params.push(`lycee=${encodeURIComponent(this.selectedLycee)}`);
+        }
+        if (this.selectedJour) {
+            params.push(`jour=${encodeURIComponent(this.selectedJour)}`);
+        }
+        
+        if (params.length > 0) {
+            heuresUrl += '?' + params.join('&');
+        }
+
+        this.http.get<string[]>(heuresUrl, { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (heures) => {
+                    this.heures = heures;
+                    // Reset selected heure if it's not in the new list
+                    if (this.selectedHeure && !heures.includes(this.selectedHeure)) {
+                        this.selectedHeure = '';
+                    }
+                },
+                error: (err) => {
+                    console.error('Error loading heures:', err);
+                }
+            });
+    }
+
     loadStatistics() {
         this.isLoading = true;
         this.errorMessage = '';
@@ -161,14 +224,24 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         if (this.selectedClasse) {
             params.push(`classe=${encodeURIComponent(this.selectedClasse)}`);
         }
+        if (this.selectedJour) {
+            params.push(`jour=${encodeURIComponent(this.selectedJour)}`);
+        }
+        if (this.selectedHeure) {
+            params.push(`heure=${encodeURIComponent(this.selectedHeure)}`);
+        }
 
         if (params.length > 0) {
             url += '?' + params.join('&');
         }
 
+        // Debug: voir l'URL appelée
+        console.log('Fetching statistics from:', url);
+
         this.http.get<any>(url, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (data) => {
+                    console.log('Statistics data:', data);
                     this.totalEleves = data.totalEleves || 0;
                     this.elevesInscrits = data.elevesInscrits || 0;
                     this.elevesNonInscrits = data.elevesNonInscrits || 0;
@@ -176,7 +249,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                         ? Math.round((this.elevesInscrits / this.totalEleves) * 100)
                         : 0;
 
-                    // Detailed activity statistics - Map<String, Long> converted to array
+                    // Detailed activity statistics
                     this.conferencesStats = this.mapToActivityStats(data.conferencesStats || {});
                     this.tablesRondesStats = this.mapToActivityStats(data.tablesRondesStats || {});
                     this.flashsMetiersStats = this.mapToActivityStats(data.flashsMetiersStats || {});
@@ -206,8 +279,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     onLyceeChange() {
-        // When lycee changes, reload classes for that lycee
+        // When lycee changes, reload classes, jours, heures for that lycee
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
         this.loadStatistics();
     }
 
@@ -215,13 +290,28 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.loadStatistics();
     }
 
+    onJourChange() {
+        // Reset hour and reload heures when day changes
+        this.selectedHeure = '';
+        this.loadHeures();
+        this.loadStatistics();
+    }
+
+    onHeureChange() {
+        this.loadStatistics();
+    }
+
     resetFilters() {
         this.selectedClasse = '';
+        this.selectedJour = '';
+        this.selectedHeure = '';
         // Reset lycee only if not a viewer (viewers are locked to their lycee)
         if (!this.isViewer) {
             this.selectedLycee = '';
         }
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
         this.loadStatistics();
     }
 
