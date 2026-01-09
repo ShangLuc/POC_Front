@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { Chart, registerables } from 'chart.js';
-import { log } from 'console';
+import { environment } from '../../../environments/environment';
 
 Chart.register(...registerables);
 
@@ -122,7 +122,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     loadFilters() {
         // Load lycées
-        this.http.get<string[]>('http://localhost:8080/api/eleves/lycees', { headers: this.getAuthHeaders() })
+        this.http.get<string[]>(`${environment.apiUrl}/api/eleves/lycees`, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (lycees) => {
                     this.lycees = lycees;
@@ -139,7 +139,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     loadClasses() {
-        let classesUrl = 'http://localhost:8080/api/eleves/classes';
+        let classesUrl = `${environment.apiUrl}/api/eleves/classes`;
         if (this.selectedLycee) {
             classesUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
         }
@@ -160,7 +160,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     loadJours() {
-        let joursUrl = 'http://localhost:8080/api/eleves/jours';
+        let joursUrl = `${environment.apiUrl}/api/eleves/jours`;
         if (this.selectedLycee) {
             joursUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
         }
@@ -182,7 +182,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     loadHeures() {
-        let heuresUrl = 'http://localhost:8080/api/eleves/heures';
+        let heuresUrl = `${environment.apiUrl}/api/eleves/heures`;
         const params: string[] = [];
         
         if (this.selectedLycee) {
@@ -215,7 +215,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        let url = 'http://localhost:8080/api/dashboard/statistics';
+        let url = `${environment.apiUrl}/api/dashboard/statistics`;
         const params: string[] = [];
 
         if (this.selectedLycee) {
@@ -235,13 +235,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             url += '?' + params.join('&');
         }
 
-        // Debug: voir l'URL appelée
-        console.log('Fetching statistics from:', url);
+   
 
         this.http.get<any>(url, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (data) => {
-                    console.log('Statistics data:', data);
                     this.totalEleves = data.totalEleves || 0;
                     this.elevesInscrits = data.elevesInscrits || 0;
                     this.elevesNonInscrits = data.elevesNonInscrits || 0;

@@ -3,6 +3,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 import * as XLSX from 'xlsx';
+import { environment } from '../../../environments/environment';
 
 
 
@@ -197,7 +198,7 @@ export class StudentListComponent implements OnInit {
             inscrit: this.newStudent.inscrit === 'oui' ? true : false
         };
 
-        this.http.post<string>('http://localhost:8080/api/admin/eleves',
+        this.http.post<string>(`${environment.apiUrl}/api/admin/eleves`,
             student,
             {
                 headers: headers,
@@ -276,7 +277,7 @@ export class StudentListComponent implements OnInit {
 
     getAllEleves(): Observable<any[]> {
         return this.http.get<any[]>(
-            'http://localhost:8080/api/admin/eleves',
+            `${environment.apiUrl}/api/admin/eleves`,
             { headers: this.getAuthHeaders() }
         );
     }
@@ -289,7 +290,7 @@ export class StudentListComponent implements OnInit {
         }
 
         return this.http.get<any[]>(
-            `http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}/eleves`,
+            `${environment.apiUrl}/api/viewers/by-username/${encodeURIComponent(viewerUsername)}/eleves`,
             { headers: this.getAuthHeaders() }
         );
     }
@@ -317,7 +318,7 @@ export class StudentListComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        const url = `http://localhost:8080/api/admin/eleves/${encodeURIComponent(id)}`;
+        const url = `${environment.apiUrl}/api/admin/eleves/${encodeURIComponent(id)}`;
         this.http.delete<string>(url, { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
                 this.successMessage = response || 'Élève supprimé avec succès.';
@@ -497,7 +498,7 @@ export class StudentListComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        this.http.delete<string>('http://localhost:8080/api/admin/eleves', { headers, responseType: 'text' as 'json' }).subscribe({
+        this.http.delete<string>(`${environment.apiUrl}/api/admin/eleves`, { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
                 this.successMessage = response || 'Tous les élèves ont été supprimés avec succès.';
                 // Réinitialiser toutes les données
@@ -590,7 +591,7 @@ export class StudentListComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        this.http.post<string>('http://localhost:8080/api/admin/eleves/import', formData, { headers, responseType: 'text' as 'json' }).subscribe({
+        this.http.post<string>(`${environment.apiUrl}/api/admin/eleves/import`, formData, { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
                 this.successMessage = response || 'Import réussi. Rafraîchissement de la liste…';
                 this.closeImportModal();
@@ -624,7 +625,7 @@ export class StudentListComponent implements OnInit {
             return;
         }
 
-        this.http.get<any[]>('http://localhost:8080/api/admin/eleves/export-data', { headers })
+        this.http.get<any[]>(`${environment.apiUrl}/api/admin/eleves/export-data`, { headers })
             .subscribe({
                 next: (data) => {
                     // Trier: Etablissement > Nom > Prénom

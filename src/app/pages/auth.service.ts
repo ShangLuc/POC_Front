@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api'; // keep host consistent with frontend to share cookies
+  private baseUrl = `${environment.apiUrl}/api`; // keep host consistent with frontend to share cookies
   private readonly eleveIdKey = 'eleveId';
   private readonly viewerUsernameKey = 'viewerUsername';
   private currentUserRole: string = '';

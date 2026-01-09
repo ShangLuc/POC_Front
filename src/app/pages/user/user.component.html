@@ -336,12 +336,6 @@
             <button type="button" class="btn btn-primary" *ngIf="!showAddViewerForm" (click)="showAddViewerForm = true">
               <i class="nc-icon nc-simple-add"></i> Ajouter un référent
             </button>
-
-            <!-- Password Change Button -->
-            <button type="button" class="btn btn-primary" *ngIf="!showViewerPasswordForm"
-              (click)="showViewerPasswordForm = true">
-              <i class="nc-icon nc-key-25"></i> Modifier le mot de passe
-            </button>
           </div>
         </div>
 
@@ -364,8 +358,15 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Username</label>
-                      <input type="username" class="form-control" placeholder="Entrez le username"
+                      <input type="text" class="form-control" placeholder="Entrez le username"
                         [(ngModel)]="newViewerUsername" name="newViewerUsername">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Mot de passe</label>
+                      <input type="password" class="form-control" placeholder="Entrez le mot de passe"
+                        [(ngModel)]="newViewerPasswordInput" name="newViewerPasswordInput">
                     </div>
                   </div>
                 </div>
@@ -384,57 +385,6 @@
           </div>
         </div>
 
-        <!-- Success/Error Messages for Password Change -->
-        <div *ngIf="viewerPasswordSuccessMessage" class="alert alert-success alert-with-icon" role="alert">
-          <span data-notify="icon" class="nc-icon nc-check-2"></span>
-          <span data-notify="message">{{ viewerPasswordSuccessMessage }}</span>
-        </div>
-        <div *ngIf="viewerPasswordErrorMessage" class="alert alert-danger alert-with-icon" role="alert">
-          <span data-notify="icon" class="nc-icon nc-alert-circle-i"></span>
-          <span data-notify="message">{{ viewerPasswordErrorMessage }}</span>
-        </div>
-
-        <!-- Password Change Form -->
-        <div *ngIf="showViewerPasswordForm" class="mt-3">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Mot de passe actuel</label>
-                <input type="password" class="form-control" placeholder="Entrez votre mot de passe actuel"
-                  [(ngModel)]="currentViewerPassword" name="currentPassword">
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Nouveau mot de passe</label>
-                <input type="password" class="form-control" placeholder="Entrez le nouveau mot de passe"
-                  [(ngModel)]="newViewerPassword" name="newPassword">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Confirmer le nouveau mot de passe</label>
-                <input type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe"
-                  [(ngModel)]="confirmNewViewerPassword" name="confirmNewPassword">
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <button type="button" class="btn btn-success btn-sm" [disabled]="isChangingViewerPassword"
-                (click)="changeViewerPassword()">
-                <i class="nc-icon nc-check-2"></i>
-                {{ isChangingViewerPassword ? 'Modification en cours...' : 'Confirmer' }}
-              </button>
-              <button type="button" class="btn btn-secondary btn-sm ms-2" [disabled]="isChangingViewerPassword"
-                (click)="cancelViewerPasswordChange()">
-                <i class="nc-icon nc-simple-remove"></i> Annuler
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

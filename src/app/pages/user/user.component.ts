@@ -4,6 +4,7 @@ import { AuthService } from '../auth.service';
 import { AdminManagementService } from '../admin-management.service';
 import { EleveService } from '../eleve.service';
 import { Eleve } from '../../models/eleve.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'user-cmp',
@@ -40,6 +41,7 @@ export class UserComponent implements OnInit {
     viewers: any[] = [];
     newViewerLycee: string = '';
     newViewerUsername: string = '';
+    newViewerPasswordInput: string = '';  // Add this line
     showAddViewerForm: boolean = false;
     loadingViewers: boolean = false;
     viewerSuccessMessage: string = '';
@@ -121,7 +123,7 @@ export class UserComponent implements OnInit {
     // Charge la liste des lycées existants en base (même logique que DashboardComponent)
     private loadLycees(): void {
         this.http.get<string[]>(
-            'http://localhost:8080/api/eleves/lycees',
+            `${environment.apiUrl}/api/eleves/lycees`,
             { headers: this.getAuthHeaders() }
         ).subscribe({
             next: (lycees) => {
@@ -257,7 +259,7 @@ export class UserComponent implements OnInit {
 
     // Add new viewer
     addViewer() {
-        if (!this.newViewerLycee || !this.newViewerUsername) {
+        if (!this.newViewerLycee || !this.newViewerUsername || !this.newViewerPasswordInput) {
             this.viewerErrorMessage = 'Veuillez remplir tous les champs.';
             return;
         }
@@ -267,11 +269,12 @@ export class UserComponent implements OnInit {
         this.viewerErrorMessage = '';
         this.viewerSuccessMessage = '';
 
-        this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerLycee).subscribe({
+        this.adminManagementService.addViewer(this.newViewerUsername, this.newViewerPasswordInput, this.newViewerLycee).subscribe({
             next: (response) => {
                 this.viewerSuccessMessage = 'Référent ajouté avec succès.';
                 this.newViewerLycee = '';
                 this.newViewerUsername = '';
+                this.newViewerPasswordInput = '';
                 this.showAddViewerForm = false;
                 this.loadViewers(); // Reload the list
             },
@@ -310,6 +313,7 @@ export class UserComponent implements OnInit {
         this.showAddViewerForm = false;
         this.newViewerLycee = '';
         this.newViewerUsername = '';
+        this.newViewerPasswordInput = '';
         this.viewerErrorMessage = '';
     }
 

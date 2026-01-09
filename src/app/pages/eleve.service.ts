@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Eleve } from '../models/eleve.model';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EleveService {
-  private baseUrl = 'http://localhost:8080/api'; // keep host aligned with frontend for cookies
+  private baseUrl = `${environment.apiUrl}/api`; // keep host aligned with frontend for cookies
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -19,7 +20,7 @@ export class EleveService {
       : {};
       
     return this.http.post(
-      `http://localhost:8080/api/eleves/${eleveId}/voeux`,
+      `${environment.apiUrl}/api/eleves/${eleveId}/voeux`,
       { eventIds },
       { 
         headers,

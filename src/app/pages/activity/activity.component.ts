@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
-
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'dashboard-cmp',
@@ -65,7 +65,7 @@ export class ActivityComponent implements OnInit{
             return;
         }
 
-        this.http.get<any[]>('http://localhost:8080/api/admin/events', { headers })
+        this.http.get<any[]>(`${environment.apiUrl}/api/admin/events`, { headers })
             .subscribe({
                 next: (activities) => {
                     console.log('Activités chargées:', activities); // Debug log
@@ -183,7 +183,7 @@ export class ActivityComponent implements OnInit{
             capacite: this.newActivity.capacite
         };
 
-        this.http.post<string>('http://localhost:8080/api/admin/events',
+        this.http.post<string>(`${environment.apiUrl}/api/admin/events`,
             activity,
             { 
                 headers: headers,
@@ -272,7 +272,7 @@ export class ActivityComponent implements OnInit{
             capacite: this.newActivity.capacite
         };
 
-        this.http.put<string>(`http://localhost:8080/api/admin/events/${this.editActivityId}`,
+        this.http.put<string>(`${environment.apiUrl}/api/admin/events/${this.editActivityId}`,
             activity,
             { 
                 headers: headers,
@@ -315,7 +315,7 @@ export class ActivityComponent implements OnInit{
             return;
         }
 
-        this.http.delete<string>(`http://localhost:8080/api/admin/events/${id}`,
+        this.http.delete<string>(`${environment.apiUrl}/api/admin/events/${id}`,
             { 
                 headers: headers,
                 responseType: 'text' as 'json'
