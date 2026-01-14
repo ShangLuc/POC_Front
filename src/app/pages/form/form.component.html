@@ -3,7 +3,7 @@
     <div class="col-lg-10">
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white">
-          <h5 class="card-title ">Inscription aux activités - Forum de l'orientation</h5>
+          <h5 class="card-title ">Inscription aux activités du FESUP</h5>
         </div>
         <div class="card-body p-5">
           <!-- Message d'introduction personnalisé pour l'élève connecté -->
@@ -49,8 +49,8 @@
             <div class="alert alert-info-soft border-0 rounded-3" role="alert">
               <strong><i class="fa fa-info-circle me-2"></i>Instructions :</strong>
               <ul class="mb-0 mt-2 ms-3">
-                <li>Vœux 1, 2 et 3 : Conférences obligatoires (attribution garantie)</li>
-                <li>Vœux 4 et 5 : Au choix parmi conférences, tables rondes et flashs métiers</li>
+                <li>Choisis obligatoirement 3 conférences pour les vœux 1, 2 et 3</li>
+                <li>Choisis librement  conférences ou tables rondes ou flash métiers pour les vœux 4 et 5  </li>
                 <li>Tous les vœux doivent être différents</li>
                 <li>Après confirmation, il sera possible de consulter les vœux mais il ne sera plus possible de les modifier</li>
               </ul>
@@ -58,9 +58,9 @@
 
             <!-- CONTAINER 1: Vœux 1 & 2 (Obligatoires) -->
             <div class="form-section mb-4">
-              <h6 class="section-title text-primary mb-4 fw-bold">
+              <!-- <h6 class="section-title text-primary mb-4 fw-bold">
                 Vœux obligatoires (Conférences)
-              </h6>
+              </h6> -->
 
               <!-- Vœu 1 -->
               <div class="activity-row mb-4">
@@ -97,7 +97,7 @@
               </div>
 
               <!-- Vœu 2 -->
-              <div class="activity-row">
+              <div class="activity-row mb-4">
                 <div class="row g-3 align-items-end">
                   <div class="col-lg-10">
                     <label for="voeu2" class="form-label mb-2">
@@ -129,15 +129,15 @@
                   <small><i class="fa fa-exclamation-circle me-1"></i>Le vœu 2 est obligatoire.</small>
                 </div>
               </div>
-            </div>
+            <!-- </div> -->
 
-            <hr class="my-4 border-light">
+            <!-- <hr class="my-4 border-light"> -->
 
             <!-- CONTAINER 2: Vœux 3, 4 & 5 (Au choix / mixte) -->
-            <div class="form-section mb-4">
-              <h6 class="section-title text-primary mb-4 fw-bold">
+            <!-- <div class="form-section mb-4"> -->
+              <!-- <h6 class="section-title text-primary mb-4 fw-bold">
                Vœux au choix
-              </h6>
+              </h6> -->
 
               <!-- Vœu 3 -->
               <div class="activity-row mb-4">
@@ -318,35 +318,35 @@
           <div class="summary-item mb-3">
             <span class="summary-number">1</span>
             <div class="summary-content">
-              <span class="summary-label">Vœu 1 (Conférence obligatoire)</span>
+              <span class="summary-label">Vœu 1</span>
               <span class="summary-value">{{ formGroup.get('voeu1')?.value }}</span>
             </div>
           </div>
           <div class="summary-item mb-3">
             <span class="summary-number">2</span>
             <div class="summary-content">
-              <span class="summary-label">Vœu 2 (Conférence obligatoire)</span>
+              <span class="summary-label">Vœu 2</span>
               <span class="summary-value">{{ formGroup.get('voeu2')?.value }}</span>
             </div>
           </div>
           <div class="summary-item mb-3">
             <span class="summary-number">3</span>
             <div class="summary-content">
-              <span class="summary-label">Vœu 3 (Au choix)</span>
+              <span class="summary-label">Vœu 3</span>
               <span class="summary-value">{{ formGroup.get('voeu3')?.value }}</span>
             </div>
           </div>
           <div class="summary-item mb-3">
             <span class="summary-number">4</span>
             <div class="summary-content">
-              <span class="summary-label">Vœu 4 (Au choix)</span>
+              <span class="summary-label">Vœu 4 </span>
               <span class="summary-value">{{ formGroup.get('voeu4')?.value }}</span>
             </div>
           </div>
           <div class="summary-item">
             <span class="summary-number">5</span>
             <div class="summary-content">
-              <span class="summary-label">Vœu 5 (Conférence obligatoire)</span>
+              <span class="summary-label">Vœu 5 </span>
               <span class="summary-value">{{ formGroup.get('voeu5')?.value }}</span>
             </div>
           </div>
