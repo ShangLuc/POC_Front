@@ -678,26 +678,23 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
                     // Mapper les données pour Excel
                     const exportData = data.map(eleve => {
+                        // Si demiJournee existe, on sépare en date et heure, sinon on garde les champs d'origine
+                        let date = eleve.date || "";
+                        let heure = eleve.heure || "";
+                        if (eleve.demiJournee) {
+                            const [datePart, timePart] = eleve.demiJournee.split(' ');
+                            date = datePart || date;
+                            heure = timePart || heure;
+                        }
                         const row: any = {
                             "Etablissement": eleve.etablissement,
                             "Nom de famille": eleve.nom,
                             "Prenom": eleve.prenom,
-                            "Date": eleve.date || "",
-                            "Heure": eleve.heure || "",
+                            "Date": date,
+                            "Heure": heure,
                             "ID National": eleve.id,
                             "Lib. Structure": eleve.libStructure
                         };
-
-                        // Séparer la date et l'heure de la demi-journée
-                        if (eleve.demiJournee) {
-                            // Format attendu : 'dd/MM/yyyy HH:mm'
-                            const [datePart, timePart] = eleve.demiJournee.split(' ');
-                            row["Demi-journée (date)"] = datePart || '';
-                            row["Demi-journée (heure)"] = timePart || '';
-                        } else {
-                            row["Demi-journée (date)"] = '';
-                            row["Demi-journée (heure)"] = '';
-                        }
 
                         // Ajouter les voeux
                         if (eleve.voeux && Array.isArray(eleve.voeux)) {
