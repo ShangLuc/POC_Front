@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { Chart, registerables } from 'chart.js';
 import { environment } from '../../../environments/environment';
+import { Subscription } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -16,9 +17,11 @@ interface ActivityStat {
     selector: 'dashboard-cmp',
     moduleId: module.id,
     templateUrl: 'dashboard.component.html',
-    styleUrls: ['dashboard.component.css']
+    styleUrls: ['dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+    private subscriptions = new Subscription();
 
     @ViewChild('inscriptionChart') inscriptionChartRef: ElementRef;
     @ViewChild('conferencesChart') conferencesChartRef: ElementRef;
@@ -71,7 +74,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     constructor(
         private http: HttpClient,
-        private authService: AuthService
+        private authService: AuthService,
+        private cdr: ChangeDetectorRef
     ) { }
 
     private getAuthHeaders(): HttpHeaders {
@@ -253,6 +257,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     this.flashsMetiersStats = this.mapToActivityStats(data.flashsMetiersStats || {});
 
                     this.isLoading = false;
+                    this.cdr.markForCheck(); // Marquer pour la détection de changements
 
                     // Wait for Angular to render the DOM before initializing charts
                     setTimeout(() => {
@@ -263,6 +268,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     console.error('Error loading statistics:', err);
                     this.errorMessage = 'Erreur lors du chargement des statistiques.';
                     this.isLoading = false;
+                    this.cdr.markForCheck(); // Marquer pour la détection de changements
                 }
             });
     }
@@ -611,4 +617,20 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     getTotalInscriptions(stats: ActivityStat[]): number {
         return stats.reduce((total, stat) => total + stat.count, 0);
     }
-}
+    ngOnDestroy() {
+        // Détruire tous les graphiques pour libérer la mémoire
+        if (this.inscriptionChart) {
+            this.inscriptionChart.destroy();
+        }
+        if (this.conferencesChart) {
+            this.conferencesChart.destroy();
+        }
+        if (this.tablesRondesChart) {
+            this.tablesRondesChart.destroy();
+        }
+        if (this.flashsMetiersChart) {
+            this.flashsMetiersChart.destroy();
+        }
+        // Désabonner toutes les subscriptions
+        this.subscriptions.unsubscribe();
+    }}
