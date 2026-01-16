@@ -1,5 +1,4 @@
-﻿<!-- Modern Auth Page with Split Layout -->
-<div class="auth-page" 
+﻿<div class="auth-page" 
      [class.auth-page--eleve]="selectedProfile === 'eleve'"
      [class.auth-page--admin]="selectedProfile === 'admin'"
      [class.auth-page--viewer]="selectedProfile === 'viewer'">
@@ -263,13 +262,19 @@
                                 </div>
 
                                 <div class="auth-form__group">
-                                    <label for="adminPassword" class="auth-form__label">
+                                    <label for="viewerPassword" class="auth-form__label">
                                         <i class="fa fa-lock" aria-hidden="true"></i>
                                         Mot de passe
                                     </label>
                                     <div class="auth-form__input-wrapper">
-                                        <input type="password" class="auth-form__input" id="adminPassword" placeholder="Entrez votre mot de passe"
-                                            [(ngModel)]="adminPassword" name="adminPassword" autocomplete="current-password">
+                                        <input 
+                                            type="password" 
+                                            class="auth-form__input" 
+                                            id="viewerPassword"
+                                            placeholder="Entrez votre mot de passe"
+                                            [(ngModel)]="adminPassword"
+                                            name="adminPassword"
+                                            autocomplete="current-password">
                                         <span class="auth-form__input-icon">
                                             <i class="fa fa-lock" aria-hidden="true"></i>
                                         </span>
@@ -297,5 +302,27 @@
                 </div>
             </div>
         </div>
+        
     </div>
+    <div>
+    <!-- Footer personnalisé pour la page d'authentification -->
+     <footer class="footer">
+    <div class="container-fluid">
+        <nav class="pull-left">
+            <ul>
+
+            </ul>
+        </nav>
+        <div class="copyright pull-right">
+            &copy; {{test | date: 'yyyy'}} Télécom Saint-Etienne
+            
+            <!-- Image position absolue (exemple en bas à droite du footer) -->
+            <div style="position:relative; height:80px;">
+                <img src="assets/img/TSE -logo-quadri.png" alt="TSE Logo" style="position:absolute; bottom:0; right:0; height:70px;">
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+    
 </div>

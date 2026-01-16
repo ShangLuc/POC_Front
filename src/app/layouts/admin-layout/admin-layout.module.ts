@@ -19,6 +19,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActivityComponent } from 'app/pages/activity/activity.component';
 import { StudentListComponent } from 'app/pages/studentList/studentList.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { FooterModule } from '../../shared/footer/footer.module';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
     NgbModule,
-    NgSelectModule
+    NgSelectModule,
+    FooterModule
   ],
   declarations: [
     AuthComponent,

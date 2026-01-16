@@ -12,13 +12,16 @@ import { AppComponent } from './app.component';
 import { AppRoutes } from './app.routing';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+// import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { HttpClientModule } from "@angular/common/http";
+import { AuthLayoutModule } from './layouts/auth-layout/auth-layout.module';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    AdminLayoutComponent
+    AdminLayoutComponent,
+    // AuthLayoutComponent
     ],
   imports: [
     BrowserAnimationsModule,

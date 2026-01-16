@@ -14,6 +14,7 @@ export class AuthComponent implements OnInit {
   adminUsername: string = '';
   adminPassword: string = '';
   viewerUsername: string = '';
+  test : Date = new Date();
 
   // Paramètres réglables pour le bouton retour
   backButtonColor: string = '#999999';

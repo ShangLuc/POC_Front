@@ -4,6 +4,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import { AuthComponent } from './pages/auth/auth.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RequireAuthGuard } from './guards/require-auth.guard';
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 
 export const AppRoutes: Routes = [
   {
@@ -13,13 +14,19 @@ export const AppRoutes: Routes = [
   }, 
   {
     path: 'auth',
-    component: AuthComponent,
-    canActivate: [AuthGuard] // Redirige si déjà authentifié
+    component: AuthLayoutComponent,
+    children: [
+      {
+        path: '',
+        component: AuthComponent,
+        canActivate: [AuthGuard]
+      }
+    ]
   },
   {
     path: '',
     component: AdminLayoutComponent,
-    canActivate: [RequireAuthGuard], // Toutes les pages nécessitent une authentification
+    canActivate: [RequireAuthGuard],
     children: [
         {
       path: '',

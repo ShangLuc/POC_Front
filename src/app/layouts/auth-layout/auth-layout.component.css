@@ -1,0 +1,15 @@
+.auth-layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-layout-wrapper > router-outlet {
+  flex: 1 0 auto;
+}
+
+footer-cmp {
+  flex-shrink: 0;
+  margin-top: 0;
+  margin-bottom: 0px;
+}
