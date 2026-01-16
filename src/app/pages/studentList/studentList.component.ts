@@ -649,6 +649,17 @@ export class StudentListComponent implements OnInit {
                             "Lib. Structure": eleve.libStructure
                         };
 
+                        // Séparer la date et l'heure de la demi-journée
+                        if (eleve.demiJournee) {
+                            // Format attendu : 'dd/MM/yyyy HH:mm'
+                            const [datePart, timePart] = eleve.demiJournee.split(' ');
+                            row["Demi-journée (date)"] = datePart || '';
+                            row["Demi-journée (heure)"] = timePart || '';
+                        } else {
+                            row["Demi-journée (date)"] = '';
+                            row["Demi-journée (heure)"] = '';
+                        }
+
                         // Ajouter les voeux
                         if (eleve.voeux && Array.isArray(eleve.voeux)) {
                             // Trier par numeroVoeu
