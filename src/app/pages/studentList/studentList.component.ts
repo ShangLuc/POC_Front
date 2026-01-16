@@ -645,6 +645,8 @@ export class StudentListComponent implements OnInit {
                             "Etablissement": eleve.etablissement,
                             "Nom de famille": eleve.nom,
                             "Prenom": eleve.prenom,
+                            "Date": eleve.date || "",
+                            "Heure": eleve.heure || "",
                             "ID National": eleve.id,
                             "Lib. Structure": eleve.libStructure
                         };
