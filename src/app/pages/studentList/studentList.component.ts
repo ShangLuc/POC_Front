@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import * as XLSX from 'xlsx';
 import { environment } from '../../../environments/environment';
@@ -15,12 +16,24 @@ import { environment } from '../../../environments/environment';
 
 
 
-export class StudentListComponent implements OnInit {
+export class StudentListComponent implements OnInit, OnDestroy {
+    private subscriptions = new Subscription();
+    private searchSubject = new Subject<string>();
 
     constructor(
         private http: HttpClient,
         private authService: AuthService
-    ) { }
+    ) {
+        // Debounce la recherche pour ne pas surcharger le CPU
+        this.subscriptions.add(
+            this.searchSubject.pipe(
+                debounceTime(300),
+                distinctUntilChanged()
+            ).subscribe(() => {
+                this.applyFilters();
+            })
+        );
+    }
 
     // Get authorization headers with Bearer token
     private getAuthHeaders(): HttpHeaders {
@@ -98,6 +111,19 @@ export class StudentListComponent implements OnInit {
     // Date/time selection arrays
     days: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
     months: string[] = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+    // TrackBy functions pour optimiser le rendu des listes
+    trackByStudentId(index: number, student: any): string {
+        return student.id || index.toString();
+    }
+
+    trackByIndex(index: number): number {
+        return index;
+    }
+
+    trackByValue(index: number, value: any): any {
+        return value;
+    }
     years: number[] = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i);
     hours: number[] = Array.from({ length: 24 }, (_, i) => i);
     minutes: number[] = Array.from({ length: 60 }, (_, i) => i);
@@ -238,38 +264,42 @@ export class StudentListComponent implements OnInit {
         this.errorMessage = '';
 
         if (this.isAdmin) {
-            this.getAllEleves().subscribe({
-                next: (response) => {
-                    this.students = response;
-                    this.updateNumbers();
-                    this.updateMetadata();
-                    this.applyFilters();
-                    this.recalcDisplayed();
-                    this.loadingEleves = false;
-                },
-                error: (err) => {
-                    console.error('Error loading Eleves:', err);
-                    this.errorMessage = 'Erreur lors du chargement des élèves.';
-                    this.loadingEleves = false;
-                }
-            });
+            this.subscriptions.add(
+                this.getAllEleves().subscribe({
+                    next: (response) => {
+                        this.students = response;
+                        this.updateNumbers();
+                        this.updateMetadata();
+                        this.applyFilters();
+                        this.recalcDisplayed();
+                        this.loadingEleves = false;
+                    },
+                    error: (err) => {
+                        console.error('Error loading Eleves:', err);
+                        this.errorMessage = 'Erreur lors du chargement des élèves.';
+                        this.loadingEleves = false;
+                    }
+                })
+            );
         }
         else if (this.isViewer) {
-            this.getAllElevesViewer().subscribe({
-                next: (response) => {
-                    this.students = response;
-                    this.updateNumbers();
-                    this.updateMetadata();
-                    this.applyFilters();
-                    this.recalcDisplayed();
-                    this.loadingEleves = false;
-                },
-                error: (err) => {
-                    console.error('Error loading Eleves:', err);
-                    this.errorMessage = 'Erreur lors du chargement des élèves.';
-                    this.loadingEleves = false;
-                }
-            });
+            this.subscriptions.add(
+                this.getAllElevesViewer().subscribe({
+                    next: (response) => {
+                        this.students = response;
+                        this.updateNumbers();
+                        this.updateMetadata();
+                        this.applyFilters();
+                        this.recalcDisplayed();
+                        this.loadingEleves = false;
+                    },
+                    error: (err) => {
+                        console.error('Error loading Eleves:', err);
+                        this.errorMessage = 'Erreur lors du chargement des élèves.';
+                        this.loadingEleves = false;
+                    }
+                })
+            );
         }
     }
 
@@ -467,6 +497,13 @@ export class StudentListComponent implements OnInit {
     }
 
     onFilterChange() {
+        // Pour la recherche textuelle, utiliser le debounce
+        // Pour les autres filtres (dropdowns), appliquer immédiatement
+        this.searchSubject.next(this.searchQuery);
+    }
+
+    onDropdownFilterChange() {
+        // Filtre immédiat pour les dropdowns (pas de debounce)
         this.applyFilters();
         this.recalcDisplayed();
     }
@@ -688,5 +725,9 @@ export class StudentListComponent implements OnInit {
                     this.errorMessage = 'Erreur lors de la génération du fichier Excel.';
                 }
             });
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }

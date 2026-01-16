@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { AdminManagementService } from '../admin-management.service';
 import { EleveService } from '../eleve.service';
@@ -12,7 +13,9 @@ import { environment } from '../../../environments/environment';
     templateUrl: 'user.component.html'
 })
 
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
+    private subscriptions = new Subscription();
+    
     isAdmin: boolean = false;
     isEleve: boolean = false;
     isViewer: boolean = false;
@@ -48,6 +51,15 @@ export class UserComponent implements OnInit {
     viewerErrorMessage: string = '';
 
     // Liste des lycées existants en base pour le filtrage/choix
+
+    // TrackBy functions pour optimiser le rendu
+    trackByUsername(index: number, item: any): string {
+        return item.username || index.toString();
+    }
+
+    trackByValue(index: number, value: any): any {
+        return value;
+    }
     lycees: string[] = [];
 
     // Password change properties
@@ -169,8 +181,9 @@ export class UserComponent implements OnInit {
     loadAdmins() {
         this.loadingAdmins = true;
         this.errorMessage = '';
-        this.adminManagementService.getAllAdmins().subscribe({
-            next: (response) => {
+        this.subscriptions.add(
+            this.adminManagementService.getAllAdmins().subscribe({
+                next: (response) => {
                 this.admins = response;
                 this.loadingAdmins = false;
             },
@@ -179,7 +192,8 @@ export class UserComponent implements OnInit {
                 this.errorMessage = 'Erreur lors du chargement des administrateurs.';
                 this.loadingAdmins = false;
             }
-        });
+            })
+        );
     }
 
     // Add new admin
@@ -242,9 +256,10 @@ export class UserComponent implements OnInit {
     loadViewers() {
         this.loadingViewers = true;
         this.viewerErrorMessage = '';
-        this.adminManagementService.getAllViewers().subscribe({
-            next: (response) => {
-                console.log('Viewers from backend:', response);
+        this.subscriptions.add(
+            this.adminManagementService.getAllViewers().subscribe({
+                next: (response) => {
+                    console.log('Viewers from backend:', response);
                 console.log('First viewer object:', response[0]);
                 this.viewers = response;
                 this.loadingViewers = false;
@@ -254,7 +269,8 @@ export class UserComponent implements OnInit {
                 this.viewerErrorMessage = 'Erreur lors du chargement des référents.';
                 this.loadingViewers = false;
             }
-        });
+            })
+        );
     }
 
     // Add new viewer
@@ -417,6 +433,10 @@ export class UserComponent implements OnInit {
         this.confirmNewViewerPassword = '';
         this.viewerPasswordErrorMessage = '';
         this.viewerPasswordSuccessMessage = '';
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }
 

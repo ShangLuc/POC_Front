@@ -47,7 +47,7 @@
                         <label class="form-label">Établissement</label>
                         <ng-select [items]="etablissements" [(ngModel)]="filterEtablissement"
                             [placeholder]="filterEtablissement ? '' : 'Tous'" class="ng-select-sm" [disabled]="isViewer"
-                            [readonly]="isViewer" (change)="onFilterChange()">
+                            [readonly]="isViewer" (change)="onDropdownFilterChange()">
                         </ng-select>
                     </div>
 
@@ -56,14 +56,14 @@
                         <label class="form-label">Lib. Structure</label>
                         <ng-select [items]="libStructures" [(ngModel)]="filterLibStructure"
                             [placeholder]="filterLibStructure ? '' : 'Toutes'" class="ng-select-sm"
-                            (change)="onFilterChange()">
+                            (change)="onDropdownFilterChange()">
                         </ng-select>
                     </div>
 
 
                     <div class="col-md-2">
                         <label class="form-label">Inscrit</label>
-                        <ng-select [(ngModel)]="filterInscrit" class="ng-select-sm" (change)="onFilterChange()"
+                        <ng-select [(ngModel)]="filterInscrit" class="ng-select-sm" (change)="onDropdownFilterChange()"
                             [clearable]="false">
 
                             <ng-option value="tous">Tous</ng-option>
@@ -91,7 +91,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let student of displayedStudents; let i = index">
+                        <tr *ngFor="let student of displayedStudents; let i = index; trackBy: trackByStudentId">
                             <td>{{ student.numero }}</td>
                             <td>{{ student.identifiantNational || student.id || '-' }}</td>
                             <td>{{ student.nom }}</td>
@@ -141,7 +141,7 @@
                         </li>
 
                         <!-- Pages visibles -->
-                        <li class="page-item" *ngFor="let p of visiblePages" [class.active]="p === currentPage">
+                        <li class="page-item" *ngFor="let p of visiblePages; trackBy: trackByValue" [class.active]="p === currentPage">
                             <button class="page-link" (click)="setPage(p)">{{ p }}</button>
                         </li>
 
