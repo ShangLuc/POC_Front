@@ -214,7 +214,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let admin of admins">
+                  <tr *ngFor="let admin of admins; trackBy: trackByUsername">
                     <td>{{ admin.username }}</td>
                     <td>
                       <button type="button" class="btn btn-danger btn-sm" (click)="deleteAdmin(admin)">
@@ -315,7 +315,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let viewer of viewers">
+                  <tr *ngFor="let viewer of viewers; trackBy: trackByUsername">
                     <td>{{ viewer.etablissement }}</td>
                     <td>{{ viewer.username }}</td>
                     <td>
@@ -351,7 +351,7 @@
                       <label>Entrez l'établissement</label>
                       <select class="form-control" [(ngModel)]="newViewerLycee" name="newViewerLycee">
                         <option value="">Sélectionnez un lycée</option>
-                        <option *ngFor="let lycee of lycees" [value]="lycee">{{ lycee }}</option>
+                        <option *ngFor="let lycee of lycees; trackBy: trackByValue" [value]="lycee">{{ lycee }}</option>
                       </select>
                     </div>
                   </div>
