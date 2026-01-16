@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'dashboard-cmp',
@@ -43,7 +44,7 @@ export class AccueilComponent implements OnInit {
             ? new HttpHeaders({ Authorization: `Bearer ${token}` })
             : new HttpHeaders();
 
-        this.http.get<any>(`http://localhost:8080/api/eleves/${eleveId}`, {
+        this.http.get<any>(`${environment.apiUrl}/api/eleves/${eleveId}`, {
             headers,
             withCredentials: true
         }).subscribe({

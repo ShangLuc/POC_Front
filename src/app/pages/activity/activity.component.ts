@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
-
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'dashboard-cmp',
@@ -47,10 +47,11 @@ export class ActivityComponent implements OnInit{
     editActivityId: string = '';
     errorMessage: string = '';
     successMessage: string = '';
+    selectedFile: File | null = null;
+    importing: boolean = false;
     newActivity = {
         nom: '',
-        description: '',
-        capacite: ''
+        description: ''
     };
 
     ngOnInit(){
@@ -65,7 +66,7 @@ export class ActivityComponent implements OnInit{
             return;
         }
 
-        this.http.get<any[]>('http://localhost:8080/api/admin/events', { headers })
+        this.http.get<any[]>(`${environment.apiUrl}/api/admin/events`, { headers })
             .subscribe({
                 next: (activities) => {
                     console.log('Activités chargées:', activities); // Debug log
@@ -88,8 +89,7 @@ export class ActivityComponent implements OnInit{
                             id: activity.id,
                             numero: 0,
                             nom: activity.nom,
-                            description: activity.description,
-                            capacite: activity.capacite
+                            description: activity.description
                         };
 
                         if (activity.type === 'CONFERENCE') {
@@ -132,22 +132,14 @@ export class ActivityComponent implements OnInit{
     resetForm() {
         this.newActivity = {
             nom: '',
-            description: '',
-            capacite: ''
+            description: ''
         };
     }
 
     // Ajouter une activité
     addActivity(type: string) {
-        if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.description) {
+        if (!this.newActivity.nom || !this.newActivity.description) {
             this.errorMessage = 'Veuillez remplir tous les champs';
-            return;
-        }
-
-        // Valider la capacité : doit être un entier positif > 0
-        const capacite = Number(this.newActivity.capacite);
-        if (isNaN(capacite) || capacite <= 0 || !Number.isInteger(capacite)) {
-            this.errorMessage = 'La capacité doit être un nombre entier positif supérieur à 0';
             return;
         }
 
@@ -179,11 +171,10 @@ export class ActivityComponent implements OnInit{
         const activity = {
             type: typeEvent,
             nom: this.newActivity.nom,
-            description: this.newActivity.description,
-            capacite: this.newActivity.capacite
+            description: this.newActivity.description
         };
 
-        this.http.post<string>('http://localhost:8080/api/admin/events',
+        this.http.post<string>(`${environment.apiUrl}/api/admin/events`,
             activity,
             { 
                 headers: headers,
@@ -222,23 +213,15 @@ export class ActivityComponent implements OnInit{
         this.editActivityId = activity.id;
         this.newActivity = {
             nom: activity.nom,
-            description: activity.description,
-            capacite: activity.capacite
+            description: activity.description
         };
         this.errorMessage = '';
     }
 
     // Modifier une activité
     updateActivity() {
-        if (!this.newActivity.nom || !this.newActivity.capacite || !this.newActivity.description) {
+        if (!this.newActivity.nom || !this.newActivity.description) {
             this.errorMessage = 'Veuillez remplir tous les champs';
-            return;
-        }
-
-        // Valider la capacité : doit être un entier positif > 0
-        const capacite = Number(this.newActivity.capacite);
-        if (isNaN(capacite) || capacite <= 0 || !Number.isInteger(capacite)) {
-            this.errorMessage = 'La capacité doit être un nombre entier positif supérieur à 0';
             return;
         }
 
@@ -268,11 +251,10 @@ export class ActivityComponent implements OnInit{
         const activity = {
             type: typeEvent,
             nom: this.newActivity.nom,
-            description: this.newActivity.description,
-            capacite: this.newActivity.capacite
+            description: this.newActivity.description
         };
 
-        this.http.put<string>(`http://localhost:8080/api/admin/events/${this.editActivityId}`,
+        this.http.put<string>(`${environment.apiUrl}/api/admin/events/${this.editActivityId}`,
             activity,
             { 
                 headers: headers,
@@ -315,7 +297,7 @@ export class ActivityComponent implements OnInit{
             return;
         }
 
-        this.http.delete<string>(`http://localhost:8080/api/admin/events/${id}`,
+        this.http.delete<string>(`${environment.apiUrl}/api/admin/events/${id}`,
             { 
                 headers: headers,
                 responseType: 'text' as 'json'
@@ -342,5 +324,120 @@ export class ActivityComponent implements OnInit{
         array.forEach((activity, index) => {
             activity.numero = index + 1;
         });
+    }
+
+    // Handle file selection
+    onFileSelected(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            if (!allowedTypes.includes(file.type) && !file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
+                this.errorMessage = 'Veuillez sélectionner un fichier Excel (.xls ou .xlsx)';
+                event.target.value = '';
+                return;
+            }
+            this.selectedFile = file;
+            this.errorMessage = '';
+        }
+    }
+
+    // Import activities from Excel file
+    importActivities(type: string) {
+        if (!this.selectedFile) {
+            this.errorMessage = 'Veuillez sélectionner un fichier Excel';
+            return;
+        }
+
+        const headers = this.getAuthHeaders();
+        if (!headers.get('Authorization')) {
+            this.errorMessage = 'Authentification requise: token manquant. Veuillez vous reconnecter.';
+            return;
+        }
+
+        this.importing = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        // Map type to endpoint
+        let endpoint: string;
+        if (type === 'conferences') {
+            endpoint = 'conferences';
+        } else if (type === 'tables_rondes') {
+            endpoint = 'tables-rondes';
+        } else if (type === 'flashs_metiers') {
+            endpoint = 'flash-metiers';
+        } else {
+            this.errorMessage = 'Type d\'activité invalide.';
+            this.importing = false;
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', this.selectedFile);
+
+        // Create headers without Content-Type (browser will set it with boundary for FormData)
+        const token = this.authService.getAuthToken();
+        const uploadHeaders = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+
+        this.http.post<string>(`${environment.apiUrl}/api/admin/events/import/${endpoint}`,
+            formData,
+            { 
+                headers: uploadHeaders,
+                responseType: 'text' as 'json'
+            }
+        ).subscribe({
+            next: (response) => {
+                this.successMessage = 'Activités importées avec succès.';
+                this.selectedFile = null;
+                this.loadActivities();
+                setTimeout(() => { this.successMessage = ''; }, 3000);
+            },
+            error: (err) => {
+                console.error('Erreur lors de l\'importation des activités:', err);
+                this.errorMessage = err?.error?.message || 'Erreur lors de l\'importation des activités.';
+                this.importing = false;
+            },
+            complete: () => {
+                this.importing = false;
+            }
+        });
+    }
+
+    // Clear selected file
+    clearSelectedFile() {
+        this.selectedFile = null;
+        this.errorMessage = '';
+    }
+
+    // New: handle Excel selection and import immediately for given type
+    onExcelFileSelected(
+        type: 'conferences' | 'tables_rondes' | 'flashs_metiers',
+        event: Event
+    ) {
+        const input = event.target as HTMLInputElement;
+        const file = input?.files && input.files.length ? input.files[0] : null;
+        if (!file) return;
+
+        const allowedTypes = [
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+        if (!allowedTypes.includes(file.type) && !file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
+            this.errorMessage = 'Veuillez sélectionner un fichier Excel (.xls ou .xlsx)';
+            input.value = '';
+            return;
+        }
+
+        this.selectedFile = file;
+        this.errorMessage = '';
+
+        // trigger upload for this activity type
+        this.importActivities(type);
+
+        // reset input to allow re-selecting the same file later
+        input.value = '';
     }
 }

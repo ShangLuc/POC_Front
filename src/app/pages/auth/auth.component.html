@@ -1,8 +1,7 @@
-﻿<div class="auth-page" 
-     [class.auth-page--eleve]="selectedProfile === 'eleve'"
-     [class.auth-page--admin]="selectedProfile === 'admin'"
-     [class.auth-page--viewer]="selectedProfile === 'viewer'">
-    
+﻿<!-- Modern Auth Page with Split Layout -->
+<div class="auth-page" [class.auth-page--eleve]="selectedProfile === 'eleve'"
+    [class.auth-page--admin]="selectedProfile === 'admin'" [class.auth-page--viewer]="selectedProfile === 'viewer'">
+
     <div class="auth-container">
         <!-- Left Side: Logo Image Panel -->
         <div class="auth-visual">
@@ -11,7 +10,7 @@
                     <img src="assets/img/logo.png" alt="Logo FESUP" class="auth-visual__logo-img">
                 </div>
                 <div class="auth-visual__text">
-                    <h1 class="auth-visual__title">FESUP – Forum des Études Supérieures</h1>
+                    <h1 class="auth-visual__title">FESUP – Forum de l'Enseignement Supérieur</h1>
                     <p class="auth-visual__subtitle">Orienter, choisir, construire l'avenir</p>
                 </div>
             </div>
@@ -26,11 +25,10 @@
                 </div>
 
                 <!-- Card Container -->
-                <div class="auth-card" 
-                     [class.auth-card--eleve]="selectedProfile === 'eleve'"
-                     [class.auth-card--admin]="selectedProfile === 'admin'"
-                     [class.auth-card--viewer]="selectedProfile === 'viewer'">
-                    
+                <div class="auth-card" [class.auth-card--eleve]="selectedProfile === 'eleve'"
+                    [class.auth-card--admin]="selectedProfile === 'admin'"
+                    [class.auth-card--viewer]="selectedProfile === 'viewer'">
+
                     <!-- Header -->
                     <header class="auth-card__header">
                         <div class="auth-card__header-content">
@@ -40,12 +38,9 @@
                                 </span>
                                 Sélectionnez votre profil
                             </h2>
-                            
+
                             <div class="auth-card__title-row" *ngIf="selectedProfile">
-                                <button 
-                                    type="button"
-                                    class="auth-back-btn"
-                                    (click)="selectProfile('')"
+                                <button type="button" class="auth-back-btn" (click)="selectProfile('')"
                                     aria-label="Retour à la sélection du profil">
                                     <i class="fa fa-arrow-left" aria-hidden="true"></i>
                                     <span class="auth-back-btn__text">Retour</span>
@@ -71,18 +66,15 @@
 
                     <!-- Body -->
                     <div class="auth-card__body">
-                        
+
                         <!-- Profile Selection Cards -->
                         <div class="auth-profiles" *ngIf="!selectedProfile">
                             <p class="auth-profiles__intro">Choisissez votre profil</p>
-                            
+
                             <div class="auth-profiles__grid">
                                 <!-- Élève Card -->
-                                <button 
-                                    type="button" 
-                                    class="auth-profile-card auth-profile-card--eleve"
-                                    (click)="selectProfile('eleve')"
-                                    aria-label="Se connecter en tant qu'élève">
+                                <button type="button" class="auth-profile-card auth-profile-card--eleve"
+                                    (click)="selectProfile('eleve')" aria-label="Se connecter en tant qu'élève">
                                     <div class="auth-profile-card__icon">
                                         <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                                     </div>
@@ -95,9 +87,7 @@
                                 </button>
 
                                 <!-- Admin Card -->
-                                <button 
-                                    type="button" 
-                                    class="auth-profile-card auth-profile-card--admin"
+                                <button type="button" class="auth-profile-card auth-profile-card--admin"
                                     (click)="selectProfile('admin')"
                                     aria-label="Se connecter en tant qu'administrateur">
                                     <div class="auth-profile-card__icon">
@@ -112,11 +102,8 @@
                                 </button>
 
                                 <!-- Viewer Card -->
-                                <button 
-                                    type="button" 
-                                    class="auth-profile-card auth-profile-card--viewer"
-                                    (click)="selectProfile('viewer')"
-                                    aria-label="Se connecter en tant que référent">
+                                <button type="button" class="auth-profile-card auth-profile-card--viewer"
+                                    (click)="selectProfile('viewer')" aria-label="Se connecter en tant que référent">
                                     <div class="auth-profile-card__icon">
                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                     </div>
@@ -133,167 +120,137 @@
                         <!-- Élève Login Form -->
                         <div class="auth-form auth-form--eleve" *ngIf="selectedProfile === 'eleve'">
                             <div class="auth-form__box auth-form__box--eleve">
-                            <form class="auth-form__container">
-                                <div class="auth-form__group">
-                                    <label for="eleveIdentifiant" class="auth-form__label">
-                                        <i class="fa fa-id-card" aria-hidden="true"></i>
-                                        Identifiant
-                                    </label>
-                                    <div class="auth-form__input-wrapper">
-                                        <input 
-                                            type="text" 
-                                            class="auth-form__input" 
-                                            id="eleveIdentifiant"
-                                            placeholder="Entrez votre identifiant élève"
-                                            [(ngModel)]="eleveIdentifiant"
-                                            name="eleveIdentifiant"
-                                            autocomplete="username"
-                                            aria-describedby="eleveIdentifiantHelp">
-                                        <span class="auth-form__input-icon">
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                        </span>
+                                <form class="auth-form__container">
+                                    <div class="auth-form__group">
+                                        <label for="eleveIdentifiant" class="auth-form__label">
+                                            <i class="fa fa-id-card" aria-hidden="true"></i>
+                                            Identifiant
+                                        </label>
+                                        <div class="auth-form__input-wrapper">
+                                            <input type="text" class="auth-form__input" id="eleveIdentifiant"
+                                                placeholder="Entrez votre identifiant élève"
+                                                [(ngModel)]="eleveIdentifiant" name="eleveIdentifiant"
+                                                autocomplete="username" aria-describedby="eleveIdentifiantHelp">
+                                            <span class="auth-form__input-icon">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                        <small id="eleveIdentifiantHelp" class="auth-form__help">
+                                            Votre identifiant a été fourni par votre établissement
+                                        </small>
                                     </div>
-                                    <small id="eleveIdentifiantHelp" class="auth-form__help">
-                                        Votre identifiant a été fourni par votre établissement
-                                    </small>
-                                </div>
 
-                                <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
-                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                                    <span>{{ errorMessage }}</span>
-                                </div>
+                                    <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                        <span>{{ errorMessage }}</span>
+                                    </div>
 
-                                <button 
-                                    type="button" 
-                                    class="auth-submit-btn auth-submit-btn--eleve"
-                                    (click)="authenticate()">
-                                    <span class="auth-submit-btn__text">Se connecter</span>
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                </button>
-                            </form>
+                                    <button type="button" class="auth-submit-btn auth-submit-btn--eleve"
+                                        (click)="authenticate()">
+                                        <span class="auth-submit-btn__text">Se connecter</span>
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
                         <!-- Admin Login Form -->
                         <div class="auth-form auth-form--admin" *ngIf="selectedProfile === 'admin'">
                             <div class="auth-form__box auth-form__box--admin">
-                            <form class="auth-form__container">
-                                <div class="auth-form__group">
-                                    <label for="adminUsername" class="auth-form__label">
-                                        <i class="fa fa-user" aria-hidden="true"></i>
-                                        Nom d'utilisateur
-                                    </label>
-                                    <div class="auth-form__input-wrapper">
-                                        <input 
-                                            type="text" 
-                                            class="auth-form__input" 
-                                            id="adminUsername"
-                                            placeholder="Entrez votre nom d'utilisateur"
-                                            [(ngModel)]="adminUsername"
-                                            name="adminUsername"
-                                            autocomplete="username">
-                                        <span class="auth-form__input-icon">
+                                <form class="auth-form__container">
+                                    <div class="auth-form__group">
+                                        <label for="adminUsername" class="auth-form__label">
                                             <i class="fa fa-user" aria-hidden="true"></i>
-                                        </span>
+                                            Nom d'utilisateur
+                                        </label>
+                                        <div class="auth-form__input-wrapper">
+                                            <input type="text" class="auth-form__input" id="adminUsername"
+                                                placeholder="Entrez votre nom d'utilisateur" [(ngModel)]="adminUsername"
+                                                name="adminUsername" autocomplete="username">
+                                            <span class="auth-form__input-icon">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="auth-form__group">
-                                    <label for="adminPassword" class="auth-form__label">
-                                        <i class="fa fa-lock" aria-hidden="true"></i>
-                                        Mot de passe
-                                    </label>
-                                    <div class="auth-form__input-wrapper">
-                                        <input 
-                                            type="password" 
-                                            class="auth-form__input" 
-                                            id="adminPassword"
-                                            placeholder="Entrez votre mot de passe"
-                                            [(ngModel)]="adminPassword"
-                                            name="adminPassword"
-                                            autocomplete="current-password">
-                                        <span class="auth-form__input-icon">
+                                    <div class="auth-form__group">
+                                        <label for="adminPassword" class="auth-form__label">
                                             <i class="fa fa-lock" aria-hidden="true"></i>
-                                        </span>
+                                            Mot de passe
+                                        </label>
+                                        <div class="auth-form__input-wrapper">
+                                            <input type="password" class="auth-form__input" id="adminPassword"
+                                                placeholder="Entrez votre mot de passe" [(ngModel)]="adminPassword"
+                                                name="adminPassword" autocomplete="current-password">
+                                            <span class="auth-form__input-icon">
+                                                <i class="fa fa-lock" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
-                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                                    <span>{{ errorMessage }}</span>
-                                </div>
+                                    <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                        <span>{{ errorMessage }}</span>
+                                    </div>
 
-                                <button 
-                                    type="button" 
-                                    class="auth-submit-btn auth-submit-btn--admin"
-                                    (click)="authenticate()">
-                                    <span class="auth-submit-btn__text">Se connecter</span>
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                </button>
-                            </form>
+                                    <button type="button" class="auth-submit-btn auth-submit-btn--admin"
+                                        (click)="authenticate()">
+                                        <span class="auth-submit-btn__text">Se connecter</span>
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
                         <!-- Viewer Login Form -->
                         <div class="auth-form auth-form--viewer" *ngIf="selectedProfile === 'viewer'">
                             <div class="auth-form__box auth-form__box--viewer">
-                            <form class="auth-form__container">
-                                <div class="auth-form__group">
-                                    <label for="viewerUsername" class="auth-form__label">
-                                        <i class="fa fa-user" aria-hidden="true"></i>
-                                        Nom d'utilisateur
-                                    </label>
-                                    <div class="auth-form__input-wrapper">
-                                        <input 
-                                            type="text" 
-                                            class="auth-form__input" 
-                                            id="viewerUsername"
-                                            placeholder="Entrez votre nom d'utilisateur"
-                                            [(ngModel)]="viewerUsername"
-                                            name="viewerUsername"
-                                            autocomplete="username">
-                                        <span class="auth-form__input-icon">
+                                <form class="auth-form__container">
+                                    <div class="auth-form__group">
+                                        <label for="viewerUsername" class="auth-form__label">
                                             <i class="fa fa-user" aria-hidden="true"></i>
-                                        </span>
+                                            Nom d'utilisateur
+                                        </label>
+                                        <div class="auth-form__input-wrapper">
+                                            <input type="text" class="auth-form__input" id="viewerUsername"
+                                                placeholder="Entrez votre nom d'utilisateur"
+                                                [(ngModel)]="viewerUsername" name="viewerUsername"
+                                                autocomplete="username">
+                                            <span class="auth-form__input-icon">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                        <small class="auth-form__help">
+                                            Utilisez le nom d'utilisateur fourni par l'administration
+                                        </small>
                                     </div>
-                                    <small class="auth-form__help">
-                                        Utilisez le nom d'utilisateur fourni par l'administration
-                                    </small>
-                                </div>
 
-                                <div class="auth-form__group">
-                                    <label for="viewerPassword" class="auth-form__label">
-                                        <i class="fa fa-lock" aria-hidden="true"></i>
-                                        Mot de passe
-                                    </label>
-                                    <div class="auth-form__input-wrapper">
-                                        <input 
-                                            type="password" 
-                                            class="auth-form__input" 
-                                            id="viewerPassword"
-                                            placeholder="Entrez votre mot de passe"
-                                            [(ngModel)]="adminPassword"
-                                            name="adminPassword"
-                                            autocomplete="current-password">
-                                        <span class="auth-form__input-icon">
+                                    <div class="auth-form__group">
+                                        <label for="viewerPassword" class="auth-form__label">
                                             <i class="fa fa-lock" aria-hidden="true"></i>
-                                        </span>
+                                            Mot de passe
+                                        </label>
+                                        <div class="auth-form__input-wrapper">
+                                            <input type="password" class="auth-form__input" id="viewerPassword"
+                                                placeholder="Entrez votre mot de passe" [(ngModel)]="viewerPassword"
+                                                name="viewerPassword" autocomplete="current-password">
+                                            <span class="auth-form__input-icon">
+                                                <i class="fa fa-lock" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
-                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                                    <span>{{ errorMessage }}</span>
-                                </div>
+                                    <div *ngIf="errorMessage" class="auth-alert auth-alert--error" role="alert">
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                        <span>{{ errorMessage }}</span>
+                                    </div>
 
-                                <button 
-                                    type="button" 
-                                    class="auth-submit-btn auth-submit-btn--viewer"
-                                    (click)="authenticate()">
-                                    <span class="auth-submit-btn__text">Se connecter</span>
-                                    <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                </button>
-                            </form>
+                                    <button type="button" class="auth-submit-btn auth-submit-btn--viewer"
+                                        (click)="authenticate()">
+                                        <span class="auth-submit-btn__text">Se connecter</span>
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

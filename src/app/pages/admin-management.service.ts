@@ -2,17 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminManagementService {
-  private baseUrl = 'http://localhost:8080/api/superadmin';
+  private baseUrl = `${environment.apiUrl}/api/superadmin`;
 
   constructor(
     private http: HttpClient,
     private authService: AuthService
-  ) {}
+  ) { }
 
   // Get authorization headers with Bearer token
   private getAuthHeaders(): HttpHeaders {
@@ -41,7 +42,7 @@ export class AdminManagementService {
     return this.http.post<string>(
       `${this.baseUrl}/create-admin`,
       { username, password },
-      { 
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'  // Handle text response
       }
@@ -52,7 +53,7 @@ export class AdminManagementService {
   deleteAdmin(adminId: string): Observable<string> {
     return this.http.delete<string>(
       `${this.baseUrl}/admin/${adminId}`,
-      { 
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'  // Handle text response
       }
@@ -68,11 +69,11 @@ export class AdminManagementService {
   }
 
   // Add a new viewer (référent)
-  addViewer(  username: string, lycee: string): Observable<string> {
+  addViewer(username: string, password: string, lycee: string): Observable<string> {
     return this.http.post<string>(
       `${this.baseUrl}/viewers`,
-      {  username, etablissement: lycee },
-      { 
+      { username, password, etablissement: lycee },
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'
       }
@@ -83,18 +84,18 @@ export class AdminManagementService {
   deleteViewer(viewerId: string): Observable<string> {
     return this.http.delete<string>(
       `${this.baseUrl}/viewers/${viewerId}`,
-      { 
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'
       }
     );
   }
 
-  updateViewer(viewerId: string,  username: string, lycee: string): Observable<string> {
+  updateViewer(viewerId: string, username: string, lycee: string): Observable<string> {
     return this.http.put<string>(
       `${this.baseUrl}/viewers/${viewerId}`,
       { username, etablissement: lycee },
-      { 
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'
       }
@@ -103,14 +104,27 @@ export class AdminManagementService {
 
   // Change password for admin or superadmin
   changePassword(currentPassword: string, newPassword: string, isSuperAdmin: boolean): Observable<string> {
-    const endpoint = isSuperAdmin 
-      ? 'http://localhost:8080/api/auth/superadmin/change-password'
-      : 'http://localhost:8080/api/auth/admin/change-password';
-    
+    const endpoint = isSuperAdmin
+      ? `${environment.apiUrl}/api/auth/superadmin/change-password`
+      : `${environment.apiUrl}/api/auth/admin/change-password`;
+
     return this.http.post<string>(
       endpoint,
       { currentPassword, newPassword },
-      { 
+      {
+        headers: this.getAuthHeaders(),
+        responseType: 'text' as 'json'
+      }
+    );
+  }
+
+  changeViewerPassword(currentPassword: string, newPassword: string): Observable<string> {
+    const endpoint = `${environment.apiUrl}/api/auth/superadmin/change-viewer-password`;
+
+    return this.http.post<string>(
+      endpoint,
+      { currentPassword, newPassword },
+      {
         headers: this.getAuthHeaders(),
         responseType: 'text' as 'json'
       }

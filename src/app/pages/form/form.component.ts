@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { EleveService } from '../eleve.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'user-cmp',
@@ -80,7 +81,7 @@ export class FormComponent implements OnInit {
 
     checkEleveStatus(eleveId: string) {
         const headers = this.getAuthHeaders();
-        this.http.get<any>(`http://localhost:8080/api/eleves/${eleveId}`, { headers })
+        this.http.get<any>(`${environment.apiUrl}/api/eleves/${eleveId}`, { headers })
             .subscribe({
                 next: (eleve) => {
                     if (eleve.inscrit) {
@@ -97,7 +98,7 @@ export class FormComponent implements OnInit {
     // Charge les infos de l'élève pour afficher le message d'introduction
     private loadEleveInfo(eleveId: string) {
         const headers = this.getAuthHeaders();
-        this.http.get<any>(`http://localhost:8080/api/eleves/${eleveId}`, { headers })
+        this.http.get<any>(`${environment.apiUrl}/api/eleves/${eleveId}`, { headers })
             .subscribe({
                 next: (eleve) => {
                     if (eleve) {
@@ -125,7 +126,7 @@ export class FormComponent implements OnInit {
 
     loadVoeux(eleveId: string) {
         const headers = this.getAuthHeaders();
-        this.http.get<any[]>(`http://localhost:8080/api/eleves/${eleveId}/voeux`, { headers })
+        this.http.get<any[]>(`${environment.apiUrl}/api/eleves/${eleveId}/voeux`, { headers })
             .subscribe({
                 next: (voeux) => {
                     this.voeuxRecapitulatif = voeux.sort((a, b) => a.numeroVoeu - b.numeroVoeu);
@@ -136,7 +137,7 @@ export class FormComponent implements OnInit {
 
     loadEvents() {
         const headers = this.getAuthHeaders();
-        this.http.get<any[]>('http://localhost:8080/api/activites', { headers })
+        this.http.get<any[]>(`${environment.apiUrl}/api/activites`, { headers })
             .subscribe({
                 next: (events) => {
                     this.conferences = [];
@@ -238,7 +239,7 @@ export class FormComponent implements OnInit {
 
     inscrireEleve(eleveId: string) {
         const headers = this.getAuthHeaders();
-        this.http.put<string>(`http://localhost:8080/api/eleves/${eleveId}/inscrire`, {}, 
+        this.http.put<string>(`${environment.apiUrl}/api/eleves/${eleveId}/inscrire`, {}, 
             { headers, responseType: 'text' as 'json' }
         ).subscribe({
             next: () => {

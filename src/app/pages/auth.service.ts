@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api'; // keep host consistent with frontend to share cookies
+  private baseUrl = `${environment.apiUrl}/api`; // keep host consistent with frontend to share cookies
   private readonly eleveIdKey = 'eleveId';
   private readonly viewerUsernameKey = 'viewerUsername';
   private currentUserRole: string = '';
-  viewerData: any = null;
 
   constructor(private http: HttpClient) {
     this.currentUserRole = localStorage.getItem('userRole') || '';
@@ -60,33 +60,24 @@ export class AuthService {
     }
   }
 
-  /**
-   * Authentification viewer
-   * Version simple : on vérifie que le viewer existe via l'API backend
-   * GET /api/viewers/by-username/{username}
-   */
-  loginViewer(username: string): Observable<any> {
-    if (!username) {
-      throw new Error('Username viewer is required');
+  loginViewer(username: string, password: string): Observable<any> {
+    if (!username || !password) {
+      throw new Error('Username and password are required');
     }
 
-    return this.http.get<any>(`${this.baseUrl}/viewers/by-username/${encodeURIComponent(username)}`).pipe(
+    return this.http.post<any>(`${this.baseUrl}/auth/viewers/login`, { username, password }).pipe(
       tap((response) => {
-        this.viewerData = response;
-        console.log('Viewer data loaded:', this.viewerData);
         localStorage.setItem('userRole', 'viewer');
-        localStorage.setItem(this.viewerUsernameKey, username);
-
-        if (response?.token) {
-          this.setAuthToken(response.token);
-        }
+        localStorage.setItem('viewerUsername', username);
+        localStorage.setItem('viewerData', JSON.stringify(response));
+        localStorage.setItem('authToken', response.token);
 
         this.currentUserRole = 'viewer';
       })
     );
   }
 
-  
+
 
   // simple stockage local pour l’ID élève
   setCurrentEleveId(id: string): void {
@@ -98,11 +89,11 @@ export class AuthService {
   }
 
   setCurrentViewerUsername(username: string): void {
-    localStorage.setItem(this.viewerUsernameKey, username);
+    localStorage.setItem('viewerUsername', username);
   }
 
   getCurrentViewerUsername(): string | null {
-    return localStorage.getItem(this.viewerUsernameKey);
+    return localStorage.getItem('viewerUsername');
   }
 
   isAdmin(): boolean {

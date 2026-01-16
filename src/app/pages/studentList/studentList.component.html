@@ -24,9 +24,14 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal()">
                     <i class="fa fa-plus"></i> Ajouter un élève
                 </button>
-                <button type="button" class="btn btn-outline-success btn-sm" (click)="openImportModal()">
-                    <i class="fa fa-file-excel"></i> Importer un fichier Excel
-                </button>
+                <div>
+                    <button type="button" class="btn btn-outline-success btn-sm" (click)="openImportModal()">
+                        <i class="fa fa-file-excel"></i> Importer un fichier Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" (click)="openExportModal()">
+                        <i class="fa fa-file-excel"></i> Exporter les voeux
+                    </button>
+                </div>
             </div>
 
             <!-- Barre de recherche et filtres -->

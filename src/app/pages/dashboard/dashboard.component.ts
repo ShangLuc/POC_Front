@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth.service';
 import { Chart, registerables } from 'chart.js';
+import { environment } from '../../../environments/environment';
 
 Chart.register(...registerables);
 
@@ -18,7 +19,7 @@ interface ActivityStat {
     styleUrls: ['dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-    
+
     @ViewChild('inscriptionChart') inscriptionChartRef: ElementRef;
     @ViewChild('conferencesChart') conferencesChartRef: ElementRef;
     @ViewChild('tablesRondesChart') tablesRondesChartRef: ElementRef;
@@ -40,6 +41,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     classes: string[] = [];
     selectedLycee: string = '';
     selectedClasse: string = '';
+    
+    // Day and hour filters
+    jours: string[] = [];
+    heures: string[] = [];
+    selectedJour: string = '';
+    selectedHeure: string = '';
 
     // Statistics
     totalEleves: number = 0;
@@ -65,7 +72,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     constructor(
         private http: HttpClient,
         private authService: AuthService
-    ) {}
+    ) { }
 
     private getAuthHeaders(): HttpHeaders {
         const token = this.authService.getAuthToken();
@@ -83,7 +90,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.isViewer = this.authService.isViewer();
         this.isAdmin = this.authService.isAdmin();
-        
+
         if (this.isViewer) {
             // Load viewer's lycee first, then load data
             this.loadViewerInfo();
@@ -105,26 +112,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        this.http.get<any>(`http://localhost:8080/api/viewers/by-username/${encodeURIComponent(viewerUsername)}`, 
-            { headers: this.getAuthHeaders() })
-            .subscribe({
-                next: (viewer) => {
-                    this.viewerLycee = viewer.etablissement || '';
-                    this.selectedLycee = this.viewerLycee;
-                    this.loadClasses();
-                    this.loadStatistics();
-                },
-                error: (err) => {
-                    console.error('Error loading viewer info:', err);
-                    this.errorMessage = 'Erreur lors du chargement des informations.';
-                    this.isLoading = false;
-                }
-            });
+        this.viewerLycee = JSON.parse(localStorage.getItem('viewerData') || '')?.etablissement || '';
+        this.selectedLycee = this.viewerLycee;
+        this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
+        this.loadStatistics();
     }
 
     loadFilters() {
         // Load lycées
-        this.http.get<string[]>('http://localhost:8080/api/eleves/lycees', { headers: this.getAuthHeaders() })
+        this.http.get<string[]>(`${environment.apiUrl}/api/eleves/lycees`, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (lycees) => {
                     this.lycees = lycees;
@@ -134,16 +132,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                 }
             });
 
-        // Load classes (with optional lycee filter)
+        // Load classes, jours, heures
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
     }
 
     loadClasses() {
-        let classesUrl = 'http://localhost:8080/api/eleves/classes';
+        let classesUrl = `${environment.apiUrl}/api/eleves/classes`;
         if (this.selectedLycee) {
             classesUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
         }
-        
+
         this.http.get<string[]>(classesUrl, { headers: this.getAuthHeaders() })
             .subscribe({
                 next: (classes) => {
@@ -159,23 +159,83 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             });
     }
 
+    loadJours() {
+        let joursUrl = `${environment.apiUrl}/api/eleves/jours`;
+        if (this.selectedLycee) {
+            joursUrl += `?lycee=${encodeURIComponent(this.selectedLycee)}`;
+        }
+
+        this.http.get<string[]>(joursUrl, { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (jours) => {
+                    this.jours = jours;
+                    // Reset selected jour if it's not in the new list
+                    if (this.selectedJour && !jours.includes(this.selectedJour)) {
+                        this.selectedJour = '';
+                        this.selectedHeure = '';
+                    }
+                },
+                error: (err) => {
+                    console.error('Error loading jours:', err);
+                }
+            });
+    }
+
+    loadHeures() {
+        let heuresUrl = `${environment.apiUrl}/api/eleves/heures`;
+        const params: string[] = [];
+        
+        if (this.selectedLycee) {
+            params.push(`lycee=${encodeURIComponent(this.selectedLycee)}`);
+        }
+        if (this.selectedJour) {
+            params.push(`jour=${encodeURIComponent(this.selectedJour)}`);
+        }
+        
+        if (params.length > 0) {
+            heuresUrl += '?' + params.join('&');
+        }
+
+        this.http.get<string[]>(heuresUrl, { headers: this.getAuthHeaders() })
+            .subscribe({
+                next: (heures) => {
+                    this.heures = heures;
+                    // Reset selected heure if it's not in the new list
+                    if (this.selectedHeure && !heures.includes(this.selectedHeure)) {
+                        this.selectedHeure = '';
+                    }
+                },
+                error: (err) => {
+                    console.error('Error loading heures:', err);
+                }
+            });
+    }
+
     loadStatistics() {
         this.isLoading = true;
         this.errorMessage = '';
 
-        let url = 'http://localhost:8080/api/dashboard/statistics';
+        let url = `${environment.apiUrl}/api/dashboard/statistics`;
         const params: string[] = [];
-        
+
         if (this.selectedLycee) {
             params.push(`lycee=${encodeURIComponent(this.selectedLycee)}`);
         }
         if (this.selectedClasse) {
             params.push(`classe=${encodeURIComponent(this.selectedClasse)}`);
         }
-        
+        if (this.selectedJour) {
+            params.push(`jour=${encodeURIComponent(this.selectedJour)}`);
+        }
+        if (this.selectedHeure) {
+            params.push(`heure=${encodeURIComponent(this.selectedHeure)}`);
+        }
+
         if (params.length > 0) {
             url += '?' + params.join('&');
         }
+
+   
 
         this.http.get<any>(url, { headers: this.getAuthHeaders() })
             .subscribe({
@@ -183,17 +243,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     this.totalEleves = data.totalEleves || 0;
                     this.elevesInscrits = data.elevesInscrits || 0;
                     this.elevesNonInscrits = data.elevesNonInscrits || 0;
-                    this.tauxInscription = this.totalEleves > 0 
-                        ? Math.round((this.elevesInscrits / this.totalEleves) * 100) 
+                    this.tauxInscription = this.totalEleves > 0
+                        ? Math.round((this.elevesInscrits / this.totalEleves) * 100)
                         : 0;
 
-                    // Detailed activity statistics - Map<String, Long> converted to array
+                    // Detailed activity statistics
                     this.conferencesStats = this.mapToActivityStats(data.conferencesStats || {});
                     this.tablesRondesStats = this.mapToActivityStats(data.tablesRondesStats || {});
                     this.flashsMetiersStats = this.mapToActivityStats(data.flashsMetiersStats || {});
 
                     this.isLoading = false;
-                    
+
                     // Wait for Angular to render the DOM before initializing charts
                     setTimeout(() => {
                         this.initCharts();
@@ -217,8 +277,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     onLyceeChange() {
-        // When lycee changes, reload classes for that lycee
+        // When lycee changes, reload classes, jours, heures for that lycee
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
         this.loadStatistics();
     }
 
@@ -226,13 +288,28 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.loadStatistics();
     }
 
+    onJourChange() {
+        // Reset hour and reload heures when day changes
+        this.selectedHeure = '';
+        this.loadHeures();
+        this.loadStatistics();
+    }
+
+    onHeureChange() {
+        this.loadStatistics();
+    }
+
     resetFilters() {
         this.selectedClasse = '';
+        this.selectedJour = '';
+        this.selectedHeure = '';
         // Reset lycee only if not a viewer (viewers are locked to their lycee)
         if (!this.isViewer) {
             this.selectedLycee = '';
         }
         this.loadClasses();
+        this.loadJours();
+        this.loadHeures();
         this.loadStatistics();
     }
 
@@ -247,7 +324,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.activeTab = tab;
         // Wait for Angular to render the DOM before initializing the chart
         setTimeout(() => {
-            switch(tab) {
+            switch (tab) {
                 case 'conferences':
                     this.initConferencesChart();
                     break;

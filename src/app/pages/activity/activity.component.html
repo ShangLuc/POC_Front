@@ -5,10 +5,19 @@
             <h5 class="card-title">Conférences</h5>
         </div>
         <div class="card-body p-5">
-            <div class="mb-3">
+            <div class="mb-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal('conferences')">
                     <i class="fa fa-plus"></i> Ajouter une conférence
                 </button>
+                <button type="button" class="btn btn-outline-success btn-sm" (click)="confImportInput.click()">
+                    <i class="fa fa-file-excel"></i> Importer
+                </button>
+                <input
+                    #confImportInput
+                    type="file"
+                    class="d-none"
+                    accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    (change)="onExcelFileSelected('conferences', $event)">
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -17,7 +26,6 @@
                             <th>Numéro</th>
                             <th>Nom</th>
                             <th>Description</th>
-                            <th>Capacité Maximale</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -26,7 +34,6 @@
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
                             <td>{{ item.description }}</td>
-                            <td>{{ item.capacite }}</td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('conferences', item)">
                                     <i class="fa fa-pencil"></i>
@@ -37,7 +44,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="conferences.length === 0">
-                            <td colspan="5" class="text-center text-muted">Aucune conférence ajoutée</td>
+                            <td colspan="4" class="text-center text-muted">Aucune conférence ajoutée</td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,10 +58,19 @@
             <h5 class="card-title">Tables Rondes</h5>
         </div>
         <div class="card-body p-5">
-            <div class="mb-3">
+            <div class="mb-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal('tables_rondes')">
                     <i class="fa fa-plus"></i> Ajouter une table ronde
                 </button>
+                <button type="button" class="btn btn-outline-success btn-sm" (click)="tablesImportInput.click()">
+                    <i class="fa fa-file-excel"></i> Importer
+                </button>
+                <input
+                    #tablesImportInput
+                    type="file"
+                    class="d-none"
+                    accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    (change)="onExcelFileSelected('tables_rondes', $event)">
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -63,7 +79,6 @@
                             <th>Numéro</th>
                             <th>Nom</th>
                             <th>Description</th>
-                            <th>Capacité Maximale</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -72,7 +87,6 @@
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
                             <td>{{ item.description }}</td>
-                            <td>{{ item.capacite }}</td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('tables_rondes', item)">
                                     <i class="fa fa-pencil"></i>
@@ -83,7 +97,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="tablesRondes.length === 0">
-                            <td colspan="5" class="text-center text-muted">Aucune table ronde ajoutée</td>
+                            <td colspan="4" class="text-center text-muted">Aucune table ronde ajoutée</td>
                         </tr>
                     </tbody>
                 </table>
@@ -97,10 +111,19 @@
             <h5 class="card-title">Flashs Métiers</h5>
         </div>
         <div class="card-body p-5">
-            <div class="mb-3">
+            <div class="mb-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModal('flashs_metiers')">
                     <i class="fa fa-plus"></i> Ajouter un flash métier
                 </button>
+                <button type="button" class="btn btn-outline-success btn-sm" (click)="flashsImportInput.click()">
+                    <i class="fa fa-file-excel"></i> Importer
+                </button>
+                <input
+                    #flashsImportInput
+                    type="file"
+                    class="d-none"
+                    accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    (change)="onExcelFileSelected('flashs_metiers', $event)">
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -109,7 +132,6 @@
                             <th>Numéro</th>
                             <th>Nom</th>
                             <th>Description</th>
-                            <th>Capacité Maximale</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -118,7 +140,6 @@
                             <td>{{ item.numero }}</td>
                             <td>{{ item.nom }}</td>
                             <td>{{ item.description }}</td>
-                            <td>{{ item.capacite }}</td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-sm me-1" (click)="openEditModal('flashs_metiers', item)">
                                     <i class="fa fa-pencil"></i>
@@ -129,7 +150,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="flashsMetiers.length === 0">
-                            <td colspan="5" class="text-center text-muted">Aucun flash métier ajouté</td>
+                            <td colspan="4" class="text-center text-muted">Aucun flash métier ajouté</td>
                         </tr>
                     </tbody>
                 </table>
@@ -168,18 +189,6 @@
                     <div class="form-group mb-3">
                         <label for="descriptionInput">Description</label>
                         <input type="text" class="form-control" id="descriptionInput" [(ngModel)]="newActivity.description" placeholder="Entrez la description">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="capaciteInput">Capacité Maximale</label>
-                        <input type="number" 
-                               class="form-control" 
-                               id="capaciteInput" 
-                               [(ngModel)]="newActivity.capacite" 
-                               placeholder="Entrez la capacité"
-                               min="1"
-                               step="1"
-                               pattern="[0-9]+"
-                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                     </div>
                 </div>
                 <div class="modal-footer">
