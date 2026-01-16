@@ -768,4 +768,13 @@
     outline: 3px solid #51cbce;
     outline-offset: 2px;
 }
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
+.auth-footer {
+  margin-top: auto;
+  margin-bottom: 40px;
+}
