@@ -27,10 +27,11 @@ export class StudentListComponent implements OnInit, OnDestroy {
         // Debounce la recherche pour ne pas surcharger le CPU
         this.subscriptions.add(
             this.searchSubject.pipe(
-                debounceTime(300),
+                //debounceTime(300),
                 distinctUntilChanged()
             ).subscribe(() => {
                 this.applyFilters();
+                this.recalcDisplayed();
             })
         );
     }
@@ -326,16 +327,10 @@ export class StudentListComponent implements OnInit, OnDestroy {
     }
 
     // Supprimer un étudiant
-    deleteStudent(index: number) {
-        const student = this.students[index];
+    deleteStudent(id: string) {
+        const student = this.students.find(s => s.id === id);
         if (!student) {
             this.errorMessage = 'Élève introuvable dans la liste.';
-            return;
-        }
-
-        const id = student.id || student.identifiantNational;
-        if (!id) {
-            this.errorMessage = 'Impossible de déterminer l\'identifiant de l\'élève.';
             return;
         }
 
@@ -352,7 +347,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
         this.http.delete<string>(url, { headers, responseType: 'text' as 'json' }).subscribe({
             next: (response) => {
                 this.successMessage = response || 'Élève supprimé avec succès.';
-                this.students.splice(index, 1);
+                this.students.splice(this.students.indexOf(student), 1);
                 this.updateNumbers();
                 this.updateMetadata();
                 this.applyFilters();
@@ -510,11 +505,18 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
     // Demander confirmation avant suppression
     confirmDelete(index: number) {
-        const student = this.students[index];
+        const student = this.displayedStudents[index];
         const label = student ? `${student.nom || ''} ${student.prenom || ''}`.trim() : 'cet élève';
         const ok = window.confirm(`Voulez-vous vraiment supprimer ${label} ?`);
+
+
+        const id = student.id || student.identifiantNational;
+        if (!id) {
+            this.errorMessage = 'Impossible de déterminer l\'identifiant de l\'élève.';
+            return;
+        }
         if (ok) {
-            this.deleteStudent(index);
+            this.deleteStudent(id);
         }
     }
 
