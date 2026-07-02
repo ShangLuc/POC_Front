@@ -42,3 +42,9 @@ testem.log
 .DS_Store
 Thumbs.db
 package-lock.json
+
+.env
+.env.*
+.angular/cache/
+dist/
+coverage/
